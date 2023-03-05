@@ -1,5 +1,6 @@
 from invoke import task, run
 from .utils import ROOT_REPO_DIR, printlogo
+from logical import run_parser, run_logic
 
 
 @task()
@@ -32,7 +33,9 @@ def run(ctx):
             print(help_text)
         elif response == "parse":
             text_to_parse = input(f"{INPUT_PROMPT}: ")
+            result = run_parser(text_to_parse)
         elif response == "ask":
             ask_away = input(f"{ASK_PROMPT}: ")
+            result = run_logic(ask_away)
         else:
             print("wat")
