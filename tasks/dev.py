@@ -1,6 +1,6 @@
 from invoke import task, run
 from .utils import ROOT_REPO_DIR, printlogo
-from logical import run_parser, run_logic
+import os
 
 
 @task()
@@ -25,6 +25,12 @@ def run(ctx):
 
     """
 
+    key = os.getenv("OPENAI_API_KEY", None)
+    if key == None:
+        print("needs OPENAI_API_KEY")
+
+    from logical import run_parser, run_logic
+
     while True:
         response = input(f"{PROMPT}: ")
         if response == "exit":
@@ -34,8 +40,10 @@ def run(ctx):
         elif response == "parse":
             text_to_parse = input(f"{INPUT_PROMPT}: ")
             result = run_parser(text_to_parse)
+            print(result.content)
         elif response == "ask":
             ask_away = input(f"{ASK_PROMPT}: ")
             result = run_logic(ask_away)
+            print(result.content)
         else:
             print("wat")

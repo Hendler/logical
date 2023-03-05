@@ -7,7 +7,11 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
 )
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from pyswip import Prolog
+from logical.storage import LogicalRow, write_dataclass_to_csv, load_dataclass_from_csv
+import pendulum
 
+prolog = Prolog()
 
 # prompts for chatgpt
 
@@ -43,13 +47,20 @@ def run_parser(input_text: str):
         SystemMessage(content=SYSTEM_PARSING_PROMPT),
         HumanMessage(content=f"{ASISSITANT_PARSING_PROMPT} {input_text}"),
     ]
-    return outchat(messages)
+    result = chat(messages)
+    row = LogicalRow(
+        input_text=input_text, prolog_text=result.content, prolog_result=""
+    )
+    write_dataclass_to_csv(row)
+    return result.content
 
 
 def run_logic(input_text: str):
+    prolog.consult(PROLOG_FILE_NAME)
+
     chat = ChatOpenAI(temperature=0)
     messages = [
         SystemMessage(content=SYSTEM_ASKING_PROMPT),
         HumanMessage(content=f"{ASSISTANT_ASKING_PROMPT} {input_text}"),
     ]
-    return outchat(messages)
+    return chat(messages)
