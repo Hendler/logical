@@ -1,0 +1,13 @@
+
+langchain==0.0.102rc0
+openai==0.27.0
+pyswip==0.2.10
+
+
+
+
+# dev
+black
+ipython
+python-dotenv
+invoke
