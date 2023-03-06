@@ -2,8 +2,6 @@ import openai
 from pyswip import Prolog
 import pendulum
 
-from rdflib import Graph
-
 
 from logical.storage import (
     LogicalRow,
@@ -65,7 +63,7 @@ def parse_logic(input_text):
 
 def parse_query(input_text):
     SYSTEM_ASKING_PROMPT = """
-    You are an assistant to help us understand the output of a prolog statement.
+    You are an assistant to help us understand the output of a prolog statement. You will be provided the original prolog as well as the output.
     There may be logical errors in the database, or the query.
     """
 
@@ -91,18 +89,20 @@ def run_parser(input_text: str):
 
 def run_logic(input_text: str):
     # export all prolog to new file
-    write_all_prolog()
+    all_prolog = write_all_prolog()
     prolog = Prolog()
 
     # get query
-    query = parse_logic(input_text)
+    query = parse_logic(
+        f"user asks: {input_text}\nthe original prolog: \n {all_prolog}"
+    )
     print(f"sending query {query}")
     parse_error = None
     query_error = None
     solutions = []
     # export prolog to file
     try:
-        prolog.consult(PROLOG_FILE_NAME)
+        prolog.consult(f"/Users/jonathan.hendler/personal/logical/{PROLOG_FILE_NAME}")
     except Exception as e:
         # pyswip.prolog.PrologError: Caused by: 'consult('myprolog.pl')'. Returned: 'error(instantiation_error, context(:(system, /(atom_chars, 2)), _3208))'.
         parse_error = str(e)
@@ -116,7 +116,7 @@ def run_logic(input_text: str):
     for solution in solutions:
         print(solution)
 
-    message = f"\Result: {solutions}"
+    message = f"Result: {solutions}"
     message += f"\nErrors: {parse_error} {query_error}"
     result = parse_query(message)
 

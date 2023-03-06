@@ -56,6 +56,7 @@ def write_all_prolog() -> str:
     handle.truncate()
     handle.write(all_prolog)
     handle.close()
+    return all_prolog
 
 
 def load_dataclass_from_csv(filename=PROLOG_STORAGE_NAME) -> List[LogicalRow]:
