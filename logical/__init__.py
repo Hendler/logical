@@ -12,6 +12,7 @@ from logical.storage import (
     load_dataclass_from_csv,
     PROLOG_STORAGE_NAME,
     QUERY_FILE_NAME,
+    PROLOG_FILE_NAME,
     write_all_prolog,
 )
 
@@ -91,17 +92,32 @@ def run_parser(input_text: str):
 def run_logic(input_text: str):
     # export all prolog to new file
     write_all_prolog()
+    prolog = Prolog()
 
     # get query
     query = parse_logic(input_text)
     print(f"sending query {query}")
-
+    parse_error = None
+    query_error = None
+    solutions = []
     # export prolog to file
-    prolog.consult(PROLOG_FILE_NAME)
-    solutions = [solution for solution in prolog.query(query)]
+    try:
+        prolog.consult(PROLOG_FILE_NAME)
+    except Exception as e:
+        # pyswip.prolog.PrologError: Caused by: 'consult('myprolog.pl')'. Returned: 'error(instantiation_error, context(:(system, /(atom_chars, 2)), _3208))'.
+        parse_error = str(e)
+
+    try:
+        solutions = [solution for solution in prolog.query(query)]
+    except Exception as e:
+        # pyswip.prolog.PrologError: Caused by: 'consult('myprolog.pl')'. Returned: 'error(instantiation_error, context(:(system, /(atom_chars, 2)), _3208))'.
+        query_error = str(e)
+
     for solution in solutions:
         print(solution)
 
-    result = parse_query()
+    message = f"\Result: {solutions}"
+    message += f"\nErrors: {parse_error} {query_error}"
+    result = parse_query(message)
 
-    return chat(result)
+    return result
