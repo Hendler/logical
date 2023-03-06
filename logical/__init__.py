@@ -37,19 +37,25 @@ def _openai_wrapper(
     return result["choices"][0]["message"]["content"]
 
 
-def parse_logic(input_text):
-    SYSTEM_PARSING_PROMPT = """
+def parse_logic(input_text, query_only=False):
+    if query_only:
+        output = "a query statement only."
+    else:
+        output = "a set of logical statements only."
+
+    SYSTEM_PARSING_PROMPT = f"""
     Hello. You are a logic extractor, converting english statements to prolog.
     This requires categorizing and extracting the first class objects, and then their logical relationships.
     Do not assume the logic to be correct.  No explanation is required on your part.
     You can you will output prolog only, so prolog may find the errors.
 
-    The output may be knowledge statements or a query statement.
+    The output will be {output}.
 
     Thank you!
     """
-    ASISSITANT_PARSING_PROMPT = """
-    Please generate prolog, even if the parser fails, byt extracting factual statements or a query from the following: \n
+    ASISSITANT_PARSING_PROMPT = f"""
+    Very important thaty you only respond with  prolog coding. I won't need an explanation, but I appreciate the thought.
+    Please generate prolog, even if the parser fails, by extracting {output} from the following: \n
 
     """
 
@@ -94,9 +100,10 @@ def run_logic(input_text: str):
 
     # get query
     query = parse_logic(
-        f"user asks: {input_text}\nthe original prolog: \n {all_prolog}"
+        f"user asks: {input_text}\nthe original prolog: \n {all_prolog}",
+        query_only=True,
     )
-    print(f"sending query {query}")
+    print(f"*** sending query {query} ***")
     parse_error = None
     query_error = None
     solutions = []
@@ -106,12 +113,14 @@ def run_logic(input_text: str):
     except Exception as e:
         # pyswip.prolog.PrologError: Caused by: 'consult('myprolog.pl')'. Returned: 'error(instantiation_error, context(:(system, /(atom_chars, 2)), _3208))'.
         parse_error = str(e)
+        print(parse_error)
 
     try:
         solutions = [solution for solution in prolog.query(query)]
     except Exception as e:
         # pyswip.prolog.PrologError: Caused by: 'consult('myprolog.pl')'. Returned: 'error(instantiation_error, context(:(system, /(atom_chars, 2)), _3208))'.
         query_error = str(e)
+        print(query_error)
 
     for solution in solutions:
         print(solution)
