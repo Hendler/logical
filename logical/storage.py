@@ -4,8 +4,9 @@ from typing import List
 from dataclasses import dataclass
 
 
-PROLOG_FILE_NAME = "myprolog.csv"
+PROLOG_STORAGE_NAME = "myprolog.csv"
 QUERY_FILE_NAME = "queries.csv"
+PROLOG_FILE_NAME = "myprolog.pl"
 
 
 @dataclass
@@ -22,7 +23,21 @@ class QueryRow:
     created: pendulum.DateTime = pendulum.now().to_iso8601_string()
 
 
-def write_dataclass_to_csv(row: LogicalRow, filename=PROLOG_FILE_NAME) -> None:
+@dataclass
+class RDFQueryRow:
+    input_text: str
+    result: str
+    created: pendulum.DateTime = pendulum.now().to_iso8601_string()
+
+
+@dataclass
+class RDFLogicalRow:
+    input_text: str
+    prolog_text: str
+    created: pendulum.DateTime = pendulum.now().to_iso8601_string()
+
+
+def write_dataclass_to_csv(row: LogicalRow, filename=PROLOG_STORAGE_NAME) -> None:
     with open(filename, mode="a", newline="") as csv_file:
         writer = csv.DictWriter(
             csv_file,
@@ -33,7 +48,17 @@ def write_dataclass_to_csv(row: LogicalRow, filename=PROLOG_FILE_NAME) -> None:
         writer.writerow(row.__dict__)
 
 
-def load_dataclass_from_csv(filename=PROLOG_FILE_NAME) -> List[LogicalRow]:
+def write_all_prolog() -> str:
+    all_prolog = "\n".join([row.prolog_text for row in load_dataclass_from_csv()])
+    handle = open(PROLOG_FILE_NAME, "w")
+    # seek out the line you want to overwrite
+    handle.seek(0)
+    handle.truncate()
+    handle.write(all_prolog)
+    handle.close()
+
+
+def load_dataclass_from_csv(filename=PROLOG_STORAGE_NAME) -> List[LogicalRow]:
     with open(filename, mode="r") as csv_file:
         reader = csv.DictReader(csv_file)
         people = []

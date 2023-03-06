@@ -34,16 +34,17 @@ def run(ctx):
     while True:
         response = input(f"{PROMPT}: ")
         if response == "exit":
+            os.system("clear")
             break
         elif response == "help":
             print(help_text)
         elif response == "parse":
             text_to_parse = input(f"{INPUT_PROMPT}: ")
             result = run_parser(text_to_parse)
-            print(result.content)
+            print(result)
         elif response == "ask":
             ask_away = input(f"{ASK_PROMPT}: ")
             result = run_logic(ask_away)
-            print(result.content)
+            print(result)
         else:
             print("wat")
