@@ -2,12 +2,13 @@ import csv
 import pendulum
 from typing import List
 from dataclasses import dataclass
+import os
 
 
-PROLOG_STORAGE_NAME = "myprolog.csv"
-QUERY_FILE_NAME = "queries.csv"
-PROLOG_FILE_NAME = "myprolog.pl"
-
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+PROLOG_STORAGE_NAME = f"/{ROOT_DIR}/myprolog.csv"
+QUERY_FILE_NAME = f"/{ROOT_DIR}/queries.csv"
+PROLOG_FILE_NAME = f"/{ROOT_DIR}/myprolog.pl"
 
 @dataclass
 class LogicalRow:

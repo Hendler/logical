@@ -39,37 +39,40 @@ def _openai_wrapper(
 
 def parse_logic(input_text, query_only=False):
     if query_only:
-        output = "a query statement only."
+        output = """a query statement noted by 'user query:'.
+        You can use the original prolog starting with 'original:' to make sure the same vocabulary is generated.
+        Only ouput the new prolog query generated from the user query.
+        """
     else:
-        output = "a set of logical statements only."
+        output = """a set of logical statements, rules, and object definitions in Prolog.
+        Be sure all objects are defined before instatiating rules. And be sure there are no infinite recursions."""
 
     SYSTEM_PARSING_PROMPT = f"""
-    Hello. You are a logic extractor, converting english statements to prolog.
-    This requires categorizing and extracting the first class objects, and then their logical relationships.
-    Do not assume the logic to be correct.  No explanation is required on your part.
-    You can you will output prolog only, so prolog may find the errors.
+    Hello. You are a logic extractor, converting english statements to {output}.
+    This requires categorizing and extracting the first class objects, and their logical relationships.
+    Do not assume the logic to be correct. No explanation is required on your part.
+    You can you will output Prolog only, so prolog may find the errors. Your Prolog is correct and complete.
+    We are using swi-prolog.
 
-    The output will be {output}.
+
 
     Thank you!
     """
     ASISSITANT_PARSING_PROMPT = f"""
-    Very important thaty you only respond with  prolog coding. I won't need an explanation, but I appreciate the thought.
     Please generate prolog, even if the parser fails, by extracting {output} from the following: \n
 
     """
 
     return _openai_wrapper(
         system_message=SYSTEM_PARSING_PROMPT,
-        example_user_message=f"{ASISSITANT_PARSING_PROMPT} jane is red, jim is blue, they are the same color.",
-        example_assistant_message="jane(red), jim(blue), same_color(X,Y) :- jane(X), jim(Y).",
         user_message=f"{ASISSITANT_PARSING_PROMPT}{input_text}",
     )
 
 
 def parse_query(input_text):
     SYSTEM_ASKING_PROMPT = """
-    You are an assistant to help us understand the output of a prolog statement. You will be provided the original prolog as well as the output.
+    You are an assistant to help us understand the output of a prolog statement.
+    You will be provided the original prolog as well as the output.
     There may be logical errors in the database, or the query.
     """
 
@@ -80,8 +83,6 @@ def parse_query(input_text):
 
     return _openai_wrapper(
         system_message=SYSTEM_ASKING_PROMPT,
-        example_user_message=f"{ASSISTANT_ASKING_PROMPT} jane is red, jim is blue, they are the same color.",
-        example_assistant_message="same_color(X,Y) :- jane(X), jim(Y).",
         user_message=f"{ASSISTANT_ASKING_PROMPT}{input_text}",
     )
 
@@ -100,32 +101,31 @@ def run_logic(input_text: str):
 
     # get query
     query = parse_logic(
-        f"user asks: {input_text}\nthe original prolog: \n {all_prolog}",
+        f"user query: {input_text}, \noriginal: {all_prolog}",
         query_only=True,
     )
-    print(f"*** sending query {query} ***")
+    print(f"*** sending query {query} \n***")
     parse_error = None
     query_error = None
     solutions = []
     # export prolog to file
     try:
-        prolog.consult(f"/Users/jonathan.hendler/personal/logical/{PROLOG_FILE_NAME}")
+        prolog.consult(PROLOG_FILE_NAME)
     except Exception as e:
-        # pyswip.prolog.PrologError: Caused by: 'consult('myprolog.pl')'. Returned: 'error(instantiation_error, context(:(system, /(atom_chars, 2)), _3208))'.
         parse_error = str(e)
         print(parse_error)
 
     try:
         solutions = [solution for solution in prolog.query(query)]
     except Exception as e:
-        # pyswip.prolog.PrologError: Caused by: 'consult('myprolog.pl')'. Returned: 'error(instantiation_error, context(:(system, /(atom_chars, 2)), _3208))'.
         query_error = str(e)
         print(query_error)
 
     for solution in solutions:
         print(solution)
-
-    message = f"Result: {solutions}"
+    message = f"original: {all_prolog}"
+    message += f"query: {query}"
+    message += f"\n prolog out: {solutions}"
     message += f"\nErrors: {parse_error} {query_error}"
     result = parse_query(message)
 
