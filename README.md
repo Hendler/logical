@@ -9,7 +9,7 @@ First developed at the [OpenAI emergency hackathon on 3/5/2023](https://twitter.
 
 
 One of the promises of logic is that it can give formal grounding for truth.
-As LLMs develop more sophisicated responses, we will be more challenged to detect truth. With logic we can
+As LLMs develop more sophisicated responses, we will be more challenged to detect truth.  
 
 Via ChatGPT:
 
