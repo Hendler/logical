@@ -1,12 +1,26 @@
 # logical
 
-ChatGPT logic engine using [Prolog](https://en.wikipedia.org/wiki/Prolog)
+ChatGPT logic engine using [Prolog](https://en.wikipedia.org/wiki/Prolog).
 
 First developed at the [OpenAI emergency hackathon on 3/5/2023](https://twitter.com/nonmayorpete/status/1632456433102098434).
 
  <img alt="Bertrand Russell"   src="./russell.png" />
 
+## status 3/16/2023
 
+GPT-3.5 outputs prolog along with additional text sometimes breaking the automated push to the . It may refuse to generate prolog if there are no obvious logical statements. 
+
+## usage
+
+```
+$ inv logic.run
+$ parse 
+$ Men are mortal. Men are human. I am human. 
+$ ask
+$ Am I mortal?
+
+```
+## background
 
 One of the promises of logic is that it can give formal grounding for truth.
 As LLMs develop more sophisicated responses, we will be more challenged to detect truth.  
@@ -45,12 +59,9 @@ Via ChatGPT:
     chmod +x main.pl
 
 Then copy the `.env-example` to `.env`
+ 
 
-## usage
-
-    inv dev.run
-
-Commands:
+# Commands:
 
     - help
     - exit
@@ -58,12 +69,9 @@ Commands:
     - ask: : ask a logical question
 
 
-Example phrases to parse
-
-  1.  Men are mortal. Men are human. I am human.
-
-
 ## debug
+
+You can load the generated file in swipl to test also
 
     $ swipl
     ?- ['myprolog.pl'].
