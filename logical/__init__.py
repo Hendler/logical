@@ -1,6 +1,12 @@
 import openai
 from pyswip import Prolog
 import pendulum
+import os
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
+
+OPEN_AI_MODEL_TYPE = os.getenv("OPEN_AI_MODEL_TYPE")
 
 
 from logical.storage import (
@@ -31,7 +37,7 @@ def _openai_wrapper(
     )
 
     result = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model=OPEN_AI_MODEL_TYPE,
         messages=messages,
     )
     return result["choices"][0]["message"]["content"]
@@ -39,7 +45,7 @@ def _openai_wrapper(
 
 def parse_logic(input_text, query_only=False):
     if query_only:
-        output = """a query statement noted by 'user query:'.
+        output = """a query statement noted by 'user query:' to query over our knowledge base.
         You can use the original prolog starting with 'original:' to make sure the same vocabulary is generated.
         Only ouput the new prolog query generated from the user query.
         """
@@ -48,15 +54,13 @@ def parse_logic(input_text, query_only=False):
         Be sure all objects are defined before instatiating rules. And be sure there are no infinite recursions."""
 
     SYSTEM_PARSING_PROMPT = f"""
-    Hello. You are a logic extractor, converting english statements to {output}.
+    Hello. You are a Prolog API which converts english statements to {output}.
     This requires categorizing and extracting the first class objects, and their logical relationships.
     Do not assume the logic to be correct. No explanation is required on your part.
-    You can you will output Prolog only, so prolog may find the errors. Your Prolog is correct and complete.
-    We are using swi-prolog.
+    You will output correct and complete Prolog only, so running the output in a prolog compiler (We are using swi-prolog.) may find the errors.
+    Your Prolog is thorough so that other needed assumptions about the world are included.
+    Thank you !
 
-
-
-    Thank you!
     """
     ASISSITANT_PARSING_PROMPT = f"""
     Please generate prolog, even if the parser fails, by extracting {output} from the following: \n
@@ -71,7 +75,7 @@ def parse_logic(input_text, query_only=False):
 
 def parse_query(input_text):
     SYSTEM_ASKING_PROMPT = """
-    You are an assistant to help us understand the output of a prolog statement.
+    You are an assistant to help understand the output of a prolog statement.
     You will be provided the original prolog as well as the output.
     There may be logical errors in the database, or the query.
     """

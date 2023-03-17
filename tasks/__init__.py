@@ -2,9 +2,8 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 
-import os
 from invoke import Collection
-from . import dev
+from . import logic
 
 ns = Collection()
-ns.add_collection(dev)
+ns.add_collection(logic)

@@ -4,7 +4,7 @@ ChatGPT logic engine using [Prolog](https://en.wikipedia.org/wiki/Prolog)
 
 First developed for the [OpenAI emergency hackathon on 3/5/2023](https://twitter.com/nonmayorpete/status/1632456433102098434).
 
-[<img alt="Bertrand Russell"   src="./russell.png" />]
+ <img alt="Bertrand Russell"   src="./russell.png" />
 
 
 
