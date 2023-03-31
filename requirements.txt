@@ -2,14 +2,11 @@ openai==0.27.2
 pyswip==0.2.10
 pendulum==2.1.2
 sentence-transformers==4.27.4
-scikit-learn==1.2.2
-psycopg2==2.9.5
-logpy
-spacy
+faiss-cpu
 
 # dev
 black
 ipython
 python-dotenv
 invoke
-unitest
+
