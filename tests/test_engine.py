@@ -22,9 +22,10 @@ class TestLogicParser(unittest.TestCase):
         result = evaluate(expr, valuation)
         self.assertTrue(result)
 
-        valuation = {"A": True, "B": True, "C": False, "D": False}
+        valuation = {"A": True, "B": True, "C": True, "D": False}
         result = evaluate(expr, valuation)
         self.assertFalse(result)
+
 
 if __name__ == "__main__":
     unittest.main()

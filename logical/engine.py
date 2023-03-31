@@ -44,10 +44,12 @@ def tokenize(expr_str):
 def parse(tokens):
     def parse_expression(index):
         if tokens[index] == "(":
-            left, index = parse_expression(index + 1)
+            index += 1  # Skip the opening parenthesis
+            left, index = parse_expression(index)
             op = tokens[index]
-            right, index = parse_expression(index + 1)
-            index += 1  # Skip ")"
+            index += 1  # Move to the next token
+            right, index = parse_expression(index)
+            index += 1  # Skip the closing parenthesis
             if op == "&":
                 return And(left, right), index
             elif op == "|":
@@ -62,6 +64,8 @@ def parse(tokens):
 
     expr, _ = parse_expression(0)
     return expr
+
+
 
 def evaluate(expr, valuation):
     if isinstance(expr, Variable):
