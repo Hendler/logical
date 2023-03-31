@@ -43,11 +43,13 @@ def tokenize(expr_str):
     expr_str = expr_str.replace("(", " ( ").replace(")", " ) ")
     return expr_str.split()
 
+
+def peek(iterable):
+    a, b = tee(iterable)
+    head = next(b, None)
+    return head
+
 def parse(tokens):
-    def peek(iterable):
-        a, b = tee(iterable)
-        head = next(b, None)
-        return head
 
     tokens = iter(tokens)  # Convert the list to an iterator
 
