@@ -46,16 +46,18 @@ def parse(tokens):
         if tokens[index] == "(":
             index += 1  # Skip the opening parenthesis
             left, index = parse_expression(index)
-            op = tokens[index]
-            index += 1  # Move to the next token
-            right, index = parse_expression(index)
+            while tokens[index] != ")":
+                op = tokens[index]
+                index += 1  # Move to the next token
+                right, index = parse_expression(index)
+                if op == "&":
+                    left = And(left, right)
+                elif op == "|":
+                    left = Or(left, right)
+                elif op == "=>":
+                    left = Implies(left, right)
             index += 1  # Skip the closing parenthesis
-            if op == "&":
-                return And(left, right), index
-            elif op == "|":
-                return Or(left, right), index
-            elif op == "=>":
-                return Implies(left, right), index
+            return left, index
         elif tokens[index] == "~":
             expr, index = parse_expression(index + 1)
             return Not(expr), index
@@ -64,6 +66,7 @@ def parse(tokens):
 
     expr, _ = parse_expression(0)
     return expr
+
 
 
 
