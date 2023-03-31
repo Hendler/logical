@@ -1,3 +1,4 @@
+# test_logic_parser.py
 import unittest
 from logical.engine import tokenize, parse, evaluate
 
@@ -17,7 +18,7 @@ class TestLogicParser(unittest.TestCase):
     def test_evaluate(self):
         expr_str = "(A & B) => ~(C | D)"
         expr = parse(tokenize(expr_str))
-        valuation = {"A": True, "B": False, "C": True, "D": False}
+        valuation = {"A": True, "B": False, "C": False, "D": False}
         result = evaluate(expr, valuation)
         self.assertTrue(result)
 

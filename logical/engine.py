@@ -36,65 +36,41 @@ class Implies:
     def __repr__(self):
         return f"({self.left} => {self.right})"
 
+
 def tokenize(expr_str):
-    tokens = []
-    current_token = ""
-    for c in expr_str:
-        if c in " \t\n":
-            continue
-        if c in "~&|()":
-            if current_token:
-                tokens.append(current_token)
-                current_token = ""
-            tokens.append(c)
-        elif c == "=":
-            current_token += c
-        else:
-            if current_token == "=":
-                current_token += c
-                tokens.append(current_token)
-                current_token = ""
-            else:
-                current_token += c
-    if current_token:
-        tokens.append(current_token)
-    return tokens
+    expr_str = expr_str.replace("(", " ( ").replace(")", " ) ")
+    return expr_str.split()
 
 def parse(tokens):
-    stack = []
-    for token in tokens:
-        if token == ")":
-            right = stack.pop()
-            op = stack.pop()
-            left = stack.pop()
-            stack.pop()  # Discard "("
+    def parse_expression(index):
+        if tokens[index] == "(":
+            left, index = parse_expression(index + 1)
+            op = tokens[index]
+            right, index = parse_expression(index + 1)
+            index += 1  # Skip ")"
             if op == "&":
-                stack.append(And(left, right))
+                return And(left, right), index
             elif op == "|":
-                stack.append(Or(left, right))
+                return Or(left, right), index
             elif op == "=>":
-                stack.append(Implies(left, right))
-        elif token in "~&|=>":
-            stack.append(token)
-        elif token == "(":
-            stack.append(token)
+                return Implies(left, right), index
+        elif tokens[index] == "~":
+            expr, index = parse_expression(index + 1)
+            return Not(expr), index
         else:
-            variable = Variable(token)
-            if stack and stack[-1] == "~":
-                stack.pop()
-                stack.append(Not(variable))
-            else:
-                stack.append(variable)
-    return stack[0]
+            return Variable(tokens[index]), index + 1
+
+    expr, _ = parse_expression(0)
+    return expr
 
 def evaluate(expr, valuation):
     if isinstance(expr, Variable):
         return valuation[expr.name]
-    if isinstance(expr, Not):
-        return not evaluate(expr.expr, valuation)
-    if isinstance(expr, And):
+    elif isinstance(expr, And):
         return evaluate(expr.left, valuation) and evaluate(expr.right, valuation)
-    if isinstance(expr, Or):
+    elif isinstance(expr, Or):
         return evaluate(expr.left, valuation) or evaluate(expr.right, valuation)
-    if isinstance(expr, Implies):
+    elif isinstance(expr, Implies):
         return not evaluate(expr.left, valuation) or evaluate(expr.right, valuation)
+    elif isinstance(expr, Not):
+        return not evaluate(expr.expr, valuation)
