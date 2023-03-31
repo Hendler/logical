@@ -42,7 +42,10 @@ Via ChatGPT:
     pyenv install 3.11.2
     pyenv virtualenv 3.11.2 logical
     pip install --upgrade pip
-    chmod +x main.pl
+    pip install -r requirements.txt
+    python -m spacy download en_core_web_sm
+
+
 
 Then copy the `.env-example` to `.env`
 

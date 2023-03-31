@@ -48,3 +48,15 @@ def run(ctx):
             print(result)
         else:
             print("wat")
+
+@task()
+def test(ctx):
+    run("python -m unittest tests")
+
+
+@task()
+def installvectordb(ctx):
+    run("git clone https://github.com/asg017/sqlite-vector.git")
+    run("git clone https://github.com/asg017/sqlite-vss.git")
+    run("cd sqlite-vss && ./configure && ./make")
+
