@@ -1,3 +1,5 @@
+from itertools import tee, islice
+
 class Variable:
     def __init__(self, name):
         self.name = name
@@ -42,30 +44,46 @@ def tokenize(expr_str):
     return expr_str.split()
 
 def parse(tokens):
-    def parse_expression(index):
-        if tokens[index] == "(":
-            index += 1  # Skip the opening parenthesis
-            left, index = parse_expression(index)
-            while tokens[index] != ")":
-                op = tokens[index]
-                index += 1  # Move to the next token
-                right, index = parse_expression(index)
-                if op == "&":
-                    left = And(left, right)
-                elif op == "|":
-                    left = Or(left, right)
-                elif op == "=>":
-                    left = Implies(left, right)
-            index += 1  # Skip the closing parenthesis
-            return left, index
-        elif tokens[index] == "~":
-            expr, index = parse_expression(index + 1)
-            return Not(expr), index
-        else:
-            return Variable(tokens[index]), index + 1
+    def peek(iterable):
+        a, b = tee(iterable)
+        head = next(b, None)
+        return head
 
-    expr, _ = parse_expression(0)
-    return expr
+    tokens = iter(tokens)  # Convert the list to an iterator
+
+    def primary():
+        token = next(tokens)
+        if token == "(":
+            expr = implication()
+            next(tokens)  # Consume closing parenthesis ")"
+            return expr
+        elif token == "~":
+            return Not(primary())
+        else:
+            return Variable(token)
+
+    def conjunction():
+        expr = primary()
+        while peek(tokens) == "&":
+            next(tokens)  # Consume "&" token
+            expr = And(expr, primary())
+        return expr
+
+    def disjunction():
+        expr = conjunction()
+        while peek(tokens) == "|":
+            next(tokens)  # Consume "|" token
+            expr = Or(expr, conjunction())
+        return expr
+
+    def implication():
+        expr = disjunction()
+        while peek(tokens) == "=>":
+            next(tokens)  # Consume "=>" token
+            expr = Implies(expr, disjunction())
+        return expr
+
+
 
 
 
