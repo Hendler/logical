@@ -10,10 +10,23 @@ class TestLogicParser(unittest.TestCase):
         self.assertEqual(tokens, expected_tokens)
 
     def test_parse(self):
-        tokens = ["(", "A", "&", "B", ")", "=>", "~", "(", "C", "|", "D", ")"]
-        expr = parse(tokens)
-        expected_repr = "(A & B) => ~(C | D)"
-        self.assertEqual(repr(expr), expected_repr)
+        test_cases = [
+            ("A", "A"),
+            ("~A", "~A"),
+            ("(A & B)", "(A & B)"),
+            ("(A | B)", "(A | B)"),
+            ("(A => B)", "(A => B)"),
+            ("(A & (B | C))", "(A & (B | C))"),
+            ("(A => (B | C))", "(A => (B | C))"),
+            ("(A & B) => ~(C | D)", "(A & B) => ~(C | D)"),
+            # ("((A => B) & (C => D)) => (A => D)", "((A => B) & (C => D)) => (A => D)"),
+        ]
+
+        for input_str, expected_repr in test_cases:
+            tokens = tokenize(input_str)
+            expr = parse(tokens)
+            self.assertEqual(repr(expr), expected_repr)
+
 
     def test_evaluate(self):
         expr_str = "(A & B) => ~(C | D)"
