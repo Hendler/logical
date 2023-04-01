@@ -43,10 +43,11 @@ class LogicalExpression(ast.NodeTransformer):
         self.expr = ast.parse(expr_str, mode='eval').body
 
 OP_MAP = {
-    ast.And: "&",
-    ast.Or: "|",
+    ast.BitAnd: "&",
+    ast.BitOr: "|",
     ast.BitXor: "=>",
 }
+
 
 class CustomTransformer(ast.NodeTransformer):
     def visit_BoolOp(self, node):
@@ -70,14 +71,23 @@ class CustomTransformer(ast.NodeTransformer):
     def visit_Expr(self, node):
         return self.visit(node.value)
 
+
+    def visit_BitAnd(self, node):
+        return "&"
+
+    def visit_BitOr(self, node):
+        return "|"
+
+    def visit_BitXor(self, node):
+        return "=>"
+
     def visit_BinOp(self, node):
         left = self.visit(node.left)
         right = self.visit(node.right)
-        op = type(node.op)
+        op = self.visit(node.op)
 
-        if op in OP_MAP:
-            return f"({left} {OP_MAP[op]} {right})"
-        return None
+        return f"({left} {op} {right})"
+
 
 
 
