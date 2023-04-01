@@ -22,7 +22,8 @@ class TestLogicParser(unittest.TestCase):
             self.assertEqual(repr_expr(expr), expected_repr)
 
     def test_evaluate(self):
-        expr_str = "(A and B) => not (C or D)"
+        expr_str = "(A & B) => ~(C | D)"
+        expr_str = expr_str.replace("=>", "@@IMPLIES@@")  # Replace => with a custom marker
         expr = parse(expr_str)
 
         def evaluate_expr(expr, valuation):
@@ -34,6 +35,8 @@ class TestLogicParser(unittest.TestCase):
                     return evaluate_expr(left, valuation) and evaluate_expr(right, valuation)
                 elif op == "|":
                     return evaluate_expr(left, valuation) or evaluate_expr(right, valuation)
+                elif op == "~":
+                    return not evaluate_expr(left, valuation)
                 elif op == "=>":
                     return not evaluate_expr(left, valuation) or evaluate_expr(right, valuation)
 
@@ -44,6 +47,7 @@ class TestLogicParser(unittest.TestCase):
         valuation = {"A": True, "B": True, "C": True, "D": False}
         result = evaluate_expr(expr, valuation)
         self.assertFalse(result)
+
 
 
 if __name__ == "__main__":

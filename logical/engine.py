@@ -14,8 +14,10 @@ class LogicalExpression(ast.NodeTransformer):
 OP_MAP = {
     ast.BitAnd: "&",
     ast.BitOr: "|",
-    ast.BitXor: "=>",
+    # ast.BitXor: "=>",
+    "@@IMPLIES@@": "=>",
 }
+
 
 
 class CustomTransformer(ast.NodeTransformer):
@@ -53,10 +55,13 @@ class CustomTransformer(ast.NodeTransformer):
     def visit_BinOp(self, node):
         left = self.visit(node.left)
         right = self.visit(node.right)
-        op = self.visit(node.op)
+        op = type(node.op)
 
-        return f"({left} {op} {right})"
-
+        if op in OP_MAP:
+            return f"({left} {OP_MAP[op]} {right})"
+        elif isinstance(node.op, ast.BitXor):
+            return f"(not {left} {OP_MAP['@@IMPLIES@@']} {right})"  # Handle the custom marker for =>
+        return None
 
 
 
