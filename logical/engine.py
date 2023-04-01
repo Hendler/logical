@@ -1,103 +1,77 @@
-from itertools import tee, islice
-
-class Variable:
-    def __init__(self, name):
-        self.name = name
-
-    def __repr__(self):
-        return self.name
-
-class Not:
-    def __init__(self, expr):
-        self.expr = expr
-
-    def __repr__(self):
-        return f"~{self.expr}"
-
-class And:
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def __repr__(self):
-        return f"({self.left} & {self.right})"
-
-class Or:
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def __repr__(self):
-        return f"({self.left} | {self.right})"
-
-class Implies:
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def __repr__(self):
-        return f"({self.left} => {self.right})"
+import ast
+import re
+from collections import deque
 
 
-def tokenize(expr_str):
-    expr_str = expr_str.replace("(", " ( ").replace(")", " ) ")
-    return expr_str.split()
+# class LogicalExpression:
 
+#     def __init__(self, expr_str):
+#         self.expr_str = expr_str
+#         self.expr = self.parse(expr_str)
 
-def peek(iterable):
-    a, b = tee(iterable)
-    head = next(b, None)
-    return head
+#     def parse(self, expr_str):
+#         return ast.parse(expr_str, mode='eval').body
 
-def parse(tokens):
+#     def __repr__(self):
+#         return self.expr_str
 
-    tokens = iter(tokens)  # Convert the list to an iterator
+# class And(ast.BinOp):
+#     def __repr__(self):
+#         return f"({repr(self.left)} & {repr(self.right)})"
 
-    def primary():
-        token = next(tokens)
-        if token == "(":
-            expr = implication()
-            next(tokens)  # Consume closing parenthesis ")"
-            return expr
-        elif token == "~":
-            return Not(primary())
-        else:
-            return Variable(token)
+# class Or(ast.BinOp):
+#     def __repr__(self):
+#         return f"({repr(self.left)} | {repr(self.right)})"
 
-    def conjunction():
-        expr = primary()
-        while peek(tokens) == "&":
-            next(tokens)  # Consume "&" token
-            expr = And(expr, primary())
-        return expr
+# class Implies(ast.BinOp):
+#     def __repr__(self):
+#         return f"({repr(self.left)} => {repr(self.right)})"
 
-    def disjunction():
-        expr = conjunction()
-        while peek(tokens) == "|":
-            next(tokens)  # Consume "|" token
-            expr = Or(expr, conjunction())
-        return expr
+# class Not(ast.UnaryOp):
+#     def __repr__(self):
+#         return f"~{repr(self.operand)}"
 
-    def implication():
-        expr = disjunction()
-        while peek(tokens) == "=>":
-            next(tokens)  # Consume "=>" token
-            expr = Implies(expr, disjunction())
-        return expr
+# class Symbol(ast.Name):
+#     def __repr__(self):
+#         return self.id
+
+def repr_expr(expr):
+    return repr(expr)
+
+class LogicalExpression(ast.NodeTransformer):
+    def __init__(self, expr_str):
+        self.expr = ast.parse(expr_str, mode='eval').body
+
+class CustomTransformer(ast.NodeTransformer):
+    def visit_BoolOp(self, node):
+        self.generic_visit(node)
+        return f"({repr(node.values[0])} {repr(node.op)} {repr(node.values[1])})"
+
+    def visit_And(self, node):
+        return "&"
+
+    def visit_Or(self, node):
+        return "|"
+
+    def visit_Not(self, node):
+        return "~"
+
+    def visit_Name(self, node):
+        return node.id
+
+    def visit_UnaryOp(self, node):
+        self.generic_visit(node)
+        return f"({repr(node.op)} {repr(node.operand)})"
+
+    def visit_Eq(self, node):
+        return "=="
+
+    def visit_NotEq(self, node):
+        return "!="
+
+def parse(expr_str):
+    expr = LogicalExpression(expr_str)
+    return CustomTransformer().visit(expr.expr)
 
 
 
-
-
-
-def evaluate(expr, valuation):
-    if isinstance(expr, Variable):
-        return valuation[expr.name]
-    elif isinstance(expr, And):
-        return evaluate(expr.left, valuation) and evaluate(expr.right, valuation)
-    elif isinstance(expr, Or):
-        return evaluate(expr.left, valuation) or evaluate(expr.right, valuation)
-    elif isinstance(expr, Implies):
-        return not evaluate(expr.left, valuation) or evaluate(expr.right, valuation)
-    elif isinstance(expr, Not):
-        return not evaluate(expr.expr, valuation)
