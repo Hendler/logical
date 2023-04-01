@@ -23,7 +23,7 @@ class TestLogicParser(unittest.TestCase):
 
     def test_evaluate(self):
         expr_str = "(A & B) => ~(C | D)"
-        expr_str = expr_str.replace("=>", "@@IMPLIES@@")  # Replace => with a custom marker
+        # expr_str = expr_str.replace("=>", "@@IMPLIES@@")  # Replace => with a custom marker
         expr = parse(expr_str)
 
         def evaluate_expr(expr, valuation):

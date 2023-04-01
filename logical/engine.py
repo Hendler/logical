@@ -14,7 +14,7 @@ class LogicalExpression(ast.NodeTransformer):
 OP_MAP = {
     ast.BitAnd: "&",
     ast.BitOr: "|",
-    # ast.BitXor: "=>",
+    ast.BitXor: "=>",
     "@@IMPLIES@@": "=>",
 }
 
