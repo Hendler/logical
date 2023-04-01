@@ -3,37 +3,6 @@ import re
 from collections import deque
 
 
-# class LogicalExpression:
-
-#     def __init__(self, expr_str):
-#         self.expr_str = expr_str
-#         self.expr = self.parse(expr_str)
-
-#     def parse(self, expr_str):
-#         return ast.parse(expr_str, mode='eval').body
-
-#     def __repr__(self):
-#         return self.expr_str
-
-# class And(ast.BinOp):
-#     def __repr__(self):
-#         return f"({repr(self.left)} & {repr(self.right)})"
-
-# class Or(ast.BinOp):
-#     def __repr__(self):
-#         return f"({repr(self.left)} | {repr(self.right)})"
-
-# class Implies(ast.BinOp):
-#     def __repr__(self):
-#         return f"({repr(self.left)} => {repr(self.right)})"
-
-# class Not(ast.UnaryOp):
-#     def __repr__(self):
-#         return f"~{repr(self.operand)}"
-
-# class Symbol(ast.Name):
-#     def __repr__(self):
-#         return self.id
 
 def repr_expr(expr):
     return expr
