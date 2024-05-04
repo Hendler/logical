@@ -1,7 +1,6 @@
-openai==0.27.0
+openai==1.25.1
 pyswip==0.2.10
 pendulum==2.1.2
-
 
 # dev
 black
