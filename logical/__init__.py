@@ -37,7 +37,7 @@ def _openai_wrapper(
     )
 
     result = openai.ChatCompletion.create(
-        model=OPEN_AI_MODEL_TYPE,
+        model="gpt-4",
         messages=messages,
     )
     return result["choices"][0]["message"]["content"]
