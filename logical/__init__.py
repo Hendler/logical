@@ -3,6 +3,7 @@ from pyswip import Prolog
 import pendulum
 import os
 from dotenv import load_dotenv, find_dotenv
+from openai import OpenAI
 
 load_dotenv(find_dotenv())
 
@@ -36,11 +37,17 @@ def _openai_wrapper(
         {"role": "user", "content": user_message},
     )
 
-    result = openai.ChatCompletion.create(
+    # Instantiate a new OpenAI client
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+    # Use the new method for creating chat completions
+    result = client.chat.completions.create(
         model="gpt-4",
         messages=messages,
     )
-    return result["choices"][0]["message"]["content"]
+
+    # Update response handling to use the new Pydantic model accessors
+    return result.choices[0].message.content
 
 
 def parse_logic(input_text, query_only=False):
