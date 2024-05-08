@@ -43,6 +43,7 @@ def generate_statements(num_statements):
     return statements
 
 # Translate English statements into Prolog
+# Translate English statements into Prolog
 def translate_to_prolog(statement, truth_value):
     prolog_statement = ""
     words = statement.split()
@@ -62,50 +63,49 @@ def translate_to_prolog(statement, truth_value):
             prolog_predicate = predicates[word]
             last_predicate_added = True
             if current_quantifier == "All":
-                prolog_statement += f"forall(X, (is_a(X, {current_entity}) -> {prolog_predicate}(X)))"
+                prolog_statement += f"forall(X, (is_a(X, {current_entity}) -> {prolog_predicate}(X))). "
             elif current_quantifier == "No":
-                prolog_statement += f"forall(X, (is_a(X, {current_entity}) -> ~{prolog_predicate}(X)))"
+                prolog_statement += f"forall(X, (is_a(X, {current_entity}) -> ~{prolog_predicate}(X))). "
             elif current_quantifier == "Some":
-                prolog_statement += f"exists(X, (is_a(X, {current_entity}) & {prolog_predicate}(X)))"
+                prolog_statement += f"exists(X, (is_a(X, {current_entity}) & {prolog_predicate}(X))). "
         elif word in connectives:
             if last_predicate_added:
                 if word == "implies":
                     implies_opened = not implies_opened
                     if implies_opened:
-                        # Start a new implication
-                        prolog_statement += " :- ("
+                        prolog_statement += " :- "
                         parentheses_stack.append("(")
                     else:
-                        # Close the current implication
-                        prolog_statement = prolog_statement.strip(". ")  # Remove the period from the previous predicate
-                        prolog_statement += ") -> "
+                        prolog_statement = prolog_statement.rstrip(" ")  # Remove the space from the previous predicate
+                        prolog_statement += "). "
                         parentheses_stack.pop()
                 elif word == "and":
                     prolog_statement += ", "
                 elif word == "or":
-                    # Open a new set of parentheses for the 'or' part of the statement
+                    # Open parentheses before 'or' if not already open
                     if not parentheses_stack or parentheses_stack[-1] != "(":
                         prolog_statement += "("
                         parentheses_stack.append("(")
                     prolog_statement += "; "
+                    # Close parentheses after 'or' if the next word is not a predicate
+                    if i < len(words) - 1 and words[i + 1] not in predicates:
+                        prolog_statement += "). "
+                        parentheses_stack.pop()
                 last_predicate_added = False
             else:
+                # Skip connective if no predicate has been added
                 continue
 
         # Close any open parentheses at the end of the statement
         while parentheses_stack:
-            prolog_statement += ")"
+            prolog_statement += "). "
             parentheses_stack.pop()
-
-    # Add a period at the end of the complete Prolog statement for proper syntax
-    if not implies_opened and not parentheses_stack:
-        prolog_statement += "."
 
     # Error handling for empty Prolog representations
     if not prolog_statement.strip():
-        raise ValueError(f"Could not translate the statement: {statement}")
+        return f"Translation Error: Could not translate the statement: {statement}"
 
-    return prolog_statement
+    return prolog_statement.strip()
 
 # Example usage
 if __name__ == "__main__":
@@ -113,4 +113,4 @@ if __name__ == "__main__":
     new_statements = generate_statements(num_statements_to_generate)
     for statement, truth_value in new_statements:
         prolog_statement = translate_to_prolog(statement, truth_value)
-        print(f"{statement} is {truth_value}, Prolog: {prolog_statement}")
+        print(f"{statement} is {truth_value}, Prolog: {prolog_statement if prolog_statement else 'Translation Error'}")
