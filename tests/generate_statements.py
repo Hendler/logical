@@ -98,10 +98,10 @@ def translate_to_prolog(statement, truth_value):
                             implies_nesting += 1
                         elif words[i] == "and":
                             # Add parentheses for compound predicates connected by "and" if not already added
-                            prolog_statement += " & " if implies_nesting > 0 else ", "
+                            prolog_statement += ", " if implies_nesting == 0 else " & "
                         elif words[i] == "or":
                             # Add parentheses for compound predicates connected by "or" if not already added
-                            prolog_statement += " | " if implies_nesting > 0 else "; "
+                            prolog_statement += "; " if implies_nesting == 0 else " | "
                         last_predicate_added = False
                         # Close parentheses for the entire implication if the next word is not a connective
                         if i < len(words) - 1 and words[i+1] not in connectives:
