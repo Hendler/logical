@@ -44,7 +44,6 @@ def generate_statements(num_statements):
     return statements
 
 # Translate English statements into Prolog
-# Translate English statements into Prolog
 def translate_to_prolog(statement, truth_value):
     prolog_statement = ""
     words = statement.split()
@@ -57,8 +56,11 @@ def translate_to_prolog(statement, truth_value):
 
     while i < len(words):
         if words[i] in quantifiers:
+            if last_predicate_added:
+                # Close the previous predicate scope
+                prolog_statement += ")" if implies_nesting > 0 else ""
+                last_predicate_added = False
             current_quantifier = words[i]
-            last_predicate_added = False
             i += 1
         elif words[i] in entities:
             current_entity = words[i]
@@ -69,44 +71,26 @@ def translate_to_prolog(statement, truth_value):
                 potential_predicate = ' '.join(words[i:j+1])
                 if potential_predicate in predicates:
                     prolog_predicate = predicates[potential_predicate]
-                    last_predicate_added = True
-                    if current_quantifier == "All":
-                        if truth_value:
-                            prolog_statement += f"forall(X, (is_a(X, {current_entity}) -> {prolog_predicate}(X)))"
-                        else:
-                            prolog_statement += f"forall(X, (is_a(X, {current_entity}) & ~{prolog_predicate}(X)))"
-                    elif current_quantifier == "No":
-                        if truth_value:
-                            prolog_statement += f"forall(X, (is_a(X, {current_entity}) & ~{prolog_predicate}(X)))"
-                        else:
-                            prolog_statement += f"forall(X, (is_a(X, {current_entity}) -> {prolog_predicate}(X)))"
-                    elif current_quantifier == "Some":
-                        if truth_value:
-                            prolog_statement += f"exists(X, (is_a(X, {current_entity}) & {prolog_predicate}(X)))"
-                        else:
-                            prolog_statement += f"exists(X, (is_a(X, {current_entity}) & ~{prolog_predicate}(X)))"
-                    i = j + 1
+                    # Check if the next word is within bounds and is a connective
+                    if j+1 < len(words) and words[j+1] in connectives:
+                        # Continue processing additional predicates after "and" or "or"
+                        prolog_statement += " & " if words[j+1] == "and" else " | "
+                        i = j + 2  # Skip the connective for the next iteration
+                    else:
+                        last_predicate_added = True
+                        # Construct the Prolog statement based on the quantifier and truth value
+                        prolog_statement += construct_prolog_statement(current_quantifier, current_entity, prolog_predicate, truth_value)
+                        i = j + 1
                     break
             else:
                 # If no predicates are found, check for connectives
                 if words[i] in connectives:
                     if last_predicate_added:
-                        if words[i] == "implies":
-                            # Add parentheses for the entire implication
-                            prolog_statement += "(" if implies_nesting == 0 else ""
-                            prolog_statement += " :- "
-                            implies_nesting += 1
-                        elif words[i] == "and":
-                            # Add parentheses for compound predicates connected by "and" if not already added
-                            prolog_statement += ", " if implies_nesting == 0 else " & "
-                        elif words[i] == "or":
-                            # Add parentheses for compound predicates connected by "or" if not already added
-                            prolog_statement += "; " if implies_nesting == 0 else " | "
+                        # Handle the connectives appropriately
+                        connective_str, new_implies_nesting = handle_connectives(words[i], implies_nesting)
+                        prolog_statement += connective_str
+                        implies_nesting = new_implies_nesting
                         last_predicate_added = False
-                        # Close parentheses for the entire implication if the next word is not a connective
-                        if i < len(words) - 1 and words[i+1] not in connectives:
-                            prolog_statement += ")" if implies_nesting > 0 else ""
-                            implies_nesting = max(0, implies_nesting - 1)
                     i += 1
                 else:
                     error_detail = f"Failed to translate part of the statement: {' '.join(words[i:])}"
@@ -122,6 +106,46 @@ def translate_to_prolog(statement, truth_value):
         prolog_statement = prolog_statement.strip() + "."
 
     return prolog_statement
+
+def construct_prolog_statement(quantifier, entity, predicate, truth_value):
+    """
+    Construct a Prolog statement based on the quantifier, entity, predicate, and truth value.
+    """
+    if quantifier == "All":
+        if truth_value:
+            return f"forall(X, (is_a(X, {entity}) -> {predicate}(X)))"
+        else:
+            return f"forall(X, (is_a(X, {entity}) & ~{predicate}(X)))"
+    elif quantifier == "No":
+        if truth_value:
+            return f"forall(X, (is_a(X, {entity}) & ~{predicate}(X)))"
+        else:
+            return f"forall(X, (is_a(X, {entity}) -> {predicate}(X)))"
+    elif quantifier == "Some":
+        if truth_value:
+            return f"exists(X, (is_a(X, {entity}) & {predicate}(X)))"
+        else:
+            return f"exists(X, (is_a(X, {entity}) & ~{predicate}(X)))"
+    else:
+        raise ValueError(f"Unknown quantifier: {quantifier}")
+
+def handle_connectives(connective, implies_nesting):
+    """
+    Handle the translation of logical connectives into Prolog syntax.
+    """
+    if connective == "implies":
+        # Increment implies_nesting for a new implication
+        implies_nesting += 1
+        # Add parentheses for the entire implication if it's the first level
+        return (" :- ", implies_nesting)
+    elif connective == "and":
+        # Use ',' for 'and' connective, no change in implies_nesting
+        return (", ", implies_nesting)
+    elif connective == "or":
+        # Use ';' for 'or' connective, no change in implies_nesting
+        return ("; ", implies_nesting)
+    else:
+        raise ValueError(f"Unknown connective: {connective}")
 
 # Test cases for the translate_to_prolog function
 def test_translate_to_prolog():
