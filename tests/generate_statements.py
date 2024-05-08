@@ -80,6 +80,11 @@ def translate_to_prolog(statement, truth_value):
                         last_predicate_added = True
                         # Construct the Prolog statement based on the quantifier and truth value
                         prolog_statement += construct_prolog_statement(current_quantifier, current_entity, prolog_predicate, truth_value)
+                        # Close the implication if it's the end of the statement
+                        if implies_nesting > 0 and (j+1 >= len(words) or words[j+1] not in connectives):
+                            end_connective_str, new_implies_nesting = handle_connectives("end_implies", implies_nesting)
+                            prolog_statement += end_connective_str
+                            implies_nesting = new_implies_nesting
                         i = j + 1
                     break
                 elif j+1 < len(words) and words[j+1] in quantifiers:
@@ -137,18 +142,23 @@ def construct_prolog_statement(quantifier, entity, predicate, truth_value):
 def handle_connectives(connective, implies_nesting):
     """
     Handle the translation of logical connectives into Prolog syntax.
+    Adjust the implies_nesting counter and manage parentheses for nested implications.
     """
     if connective == "implies":
         # Increment implies_nesting for a new implication
         implies_nesting += 1
         # Add parentheses for the entire implication if it's the first level
-        return (" :- ", implies_nesting)
+        return (" :- (", implies_nesting)
     elif connective == "and":
         # Use ',' for 'and' connective, no change in implies_nesting
         return (", ", implies_nesting)
     elif connective == "or":
         # Use ';' for 'or' connective, no change in implies_nesting
         return ("; ", implies_nesting)
+    elif connective == "end_implies":
+        # Decrement implies_nesting when closing an implication scope
+        implies_nesting -= 1
+        return (")", implies_nesting)
     else:
         raise ValueError(f"Unknown connective: {connective}")
 
