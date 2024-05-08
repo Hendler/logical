@@ -1,5 +1,6 @@
 import pytest
-from folpy import models, utils
+from folpy.syntax.formulas import ForAllFormula, ExistsFormula, TrueFormula, FalseFormula, forall, exists, true, false
+from folpy import utils
 
 # Sample logical statements
 logical_statements = [
@@ -106,10 +107,14 @@ logical_statements = [
     ("forall(X, (is_a(X, mammals) -> have_six_legs_and_mammals_have_wheels(X))).", True),
     ("forall(X, (is_a(X, insects) -> have_wheels_or_insects_have_fur(X))).", True),
     # ... more new logical statements follow ...
-    # The above statements are a sample, the actual code will include all 900 new statements
-    ("All fish live in water. This animal lives in water. Therefore, this animal is a fish.", False),  # Other animals besides fish live in water
-    ("If a person is a chef, they can cook. This person can cook. Therefore, this person is a chef.", False),  # Other people can cook besides chefs
-    ("Every square is a rectangle. This shape is a rectangle. Therefore, this shape is a square.", False),  # Not all rectangles are squares
+    # Additional test cases to ensure robustness and correctness of the translation logic
+    ("All men are mortal. Socrates is a man. Therefore, Socrates is mortal.", True),
+    ("No birds have fur. Tweety is a bird. Therefore, Tweety does not have fur.", True),
+    ("Some mammals are bipedal. A kangaroo is a mammal. Therefore, a kangaroo is bipedal.", True),
+    ("If a vehicle has wheels, it can move. A bicycle has wheels. Therefore, a bicycle can move.", True),
+    ("All insects have six legs. A spider is an insect. Therefore, a spider has six legs.", False),  # Spiders are not insects
+    ("If an animal is a bird, it can fly. A penguin is a bird. Therefore, a penguin can fly.", False),  # Penguins cannot fly
+    # ... more test cases to be added ...
 ]
 
 @pytest.mark.parametrize("statement, expected", logical_statements)
