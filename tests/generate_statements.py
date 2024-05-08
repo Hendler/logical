@@ -82,6 +82,11 @@ def translate_to_prolog(statement, truth_value):
                         prolog_statement += construct_prolog_statement(current_quantifier, current_entity, prolog_predicate, truth_value)
                         i = j + 1
                     break
+                elif j+1 < len(words) and words[j+1] in quantifiers:
+                    # If the next word is a quantifier, we need to close the current scope and start a new one
+                    prolog_statement += ")" if implies_nesting > 0 else ""
+                    last_predicate_added = False
+                    break
             else:
                 # If no predicates are found, check for connectives
                 if words[i] in connectives:
