@@ -44,6 +44,7 @@ def generate_statements(num_statements):
     return statements
 
 # Translate English statements into Prolog
+# Translate English statements into Prolog
 def translate_to_prolog(statement, truth_value):
     prolog_statement = ""
     words = statement.split()
@@ -58,9 +59,14 @@ def translate_to_prolog(statement, truth_value):
         if words[i] in quantifiers:
             if last_predicate_added:
                 # Close the previous predicate scope
-                prolog_statement += ")" if implies_nesting > 0 else ""
+                prolog_statement += ")" * implies_nesting if implies_nesting > 0 else ""
                 last_predicate_added = False
             current_quantifier = words[i]
+            # Reset implies_nesting after closing the scope or starting a new quantifier
+            # implies_nesting should only be reset if we are not within an implication
+            if implies_nesting > 0 and (i == 0 or words[i-1] not in ["implies", "and", "or"]):
+                prolog_statement += ")."
+                implies_nesting = 0
             i += 1
         elif words[i] in entities:
             current_entity = words[i]
@@ -82,15 +88,23 @@ def translate_to_prolog(statement, truth_value):
                         prolog_statement += construct_prolog_statement(current_quantifier, current_entity, prolog_predicate, truth_value)
                         # Close the implication if it's the end of the statement
                         if implies_nesting > 0 and (j+1 >= len(words) or words[j+1] not in connectives):
-                            end_connective_str, new_implies_nesting = handle_connectives("end_implies", implies_nesting)
-                            prolog_statement += end_connective_str
-                            implies_nesting = new_implies_nesting
+                            prolog_statement += ")" * implies_nesting
+                            implies_nesting = 0
                         i = j + 1
                     break
                 elif j+1 < len(words) and words[j+1] in quantifiers:
                     # If the next word is a quantifier, we need to close the current scope and start a new one
-                    prolog_statement += ")" if implies_nesting > 0 else ""
+                    prolog_statement += ")." if last_predicate_added else ""
                     last_predicate_added = False
+                    # Do not reset implies_nesting as we may be starting a new statement within the same implication
+                    i = j  # Do not skip the quantifier for the next iteration
+                    break
+                elif j+1 < len(words) and words[j+1] in connectives:
+                    # If the next word is a connective, handle it accordingly
+                    connective_str, new_implies_nesting = handle_connectives(words[j+1], implies_nesting)
+                    prolog_statement += connective_str
+                    implies_nesting = new_implies_nesting
+                    i = j + 2  # Skip the connective for the next iteration
                     break
             else:
                 # If no predicates are found, check for connectives
@@ -106,13 +120,16 @@ def translate_to_prolog(statement, truth_value):
                     error_detail = f"Failed to translate part of the statement: {' '.join(words[i:])}"
                     # Provide more specific details about the nature of the translation error
                     if not last_predicate_added:
-                        error_detail += f" - Expected a predicate or connective but found '{words[i]}'."
+                        expected_element = "predicate" if i == 0 or words[i-1] in connectives else "connective"
+                        error_detail += f" - Expected a {expected_element} but found '{words[i]}'."
+                        if i > 0:
+                            error_detail += f" Previous element was '{words[i-1]}'."
                     return f"Translation Error: Could not translate the statement: {statement}. {error_detail}"
 
     # Close any open parentheses at the end of the statement
-    prolog_statement += ")" * implies_nesting
-
+    prolog_statement += ")" * implies_nesting if implies_nesting > 0 else ""
     if prolog_statement:
+        # Ensure that the period is only added at the end of the entire Prolog statement
         prolog_statement = prolog_statement.strip() + "."
 
     return prolog_statement
@@ -148,7 +165,7 @@ def handle_connectives(connective, implies_nesting):
         # Increment implies_nesting for a new implication
         implies_nesting += 1
         # Add parentheses for the entire implication if it's the first level
-        return (" :- (", implies_nesting)
+        return (" :- (", implies_nesting) if implies_nesting == 1 else (" -> (", implies_nesting)
     elif connective == "and":
         # Use ',' for 'and' connective, no change in implies_nesting
         return (", ", implies_nesting)
@@ -158,7 +175,9 @@ def handle_connectives(connective, implies_nesting):
     elif connective == "end_implies":
         # Decrement implies_nesting when closing an implication scope
         implies_nesting -= 1
-        return (")", implies_nesting)
+        # Add closing parenthesis for the implication
+        # Ensure the correct number of closing parentheses are added for all levels of nested implications
+        return (")" * implies_nesting, implies_nesting) if implies_nesting > 0 else ("", 0)
     else:
         raise ValueError(f"Unknown connective: {connective}")
 
@@ -170,7 +189,14 @@ def test_translate_to_prolog():
         ("No vehicles have wings", True),
         ("All mammals have fur and all mammals are bipedal", False),
         ("Some insects have six legs or some insects can fly", True),
-        ("No students are vehicles implies no students have wheels", True)
+        ("No students are vehicles implies no students have wheels", True),
+        # New test cases
+        ("All birds can fly and some birds are colorful", True),
+        ("No mammals have wings or some mammals can swim", True),
+        ("Some vehicles have wheels and all vehicles can move", True),
+        ("All insects have six legs implies some insects are ants", True),
+        ("No students are professors or all students are learners", True),
+        ("Some birds are bipedal and no birds are quadrupedal", True),
     ]
 
     for statement, truth_value in test_cases:
