@@ -1,7 +1,7 @@
 import random
 
 # Define logical constructs
-quantifiers = ["All", "Some", "No"]
+quantifiers = ["all", "some", "no"]
 entities = ["men", "birds", "mammals", "students", "vehicles", "insects"]
 predicates = {
     "are mortal": "mortal",
@@ -44,7 +44,6 @@ def generate_statements(num_statements):
     return statements
 
 # Translate English statements into Prolog
-# Translate English statements into Prolog
 def translate_to_prolog(statement, truth_value):
     prolog_statement = ""
     words = statement.split()
@@ -55,81 +54,98 @@ def translate_to_prolog(statement, truth_value):
     i = 0
     error_detail = ""  # Initialize the error detail variable
 
+    # Handle statements beginning with "If" as implications
+    if words[0].lower() == "if":
+        prolog_statement += ":- ("
+        implies_nesting += 1
+        words = words[1:]  # Remove "If" from the processing list
+
     while i < len(words):
-        if words[i] in quantifiers:
-            if last_predicate_added:
-                # Close the previous predicate scope
-                prolog_statement += ")" * implies_nesting if implies_nesting > 0 else ""
-                last_predicate_added = False
-            current_quantifier = words[i]
-            # Reset implies_nesting after closing the scope or starting a new quantifier
-            # implies_nesting should only be reset if we are not within an implication
-            if implies_nesting > 0 and (i == 0 or words[i-1] not in ["implies", "and", "or"]):
-                prolog_statement += ")."
-                implies_nesting = 0
+        word = words[i].lower()
+        # Debug print
+        print(f"Current word: {word}, Current quantifier: {current_quantifier}, Current entity: {current_entity}, Last predicate added: {last_predicate_added}")
+        if word in quantifiers and not current_quantifier:
+            current_quantifier = word
             i += 1
-        elif words[i] in entities:
-            current_entity = words[i]
+            continue
+        elif word in entities and not current_entity:
+            current_entity = word
             i += 1
-        else:
-            # Check for multi-word predicates
-            for j in range(i, len(words)):
-                potential_predicate = ' '.join(words[i:j+1])
-                if potential_predicate in predicates:
-                    prolog_predicate = predicates[potential_predicate]
-                    # Check if the next word is within bounds and is a connective
-                    if j+1 < len(words) and words[j+1] in connectives:
-                        # Continue processing additional predicates after "and" or "or"
-                        prolog_statement += " & " if words[j+1] == "and" else " | "
-                        i = j + 2  # Skip the connective for the next iteration
-                    else:
-                        last_predicate_added = True
-                        # Construct the Prolog statement based on the quantifier and truth value
-                        prolog_statement += construct_prolog_statement(current_quantifier, current_entity, prolog_predicate, truth_value)
-                        # Close the implication if it's the end of the statement
-                        if implies_nesting > 0 and (j+1 >= len(words) or words[j+1] not in connectives):
-                            prolog_statement += ")" * implies_nesting
-                            implies_nesting = 0
-                        i = j + 1
-                    break
-                elif j+1 < len(words) and words[j+1] in quantifiers:
-                    # If the next word is a quantifier, we need to close the current scope and start a new one
-                    prolog_statement += ")." if last_predicate_added else ""
-                    last_predicate_added = False
-                    # Do not reset implies_nesting as we may be starting a new statement within the same implication
-                    i = j  # Do not skip the quantifier for the next iteration
-                    break
-                elif j+1 < len(words) and words[j+1] in connectives:
-                    # If the next word is a connective, handle it accordingly
-                    connective_str, new_implies_nesting = handle_connectives(words[j+1], implies_nesting)
-                    prolog_statement += connective_str
-                    implies_nesting = new_implies_nesting
-                    i = j + 2  # Skip the connective for the next iteration
-                    break
+            continue
+        # Check for multi-word predicates first
+        potential_predicate = word
+        for j in range(i+1, len(words)):
+            next_word = words[j].lower()
+            next_potential = f"{potential_predicate} {next_word}"
+            if next_potential in predicates:
+                potential_predicate = next_potential
+                i = j  # Move index to the last word of the multi-word predicate
             else:
-                # If no predicates are found, check for connectives
-                if words[i] in connectives:
-                    if last_predicate_added:
-                        # Handle the connectives appropriately
-                        connective_str, new_implies_nesting = handle_connectives(words[i], implies_nesting)
-                        prolog_statement += connective_str
-                        implies_nesting = new_implies_nesting
-                        last_predicate_added = False
-                    i += 1
+                break  # No longer a valid multi-word predicate
+        if potential_predicate in predicates:
+            prolog_predicate = predicates[potential_predicate]
+            prolog_statement += construct_prolog_statement(current_quantifier, current_entity, prolog_predicate, truth_value)
+            last_predicate_added = True
+            i += 1  # Move past the predicate
+            continue
+        # If no multi-word predicate, check for single-word predicates
+        if word in predicates and not last_predicate_added:
+            prolog_predicate = predicates[word]
+            prolog_statement += construct_prolog_statement(current_quantifier, current_entity, prolog_predicate, truth_value)
+            last_predicate_added = True
+            i += 1
+            continue
+        # Check for connectives
+        if word in connectives:
+            connective_str, new_implies_nesting = handle_connectives(word, implies_nesting)
+            prolog_statement += connective_str
+            implies_nesting = new_implies_nesting
+            last_predicate_added = False
+            # Look ahead to determine if the next word is an entity
+            if i + 1 < len(words) and words[i + 1].lower() in entities:
+                # If the next word is an entity, check if it's the same as the current entity
+                if words[i + 1].lower() == current_entity:
+                    # Continue with the same quantifier and entity
+                    i += 2
+                    continue
                 else:
-                    error_detail = f"Failed to translate part of the statement: {' '.join(words[i:])}"
-                    # Provide more specific details about the nature of the translation error
-                    if not last_predicate_added:
-                        expected_element = "predicate" if i == 0 or words[i-1] in connectives else "connective"
-                        error_detail += f" - Expected a {expected_element} but found '{words[i]}'."
-                        if i > 0:
-                            error_detail += f" Previous element was '{words[i-1]}'."
-                    return f"Translation Error: Could not translate the statement: {statement}. {error_detail}"
+                    # Reset quantifier and entity for the next clause after a connective
+                    current_quantifier = ""
+                    current_entity = ""
+            i += 1
+            continue
+        # If no valid predicate or connective is found, and we have a quantifier and entity, attempt to find a predicate
+        if not last_predicate_added and current_quantifier and current_entity:
+            # Look ahead to find a potential predicate
+            found_predicate = False
+            for j in range(i, len(words)):
+                next_word = words[j].lower()
+                next_potential = f"{potential_predicate} {next_word}"
+                if next_potential in predicates:
+                    potential_predicate = next_potential
+                    found_predicate = True
+                    i = j  # Adjust index to the last word of the multi-word predicate
+                    break
+            if found_predicate:
+                prolog_predicate = predicates[potential_predicate]
+                prolog_statement += construct_prolog_statement(current_quantifier, current_entity, prolog_predicate, truth_value)
+                last_predicate_added = True
+                i += 1  # Move past the predicate
+                continue
+            else:
+                # If no predicate is found after a quantifier and entity, return an error
+                error_detail = f"Failed to translate part of the statement at word index {i}: {' '.join(words[i:])}"
+                expected_element = "predicate"
+                found_element = "quantifier" if word in quantifiers else "unknown element"
+                error_detail += f" - Expected a {expected_element} but found '{found_element}' at word index {i}."
+                if i > 0:
+                    error_detail += f" Previous element was '{words[i-1]}' at word index {i-1}."
+                return f"Translation Error: Could not translate the statement: {statement}. {error_detail}"
+        i += 1
 
     # Close any open parentheses at the end of the statement
     prolog_statement += ")" * implies_nesting if implies_nesting > 0 else ""
     if prolog_statement:
-        # Ensure that the period is only added at the end of the entire Prolog statement
         prolog_statement = prolog_statement.strip() + "."
 
     return prolog_statement
@@ -138,17 +154,17 @@ def construct_prolog_statement(quantifier, entity, predicate, truth_value):
     """
     Construct a Prolog statement based on the quantifier, entity, predicate, and truth value.
     """
-    if quantifier == "All":
+    if quantifier == "all":
         if truth_value:
             return f"forall(X, (is_a(X, {entity}) -> {predicate}(X)))"
         else:
             return f"forall(X, (is_a(X, {entity}) & ~{predicate}(X)))"
-    elif quantifier == "No":
+    elif quantifier == "no":
         if truth_value:
             return f"forall(X, (is_a(X, {entity}) & ~{predicate}(X)))"
         else:
             return f"forall(X, (is_a(X, {entity}) -> {predicate}(X)))"
-    elif quantifier == "Some":
+    elif quantifier == "some":
         if truth_value:
             return f"exists(X, (is_a(X, {entity}) & {predicate}(X)))"
         else:
@@ -176,8 +192,7 @@ def handle_connectives(connective, implies_nesting):
         # Decrement implies_nesting when closing an implication scope
         implies_nesting -= 1
         # Add closing parenthesis for the implication
-        # Ensure the correct number of closing parentheses are added for all levels of nested implications
-        return (")" * implies_nesting, implies_nesting) if implies_nesting > 0 else ("", 0)
+        return (")" * (implies_nesting + 1), max(implies_nesting, 0)) if implies_nesting >= 0 else ("", 0)
     else:
         raise ValueError(f"Unknown connective: {connective}")
 

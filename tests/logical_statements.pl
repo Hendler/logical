@@ -24,3 +24,10 @@ can_fly(X) :- car(X), has_wings(X).
 % Queries for testing false statements
 % Query: "No dogs have wings." This should fail as no fact defines dogs with wings.
 query_dog_wings :- dog(X), has_wings(X), fail.
+
+% Define even/1 predicate
+even(X) :- 0 is X mod 2.
+
+% Define divisible_by_fourteen/1 predicate as dynamic to allow runtime modifications
+:- dynamic divisible_by_fourteen/1.
+divisible_by_fourteen(X) :- 0 is X mod 14.
