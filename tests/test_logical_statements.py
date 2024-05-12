@@ -82,14 +82,15 @@ class TestLogicalStatements(unittest.TestCase):
             output = result.stdout.strip()
             error_output = result.stderr.strip()
             print(f"Prolog interpreter output: {output}")
-            if error_output:
-                print(f"Prolog interpreter error output: {error_output}")
+            print(f"Prolog interpreter error output: {error_output}")
             # Check if the output contains the expected result ignoring the initialization message
             if "true" in output:
                 return True
             elif "false" in output:
                 return False
             else:
+                # If neither 'true' nor 'false' is in the output, log the output for further investigation
+                print(f"Unexpected Prolog interpreter output: {output}")
                 return False
         except subprocess.CalledProcessError as e:
             # Log the error for debugging purposes
