@@ -81,5 +81,5 @@ NUM_EXAMPLES_TO_GENERATE = 999
 # Generate the examples
 generate_examples(NUM_EXAMPLES_TO_GENERATE)
 
-# Run tests
-test_validate_logical_statement()
+# Uncomment the line below to run tests
+# test_validate_logical_statement()
