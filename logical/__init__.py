@@ -10,7 +10,7 @@ load_dotenv(find_dotenv())
 OPEN_AI_MODEL_TYPE = os.getenv("OPEN_AI_MODEL_TYPE")
 
 
-from logical.storage import (
+from storage import (
     LogicalRow,
     QueryRow,
     write_dataclass_to_csv,

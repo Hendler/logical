@@ -1,7 +1,7 @@
 import os
 import random
-from logical.storage import LogicalRow, write_dataclass_to_csv, PROLOG_STORAGE_NAME
-from logical import run_parser
+from storage import LogicalRow, write_dataclass_to_csv, PROLOG_STORAGE_NAME
+from __init__ import run_parser
 
 # Function to generate a logical English statement
 def generate_logical_statement(index):
@@ -31,14 +31,35 @@ def validate_logical_statement(statement):
     has_subject_predicate = " is " in statement or " are " in statement
     ends_with_period = statement.endswith(".")
 
-    # Check if the statement follows a logical structure that could be parsed into a valid Prolog statement
-    # A valid statement must have a quantifier, subject-predicate structure, and end with a period.
-    # The presence of a logical connective is optional and relevant for compound statements.
-    # Adjusting the check to allow for statements that do not require a logical connective.
-    # A simple statement with a quantifier and subject-predicate is valid if it ends with a period.
-    is_valid_statement = has_quantifier and has_subject_predicate and ends_with_period
+    # Recognize conditional "If...then..." constructs
+    if "If" in statement and "then" in statement:
+        # Split the statement into its conditional parts
+        conditional_parts = statement.split("then")
+        if len(conditional_parts) != 2:
+            return False  # Invalid structure if not exactly two parts
+        condition, conclusion = conditional_parts
+        # Strip leading and trailing whitespace for accurate checks
+        condition = condition.strip()
+        conclusion = conclusion.strip()
+        # Check if both parts of the conditional are valid statements on their own
+        if not condition.startswith("If ") or not has_subject_predicate or not ends_with_period:
+            return False
+        # Validate the conclusion part of the conditional statement
+        if not has_quantifier and (" is " not in conclusion and " are " not in conclusion):
+            return False
+    # Recognize assumption-based "Assuming..." constructs
+    elif statement.startswith("Assuming"):
+        # Remove the "Assuming" part and check if the rest is a valid statement
+        assumption_part = statement.replace("Assuming", "", 1).strip()
+        if not has_quantifier or not has_subject_predicate or not ends_with_period:
+            return False
+        # Additional checks can be added here for more complex assumption logic
+    else:
+        # A valid statement must have a quantifier and subject-predicate structure, and end with a period.
+        if not (has_quantifier and has_subject_predicate and ends_with_period):
+            return False
 
-    return is_valid_statement
+    return True
 
 # Function to generate logical examples and their Prolog representations
 def generate_examples(count):
@@ -101,7 +122,7 @@ def test_validate_logical_statement():
 NUM_EXAMPLES_TO_GENERATE = 999
 
 # Generate the examples
-# generate_examples(NUM_EXAMPLES_TO_GENERATE)
+generate_examples(NUM_EXAMPLES_TO_GENERATE)
 
 # To run tests, uncomment the line below and execute the script.
 # This should be done in a development environment to verify changes.
