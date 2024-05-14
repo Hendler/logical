@@ -6,9 +6,9 @@ import os
 
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-PROLOG_STORAGE_NAME = f"/{ROOT_DIR}/myprolog.csv"
-QUERY_FILE_NAME = f"/{ROOT_DIR}/queries.csv"
-PROLOG_FILE_NAME = f"/{ROOT_DIR}/myprolog.pl"
+PROLOG_STORAGE_NAME = f"{ROOT_DIR}/myprolog.csv"
+QUERY_FILE_NAME = f"{ROOT_DIR}/queries.csv"
+PROLOG_FILE_NAME = f"{ROOT_DIR}/myprolog.pl"
 
 
 @dataclass
