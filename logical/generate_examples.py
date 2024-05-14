@@ -7,8 +7,8 @@ from logical import run_parser
 def generate_logical_statement(index):
     # This function generates diverse logical statements.
     # For demonstration purposes, it returns a variety of simple logical statements.
-    subjects = ["Socrates", "a cat", "the car", "the sun", "a prime number"]
-    predicates = ["is mortal", "is on the mat", "is fast", "is hot", "is odd"]
+    subjects = ["Socrates", "a cat", "the car", "the sun", "a prime number", "an electron", "a molecule", "a mathematician", "a planet", "a galaxy"]
+    predicates = ["is mortal", "is on the mat", "is fast", "is hot", "is odd", "is charged", "is tiny", "is brilliant", "is round", "is vast"]
     logical_connectives = ["Therefore", "Because", "Since", "If", "Assuming"]
     quantifiers = ["All", "No", "Some", "Most", "Few"]
 
