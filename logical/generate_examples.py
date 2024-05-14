@@ -22,6 +22,13 @@ def generate_logical_statement(index):
     statement = f"{quantifier} {subject}s are {predicate}. {subject} is a {subject}. {logical_connective}, {subject} is {predicate}."
     return statement
 
+# Function to validate the logical consistency of a statement
+def validate_logical_statement(statement):
+    # Basic validation to check if the statement contains necessary components
+    # and follows a logical structure.
+    # This is a placeholder for a more complex validation logic.
+    return (" is " in statement) and (statement.endswith("."))
+
 # Function to generate logical examples and their Prolog representations
 def generate_examples(count):
     generated_statements = set()  # Set to keep track of generated statements to avoid duplicates
@@ -29,6 +36,9 @@ def generate_examples(count):
         try:
             # Generate a logical English statement
             english_statement = generate_logical_statement(i)
+            # Validate the logical consistency of the statement
+            if not validate_logical_statement(english_statement):
+                raise ValueError(f"Invalid logical statement: {english_statement}")
             # Check for uniqueness
             if english_statement not in generated_statements:
                 generated_statements.add(english_statement)
