@@ -54,8 +54,32 @@ def generate_examples(count):
         except Exception as e:
             print(f"An error occurred while generating example {i+1}: {e}")
 
+# Test cases for validate_logical_statement function
+def test_validate_logical_statement():
+    # Test cases with expected outcomes
+    test_cases = [
+        ("All cats are mortal.", True),
+        ("Some suns are hot.", True),
+        ("No electron is charged.", True),
+        ("Most planets are round.", True),
+        ("Few galaxies are vast.", True),
+        ("Socrates is.", False),  # Incomplete statement
+        ("If a cat then is on the mat.", False),  # Illogical structure
+        ("Because the car is fast.", False),  # No quantifier
+        ("The sun is hot", False),  # No period at the end
+        ("A prime number is odd", False)  # No quantifier and no period
+    ]
+
+    # Run test cases
+    for statement, expected in test_cases:
+        result = validate_logical_statement(statement)
+        assert result == expected, f"Test failed for statement: {statement}"
+
 # Number of examples to generate
 NUM_EXAMPLES_TO_GENERATE = 999
 
 # Generate the examples
 generate_examples(NUM_EXAMPLES_TO_GENERATE)
+
+# Run tests
+test_validate_logical_statement()
