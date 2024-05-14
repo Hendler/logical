@@ -24,10 +24,21 @@ def generate_logical_statement(index):
 
 # Function to validate the logical consistency of a statement
 def validate_logical_statement(statement):
-    # Basic validation to check if the statement contains necessary components
+    # Enhanced validation to check if the statement contains necessary components
     # and follows a logical structure.
-    # This is a placeholder for a more complex validation logic.
-    return (" is " in statement) and (statement.endswith("."))
+    # Checks for the presence of a quantifier, a subject, a predicate, and proper punctuation.
+    valid_quantifiers = {"All", "No", "Some", "Most", "Few"}
+    valid_logical_connectives = {"Therefore", "Because", "Since", "If", "Assuming"}
+    has_quantifier = any(quantifier in statement for quantifier in valid_quantifiers)
+    has_logical_connective = any(connective in statement for connective in valid_logical_connectives)
+    has_subject_predicate = " is " in statement
+    ends_with_period = statement.endswith(".")
+
+    # Check if the statement follows a logical structure that could be parsed into a valid Prolog statement
+    # This is a placeholder for a more complex logic that could involve parsing the statement
+    follows_logical_structure = has_quantifier and has_logical_connective and has_subject_predicate and ends_with_period
+
+    return follows_logical_structure
 
 # Function to generate logical examples and their Prolog representations
 def generate_examples(count):
