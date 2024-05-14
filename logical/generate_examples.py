@@ -119,7 +119,7 @@ def test_validate_logical_statement():
         assert result == expected, f"Test failed for statement: {statement}"
 
 # Number of examples to generate
-NUM_EXAMPLES_TO_GENERATE = 999
+NUM_EXAMPLES_TO_GENERATE = 1000
 
 # Generate the examples
 generate_examples(NUM_EXAMPLES_TO_GENERATE)
