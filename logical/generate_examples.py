@@ -22,23 +22,23 @@ def generate_logical_statement(index):
     statement = f"{quantifier} {subject}s are {predicate}. {subject} is a {subject}. {logical_connective}, {subject} is {predicate}."
     return statement
 
-# Function to validate the logical consistency of a statement
 def validate_logical_statement(statement):
     # Enhanced validation to check if the statement contains necessary components
     # and follows a logical structure.
-    # Checks for the presence of a quantifier, a subject, a predicate, and proper punctuation.
+    # Checks for the presence of a quantifier, a subject-predicate structure, and proper punctuation.
     valid_quantifiers = {"All", "No", "Some", "Most", "Few"}
-    valid_logical_connectives = {"Therefore", "Because", "Since", "If", "Assuming"}
-    has_quantifier = any(quantifier in statement for quantifier in valid_quantifiers)
-    has_logical_connective = any(connective in statement for connective in valid_logical_connectives)
-    has_subject_predicate = " is " in statement
+    has_quantifier = any(quantifier + " " in statement for quantifier in valid_quantifiers)
+    has_subject_predicate = " is " in statement or " are " in statement
     ends_with_period = statement.endswith(".")
 
     # Check if the statement follows a logical structure that could be parsed into a valid Prolog statement
-    # This is a placeholder for a more complex logic that could involve parsing the statement
-    follows_logical_structure = has_quantifier and has_logical_connective and has_subject_predicate and ends_with_period
+    # A valid statement must have a quantifier, subject-predicate structure, and end with a period.
+    # The presence of a logical connective is optional and relevant for compound statements.
+    # Adjusting the check to allow for statements that do not require a logical connective.
+    # A simple statement with a quantifier and subject-predicate is valid if it ends with a period.
+    is_valid_statement = has_quantifier and has_subject_predicate and ends_with_period
 
-    return follows_logical_structure
+    return is_valid_statement
 
 # Function to generate logical examples and their Prolog representations
 def generate_examples(count):
@@ -78,7 +78,18 @@ def test_validate_logical_statement():
         ("If a cat then is on the mat.", False),  # Illogical structure
         ("Because the car is fast.", False),  # No quantifier
         ("The sun is hot", False),  # No period at the end
-        ("A prime number is odd", False)  # No quantifier and no period
+        ("A prime number is odd", False),  # No quantifier and no period
+        # Additional complex test cases
+        ("All prime numbers are odd except two.", True),  # Exception case
+        ("If Socrates is a man, then Socrates is mortal.", True),  # Conditional logic
+        ("Assuming all men are mortal, Socrates is mortal.", True),  # Assumption logic
+        ("No square circles exist.", True),  # Contradiction
+        ("Some bachelors are married.", False),  # Semantic inconsistency
+        ("Every even number greater than two is the sum of two primes.", True),  # Goldbach's conjecture
+        ("This statement is false.", False),  # Self-referential paradox
+        ("If it rains, the ground is wet.", True),  # Causal relationship
+        ("All ravens are black because they are ravens.", False),  # Circular reasoning
+        ("No unmarried man is married.", True),  # Tautology
     ]
 
     # Run test cases
@@ -90,8 +101,8 @@ def test_validate_logical_statement():
 NUM_EXAMPLES_TO_GENERATE = 999
 
 # Generate the examples
-generate_examples(NUM_EXAMPLES_TO_GENERATE)
+# generate_examples(NUM_EXAMPLES_TO_GENERATE)
 
 # To run tests, uncomment the line below and execute the script.
 # This should be done in a development environment to verify changes.
-# test_validate_logical_statement()
+test_validate_logical_statement()
