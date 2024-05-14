@@ -81,5 +81,6 @@ NUM_EXAMPLES_TO_GENERATE = 999
 # Generate the examples
 generate_examples(NUM_EXAMPLES_TO_GENERATE)
 
-# Uncomment the line below to run tests
+# To run tests, uncomment the line below and execute the script.
+# This should be done in a development environment to verify changes.
 # test_validate_logical_statement()
