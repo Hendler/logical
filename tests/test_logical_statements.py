@@ -73,25 +73,24 @@ class TestLogicalStatements(unittest.TestCase):
         Evaluate the given Prolog statement using a Prolog interpreter.
         Returns True if the statement is logically valid, False otherwise.
         """
-        command = ['swipl', '-q', '-g', prolog_statement, '-t', 'halt', '/home/ubuntu/logical/tests/logical_statements.pl']
+        command = ['swipl', '-q', '-g', prolog_statement, '/home/ubuntu/logical/tests/logical_statements.pl', '-t', 'halt']
         print(f"Running Prolog command: {command}")
         try:
             # Call the Prolog interpreter using subprocess
             result = subprocess.run(command, capture_output=True, text=True, check=True)
             # Parse the output from Prolog interpreter
-            output = result.stdout.strip()
+            output_lines = result.stdout.strip().split('\n')
             error_output = result.stderr.strip()
-            print(f"Prolog interpreter output: {output}")
             print(f"Prolog interpreter error output: {error_output}")
-            # Check if the output contains the expected result ignoring the initialization message
-            if "true" in output:
-                return True
-            elif "false" in output:
-                return False
-            else:
-                # If neither 'true' nor 'false' is in the output, log the output for further investigation
-                print(f"Unexpected Prolog interpreter output: {output}")
-                return False
+            # Check each line of the output for the expected result
+            for line in output_lines:
+                if "true" in line:
+                    return True
+                elif "false" in line:
+                    return False
+            # If neither 'true' nor 'false' is in any line of the output, log the output for further investigation
+            print(f"Unexpected Prolog interpreter output: {output_lines}")
+            return False
         except subprocess.CalledProcessError as e:
             # Log the error for debugging purposes
             print(f"Prolog evaluation failed: {e}")
