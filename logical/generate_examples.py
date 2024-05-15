@@ -101,14 +101,15 @@ def validate_logical_statement(statement):
             return False
 
     # Recognize conditional "If...then..." constructs
-    # If the statement starts with a conditional, ensure that the subjects and predicates match
     if starts_with_conditional:
         conditional_match = re.match(r'If\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s+(is|are)\s+([a-z]+),\s+then\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s+(is|are)\s+([a-z]+)\.', statement)
         if conditional_match:
             subject1, verb1, predicate1, subject2, verb2, predicate2 = conditional_match.groups()
-            # Ensure that the subjects match and the predicates are logically coherent
+            # Ensure that the subjects match
             if subject1 != subject2 or verb1 != verb2:
                 return False
+            # The predicates can be different but should be logically coherent
+            # Additional logic to check for logical coherence can be added here if necessary
             return True
 
     # Recognize assumption-based "Assuming..." constructs
