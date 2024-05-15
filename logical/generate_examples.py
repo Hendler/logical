@@ -136,8 +136,7 @@ def validate_logical_statement(statement):
 
 def validate_individual_condition_part(condition):
     # Use regular expressions to match the pattern of a conditional statement
-    # The regular expression now accounts for an optional comma before 'then'
-    # and includes proper handling of proper nouns and multi-word predicates
+    # The regular expression now accounts for proper handling of proper nouns and multi-word predicates
     match = re.match(r'If\s+(.+?)\s+then\s+(.+)\s*$', condition, re.IGNORECASE)
     if match:
         condition_part, conclusion_part = match.groups()
@@ -182,6 +181,12 @@ def validate_statement_part(part):
             # Handle predicates that are proper nouns or multi-word phrases
             if predicate[0].isupper() or ' ' in predicate:
                 return True
+
+    # Handle cases where the predicate is a proper noun or a multi-word phrase
+    proper_noun_or_phrase = re.match(r'^([A-Z][a-z]+(?: [A-Z][a-z]+)*) (is|are) ([A-Z][a-z]+(?: [A-Z][a-z]+)*)\.$', part)
+    if proper_noun_or_phrase:
+        subject, verb, predicate = proper_noun_or_phrase.groups()
+        return True
 
     return False
 
@@ -269,6 +274,60 @@ def test_validate_logical_statement():
         ("If a fish swims, then the fish is a bird.", False),  # Illogical conclusion
         ("If a phone is ringing, then the phone is a banana.", False),  # Illogical conclusion
         ("If a computer is on, then the computer is a robot.", False),  # Illogical conclusion
+        # Additional test cases for complex predicates and proper nouns
+        ("If Wisdom is a virtue, then Socrates possesses Wisdom.", True),  # Proper noun and complex predicate
+        ("If the Earth is a planet, then the Earth orbits the Sun.", True),  # Proper noun and scientific fact
+        ("If a Wise person is knowledgeable, then Socrates is Wise.", True),  # Proper noun and adjective predicate
+        ("If a cat is a mammal, then a cat has fur.", True),  # Common noun and biological fact
+        ("If a vehicle is a bicycle, then a vehicle has two wheels.", True),  # Common noun and defining characteristic
+        ("If a tree is an oak, then the tree is a plant.", True),  # Common noun and categorical fact
+        ("If a computer is advanced, then the computer has a fast processor.", True),  # Common noun and technical specification
+        ("If a book is a bestseller, then the book is popular.", True),  # Common noun and descriptive predicate
+        ("If a person is an athlete, then the person is fit.", True),  # Common noun and associated characteristic
+        ("If a building is tall, then the building can be seen from afar.", True),  # Common noun and logical inference
+        ("If a food is spicy, then the food contains chili.", True),  # Common noun and ingredient-related predicate
+        ("If a country is democratic, then the country holds elections.", True),  # Common noun and political system characteristic
+        ("If a language is complex, then the language has many rules.", True),  # Common noun and descriptive predicate
+        ("If a flower is a rose, then the flower is fragrant.", True),  # Common noun and associated characteristic
+        ("If a person is a teacher, then the person educates students.", True),  # Common noun and role-related action
+        ("If a liquid is water, then the liquid is H2O.", True),  # Common noun and scientific fact
+        ("If a shape is a square, then the shape has four equal sides.", True),  # Common noun and geometric fact
+        ("If a machine is a robot, then the machine can perform tasks.", True),  # Common noun and functional characteristic
+        ("If a person is a doctor, then the person treats patients.", True),  # Common noun and professional duty
+        ("If a planet is Mars, then the planet is the fourth from the Sun.", True),  # Proper noun and astronomical fact
+        ("If a person is a philosopher, then the person engages in philosophy.", True),  # Common noun and activity-related predicate
+        ("If a cat is a Siamese, then the cat has a distinctive coat pattern.", True),  # Common noun and breed-specific characteristic
+        ("If a device is a smartphone, then the device can access the internet.", True),  # Common noun and technological capability
+        ("If a person is a musician, then the person plays an instrument.", True),  # Common noun and skill-related predicate
+        ("If a bird is an eagle, then the bird can fly.", True),  # Common noun and species-specific ability
+        ("If a person is a carpenter, then the person works with wood.", True),  # Common noun and material-related predicate
+        ("If a vehicle is a car, then the vehicle has an engine.", True),  # Common noun and essential component
+        ("If a person is a pilot, then the person flies airplanes.", True),  # Common noun and job-related action
+        ("If a substance is gold, then the substance is a metal.", True),  # Common noun and material category
+        ("If a person is a scientist, then the person conducts research.", True),  # Common noun and professional activity
+        ("If a game is chess, then the game involves strategy.", True),  # Common noun and game-related characteristic
+        ("If a person is a firefighter, then the person extinguishes fires.", True),  # Common noun and job-related action
+        ("If a person is a baker, then the person bakes bread.", True),  # Common noun and job-specific task
+        ("If a person is a programmer, then the person writes code.", True),  # Common noun and professional skill
+        ("If a person is a painter, then the person creates art.", True),  # Common noun and creative activity
+        ("If a person is a lawyer, then the person practices law.", True),  # Common noun and professional practice
+        ("If a person is a judge, then the person presides over court.", True),  # Common noun and role-specific duty
+        ("If a person is a nurse, then the person cares for patients.", True),  # Common noun and healthcare-related action
+        ("If a person is a poet, then the person writes poems.", True),  # Common noun and artistic expression
+        ("If a person is a gardener, then the person tends to plants.", True),  # Common noun and task-related action
+        ("If a person is a chef, then the person cooks food.", True),  # Common noun and culinary skill
+        ("If a person is a detective, then the person solves cases.", True),  # Common noun and investigative duty
+        ("If a person is a journalist, then the person reports news.", True),  # Common noun and media-related role
+        ("If a person is a librarian, then the person manages books.", True),  # Common noun and library-related task
+        ("If a person is a mechanic, then the person repairs vehicles.", True),  # Common noun and technical skill
+        ("If a person is a soldier, then the person serves in the military.", True),  # Common noun and service-related duty
+        ("If a person is a tailor, then the person makes clothes.", True),  # Common noun and craft-related skill
+        ("If a person is a writer, then the person publishes works.", True),  # Common noun and literary activity
+        ("If a person is an actor, then the person performs in films.", True),  # Common noun and entertainment-related profession
+        ("If a person is an artist, then the person exhibits paintings.", True),  # Common noun and artistic display
+        ("If a person is an engineer, then the person designs structures.", True),  # Common noun and technical expertise
+        ("If a person is an architect, then the person draws blueprints.", True),  # Common noun and design-related task
+        ("If a person is a dancer, then the person performs in films.", True),  # Common noun and entertainment-related profession
     ]
 
     # Run test cases
