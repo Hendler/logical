@@ -67,7 +67,7 @@ class TestLogicalStatements(unittest.TestCase):
         Evaluate the given Prolog statement using a Prolog interpreter.
         Returns True if the statement is logically valid, False otherwise.
         """
-        command = ['swipl', '-s', 'logical_statements.pl', '-g', prolog_statement, '-t', 'halt']
+        command = ['swipl', '-s', '/home/ubuntu/logical/tests/logical_statements.pl', '-g', prolog_statement, '-t', 'halt']
         print(f"Running Prolog command: {command}")
         try:
             # Call the Prolog interpreter using subprocess
