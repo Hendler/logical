@@ -73,7 +73,7 @@ def validate_logical_statement(statement):
     has_quantifier = any(quantifier + " " in statement for quantifier in valid_quantifiers)
     has_subject_predicate = re.search(r'\b(is|are)\b', statement) is not None
     ends_with_period = statement.endswith(".")
-    starts_with_conditional = re.match(r'If\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s+(is|are)\s+([a-z]+),\s+then\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s+(is|are)\s+([a-z]+)\.', statement) is not None
+    starts_with_conditional = re.match(r'If\s+([A-Za-z][a-z]*(?:\s+[A-Za-z][a-z]*)*)\s+(is|are)\s+([a-z]+),\s+then\s+([A-Za-z][a-z]*(?:\s+[A-Za-z][a-z]*)*)\s+(is|are)\s+([a-z]+)\s*\.', statement.strip(), re.IGNORECASE) is not None
     starts_with_assumption = statement.startswith("Assuming")
     has_negation = " not " in statement or statement.startswith("It is not the case")
     has_comparative = " more " in statement or " either " in statement or " neither " in statement
@@ -86,6 +86,7 @@ def validate_logical_statement(statement):
 
     # Check for valid structure or known valid constructs
     if not (has_quantifier and has_subject_predicate and ends_with_period) and not (starts_with_conditional or starts_with_assumption or has_negation or has_comparative):
+        print("Invalid structure or known valid constructs check: False")
         return False  # Invalid structure if it doesn't meet any known valid constructs
 
     # Additional checks for contradictions and semantic inconsistencies
@@ -98,16 +99,41 @@ def validate_logical_statement(statement):
     # Check for semantic inconsistencies which are inherently false
     for subject, invalid_predicates in semantic_inconsistencies.items():
         if subject in statement and any(invalid_predicate in statement for invalid_predicate in invalid_predicates):
+            print(f"Semantic inconsistency check for {subject}: False")
             return False
 
     # Dictionary mapping predicates to logically coherent conclusions
     logically_coherent_predicates = {
-        "man": {"mortal": True, "rational": True, "philosopher": True},
-        "bird": {"can_fly": True, "has_feathers": True, "lays_eggs": True},
-        "cat": {"is_a_pet": True, "has_claws": True, "chases_mice": True},
-        "dog": {"barks": True, "is_loyal": True, "can_be_trained": True},
-        "car": {"has_wheels": True, "requires_fuel": True, "can_transport_people": True},
-        "tree": {"has_leaves": True, "grows": True, "produces_oxygen": True},
+        "man": {
+            "mortal": True,
+            "rational": True,
+            "philosopher": True,
+        },
+        "bird": {
+            "can_fly": True,
+            "has_feathers": True,
+            "lays_eggs": True,
+        },
+        "cat": {
+            "is_a_pet": True,
+            "has_claws": True,
+            "chases_mice": True,
+        },
+        "dog": {
+            "barks": True,
+            "is_loyal": True,
+            "can_be_trained": True,
+        },
+        "car": {
+            "has_wheels": True,
+            "requires_fuel": True,
+            "can_transport_people": True,
+        },
+        "tree": {
+            "has_leaves": True,
+            "grows": True,
+            "produces_oxygen": True,
+        },
         # ... (additional mappings can be added here)
     }
 
@@ -119,7 +145,7 @@ def validate_logical_statement(statement):
 
     # Recognize conditional "If...then..." constructs
     if starts_with_conditional:
-        conditional_match = re.match(r'If\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s+(is|are)\s+([a-z]+),\s+then\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s+(is|are)\s+([a-z]+)\.', statement)
+        conditional_match = re.match(r'If\s+([A-Za-z][a-z]*(?:\s+[A-Za-z][a-z]*)*)\s+(is|are)\s+([a-z]+),\s+then\s+([A-Za-z][a-z]*(?:\s+[A-Za-z][a-z]*)*)\s+(is|are)\s+([a-z]+)\s*\.', statement)
         if conditional_match:
             subject1, verb1, predicate1, subject2, verb2, predicate2 = conditional_match.groups()
 
@@ -133,38 +159,40 @@ def validate_logical_statement(statement):
             subject1_key = proper_noun_mappings.get(subject1_key, subject1_key)
             subject2_key = proper_noun_mappings.get(subject2_key, subject2_key)
 
-            # Check if the subjects are the same and if the predicate2 is a logically coherent conclusion of predicate1
+            # Check if the subjects are the same and if predicate2 is a logically coherent conclusion of predicate1
             if subject1_key == subject2_key:
                 # Retrieve the coherent conclusions for the subject
                 coherent_conclusions = logically_coherent_predicates.get(subject1_key, {})
-                # Check if predicate2 is a logically coherent conclusion that can be derived from predicate1
-                if coherent_conclusions.get(normalized_predicate1, {}).get(normalized_predicate2, False):
+                # Check if predicate2 is a coherent conclusion of predicate1
+                if coherent_conclusions.get(normalized_predicate1, False) and coherent_conclusions.get(normalized_predicate2, False):
                     return True
                 else:
-                    # If the logical relationship between predicate1 and predicate2 is not known, it's not a known logical relationship
                     return False
             else:
-                # If the subjects are different, the logical coherence is not required
-                return True
+                return False  # If the subjects are not the same, the statement is not logically coherent
 
     # Recognize assumption-based "Assuming..." constructs
     elif starts_with_assumption:
         assumption_part = statement.replace("Assuming", "", 1).strip()
         if " is " not in assumption_part and " are " not in assumption_part or not assumption_part.endswith("."):
+            print("Assumption-based construct check: False")
             return False
     # Recognize negation constructs
     if has_negation:
         negation_part = statement.replace("It is not the case that ", "", 1).strip() if statement.startswith("It is not the case that ") else statement
         if " is " not in negation_part and " are " not in negation_part or not negation_part.endswith("."):
+            print("Negation construct check: False")
             return False
 
     # Recognize comparative constructs
     if has_comparative:
         comparative_match = re.match(r'(.+) is more (.+) than (.+)\.', statement)
         if not comparative_match:
+            print("Comparative construct check: False")
             return False
         subject, predicate, subject2 = comparative_match.groups()
         if not subject or not predicate or not subject2:
+            print("Comparative construct subject/predicate check: False")
             return False
 
     return True
@@ -237,20 +265,19 @@ def generate_examples():
             # Generate a logical English statement
             english_statement = generate_logical_statement(len(generated_statements))
             # Validate the logical consistency of the statement
-            if not validate_logical_statement(english_statement):
-                raise ValueError(f"Invalid logical statement: {english_statement}")
-            # Check for uniqueness
-            if english_statement not in generated_statements:
-                generated_statements.add(english_statement)
-                # Convert the English statement to a Prolog representation using the run_parser function
-                prolog_statement = run_parser(english_statement)
-                # Create a LogicalRow instance
-                logical_row = LogicalRow(input_text=english_statement, prolog_text=prolog_statement)
-                # Write the LogicalRow instance to the CSV file
-                write_dataclass_to_csv(logical_row, PROLOG_STORAGE_NAME)
-                print(f"Generated example {len(generated_statements)}/{NUM_EXAMPLES_TO_GENERATE}: {english_statement}")
-            else:
-                print(f"Duplicate statement detected, skipping: {english_statement}")
+            if validate_logical_statement(english_statement):
+                # Check for uniqueness
+                if english_statement not in generated_statements:
+                    generated_statements.add(english_statement)
+                    # Convert the English statement to a Prolog representation using the run_parser function
+                    prolog_statement = run_parser(english_statement)
+                    # Create a LogicalRow instance
+                    logical_row = LogicalRow(input_text=english_statement, prolog_text=prolog_statement)
+                    # Write the LogicalRow instance to the CSV file
+                    write_dataclass_to_csv(logical_row, PROLOG_STORAGE_NAME)
+                    print(f"Generated example {len(generated_statements)}/{NUM_EXAMPLES_TO_GENERATE}: {english_statement}")
+                else:
+                    print(f"Duplicate statement detected, skipping: {english_statement}")
         except Exception as e:
             print(f"An error occurred while generating example {len(generated_statements)}: {e}")
 
