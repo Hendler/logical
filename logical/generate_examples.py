@@ -1,8 +1,8 @@
 import os
 import random
 import re  # Importing the re module for regular expression operations
-from .storage import LogicalRow, write_dataclass_to_csv, PROLOG_STORAGE_NAME
-from . import run_parser
+from logical.storage import LogicalRow, write_dataclass_to_csv, PROLOG_STORAGE_NAME
+from logical import run_parser
 
 # Lists of components for logical statements
 subjects = ["cat", "dog", "bird", "car", "tree"]
