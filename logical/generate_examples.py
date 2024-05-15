@@ -190,6 +190,10 @@ def validate_statement_part(part):
 
     return False
 
+subjects = ["cat", "dog", "bird", "car", "tree", "Socrates"]
+predicates = ["mortal", "fast", "tall", "short", "round", "man"]
+logical_connectives = ["and", "or", "if", "then", "not"]
+
 # Function to generate logical examples and their Prolog representations
 def generate_examples():
     generated_statements = set()  # Set to keep track of generated statements to avoid duplicates
