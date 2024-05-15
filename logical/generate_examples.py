@@ -104,10 +104,26 @@ def validate_logical_statement(statement):
     if starts_with_conditional:
         conditional_match = re.match(r'If\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s+(is|are)\s+([a-z]+),\s+then\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s+(is|are)\s+([a-z]+)\.', statement)
         if conditional_match:
-            # The subjects can be different and the predicates can be different but should be logically coherent
-            # Additional logic to check for logical coherence can be added here if necessary
-            return True
+            subject1, verb1, predicate1, subject2, verb2, predicate2 = conditional_match.groups()
+            logically_coherent_predicates = {
+                "man": "mortal",
+                "bird": "can_fly",
+                "fish": "can_swim",
+                # Additional coherent predicate relationships
+                "mortal": "man",
+                "can_fly": "bird",
+                "can_swim": "fish",
+                # More entries can be added here as needed
+            }
 
+            # Check if the predicate1 logically leads to predicate2
+            if predicate1 in logically_coherent_predicates:
+                expected_predicate2 = logically_coherent_predicates[predicate1]
+                # Allow for plural forms and variations in tense
+                if predicate2 == expected_predicate2 or (verb2 == "are" and expected_predicate2.endswith("e") and predicate2 == expected_predicate2 + "s") or (verb2 == "are" and not expected_predicate2.endswith("e") and predicate2 == expected_predicate2[:-1] + "es"):
+                    return True
+            # If the relationship is not defined, we cannot assume logical coherence
+            return False
     # Recognize assumption-based "Assuming..." constructs
     elif starts_with_assumption:
         assumption_part = statement.replace("Assuming", "", 1).strip()
