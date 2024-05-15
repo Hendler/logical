@@ -102,7 +102,7 @@ def validate_logical_statement(statement):
 
     # Recognize conditional "If...then..." constructs
     if starts_with_conditional:
-        conditional_parts = statement.split(" then ", 1)
+        conditional_parts = statement.split(", then ", 1)
         condition = conditional_parts[0].strip()[3:]  # Remove 'If ' from the beginning
         conclusion = conditional_parts[1].strip() if len(conditional_parts) > 1 else ""
         # Validate the logical consistency of the conditional statement
@@ -136,7 +136,9 @@ def validate_logical_statement(statement):
 
 def validate_individual_condition_part(condition):
     # Use regular expressions to match the pattern of a conditional statement
-    match = re.match(r'If\s+(.+?)\s+then\s+(.+?)\s*$', condition, re.IGNORECASE)
+    # The regular expression now accounts for an optional comma before 'then'
+    # and includes proper handling of proper nouns and multi-word predicates
+    match = re.match(r'If\s+(.+?)(?:,)?\s+then\s+(.+)\s*$', condition, re.IGNORECASE)
     if match:
         condition_part, conclusion_part = match.groups()
         # Validate both the condition and conclusion parts as individual statements
@@ -144,8 +146,8 @@ def validate_individual_condition_part(condition):
         valid_conclusion = validate_statement_part(conclusion_part.strip().rstrip('.'))
         return valid_condition and valid_conclusion
     else:
-        # If the statement does not match the conditional pattern, it is not valid
-        return False
+        # If the statement does not match the conditional pattern, validate it as a simple statement
+        return validate_statement_part(condition.strip().rstrip('.'))
 
 def validate_statement_part(part):
     # Check for the presence of a subject and predicate in the correct order
@@ -177,6 +179,13 @@ def validate_statement_part(part):
             # Check if the predicate is valid and allows for multi-word predicates
             if any(predicate.lower().startswith(p.lower()) for p in predicates):
                 return True
+
+    # New check for proper nouns as subjects in the format "ProperNoun is Predicate."
+    proper_noun_match = re.match(r'^([A-Z][a-z]+(?: [A-Z][a-z]+)*) is ([A-Za-z\s]+)\.$', part)
+    if proper_noun_match:
+        proper_noun, predicate = proper_noun_match.groups()
+        if predicate.lower() in [p.lower() for p in predicates]:
+            return True
 
     return False
 
