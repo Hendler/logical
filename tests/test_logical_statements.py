@@ -59,6 +59,12 @@ class TestLogicalStatements(unittest.TestCase):
         result = self.evaluate_prolog_statement(prolog_statement)
         self.assertEqual(result, expected, f"Statement failed: {english_statement}")
 
+    def test_socrates_statement(self):
+        english_statement = "If Socrates is a man, then Socrates is mortal."
+        expected = True
+        prolog_statement = "mortal(socrates)."
+        result = self.evaluate_prolog_statement(prolog_statement)
+        self.assertEqual(result, expected, f"Statement failed: {english_statement}")
 
     # Placeholder for additional test methods to reach a total of 1000
 
