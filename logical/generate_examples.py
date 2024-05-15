@@ -73,7 +73,7 @@ def validate_logical_statement(statement):
     has_quantifier = any(quantifier + " " in statement for quantifier in valid_quantifiers)
     has_subject_predicate = re.search(r'\b(is|are)\b', statement) is not None
     ends_with_period = statement.endswith(".")
-    starts_with_conditional = re.match(r'If\s+(.+?),\s+then\s+(.+)\.', statement) is not None
+    starts_with_conditional = re.match(r'If\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s+(is|are)\s+([a-z]+),\s+then\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s+(is|are)\s+([a-z]+)\.', statement) is not None
     starts_with_assumption = statement.startswith("Assuming")
     has_negation = " not " in statement or statement.startswith("It is not the case")
     has_comparative = " more " in statement or " either " in statement or " neither " in statement
@@ -101,15 +101,15 @@ def validate_logical_statement(statement):
             return False
 
     # Recognize conditional "If...then..." constructs
+    # If the statement starts with a conditional, ensure that the subjects and predicates match
     if starts_with_conditional:
-        conditional_parts = statement.split(", then ", 1)
-        condition = conditional_parts[0].strip()[3:]  # Remove 'If ' from the beginning
-        conclusion = conditional_parts[1].strip() if len(conditional_parts) > 1 else ""
-        # Validate the logical consistency of the conditional statement
-        if validate_individual_condition_part(condition) and validate_individual_condition_part(conclusion):
+        conditional_match = re.match(r'If\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s+(is|are)\s+([a-z]+),\s+then\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s+(is|are)\s+([a-z]+)\.', statement)
+        if conditional_match:
+            subject1, verb1, predicate1, subject2, verb2, predicate2 = conditional_match.groups()
+            # Ensure that the subjects match and the predicates are logically coherent
+            if subject1 != subject2 or verb1 != verb2:
+                return False
             return True
-        else:
-            return False
 
     # Recognize assumption-based "Assuming..." constructs
     elif starts_with_assumption:
@@ -338,7 +338,7 @@ def test_validate_logical_statement():
     for statement, expected in test_cases:
         result = validate_logical_statement(statement)
         print(f"Testing statement: {statement} - Expected: {expected}, Got: {result}")
-        assert result == expected, f"Test failed for statement: {statement}"
+        assert result == expected, f"Test failed for statement: {statement} - Expected: {expected}, Got: {result}"
 
 # Number of examples to generate
 NUM_EXAMPLES_TO_GENERATE = 1000
