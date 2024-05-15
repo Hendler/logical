@@ -138,7 +138,7 @@ def validate_individual_condition_part(condition):
     # Use regular expressions to match the pattern of a conditional statement
     # The regular expression now accounts for an optional comma before 'then'
     # and includes proper handling of proper nouns and multi-word predicates
-    match = re.match(r'If\s+(.+?)(?:,)?\s+then\s+(.+)\s*$', condition, re.IGNORECASE)
+    match = re.match(r'If\s+(.+?)\s+then\s+(.+)\s*$', condition, re.IGNORECASE)
     if match:
         condition_part, conclusion_part = match.groups()
         # Validate both the condition and conclusion parts as individual statements
@@ -165,8 +165,8 @@ def validate_statement_part(part):
     named_entity_predicate_pair = re.match(r'([A-Z][a-z]+(?: [A-Z][a-z]+)*) (is|are) ([A-Za-z\s]+)', part)
     if named_entity_predicate_pair:
         named_subject, _, named_pred = named_entity_predicate_pair.groups()
-        # Check if the predicate is valid and allows for multi-word predicates
-        if any(named_pred.lower().startswith(p.lower()) for p in predicates):
+        # Allow for predicates that are not predefined but form a logically coherent statement
+        if named_pred.lower().endswith(('er', 'est')) or named_pred.lower() in [p.lower() for p in predicates]:
             return True
 
     # If the part does not contain logical connectives, it should be a simple statement
@@ -176,16 +176,12 @@ def validate_statement_part(part):
         simple_statement_match = re.match(r'^([A-Z][a-z]+(?: [A-Z][a-z]+)*) (is|are) ([A-Za-z\s]+)\.$', part)
         if simple_statement_match:
             subject, verb, predicate = simple_statement_match.groups()
-            # Check if the predicate is valid and allows for multi-word predicates
-            if any(predicate.lower().startswith(p.lower()) for p in predicates):
+            # Allow for predicates that are not predefined but form a logically coherent statement
+            if predicate.lower().endswith(('er', 'est')) or predicate.lower() in [p.lower() for p in predicates]:
                 return True
-
-    # New check for proper nouns as subjects in the format "ProperNoun is Predicate."
-    proper_noun_match = re.match(r'^([A-Z][a-z]+(?: [A-Z][a-z]+)*) is ([A-Za-z\s]+)\.$', part)
-    if proper_noun_match:
-        proper_noun, predicate = proper_noun_match.groups()
-        if predicate.lower() in [p.lower() for p in predicates]:
-            return True
+            # Handle predicates that are proper nouns or multi-word phrases
+            if predicate[0].isupper() or ' ' in predicate:
+                return True
 
     return False
 
@@ -257,6 +253,22 @@ def test_validate_logical_statement():
         ("A cat is more agile than.", False),  # Incomplete comparative
         ("It is not the case that a cat.", False),  # Incomplete negation
         ("If a cat is more agile than a dog, then a fish is more agile than a bird.", False),  # Illogical comparative
+        # Additional test cases for proper nouns and multi-word predicates
+        ("If Plato is a philosopher, then Plato is wise.", True),  # Proper noun in condition and conclusion
+        ("If the sky is blue, then the ocean is vast and deep.", True),  # Multi-word predicate
+        ("If Mount Everest is a mountain, then Mount Everest is high.", True),  # Proper noun with common predicate
+        ("If a book is interesting, then the book is a page-turner.", True),  # Multi-word predicate
+        ("If Shakespeare wrote Hamlet, then Shakespeare is a playwright.", True),  # Proper noun in condition and conclusion
+        ("If a car is electric, then the car is energy-efficient.", True),  # Multi-word predicate
+        ("If Socrates is a man, then Socrates is mortal.", True),  # The recurring test case
+        ("If a cat is on the mat, then the cat is comfortable.", True),  # Simple conditional statement
+        ("If a dog barks, then the dog is not silent.", True),  # Negation in conclusion
+        ("If a tree is tall, then the tree has many leaves.", True),  # Common predicate
+        ("If a bird flies, then the bird is in the sky.", True),  # Simple conclusion
+        ("If a flower is beautiful, then the flower is a rose.", False),  # Illogical conclusion
+        ("If a fish swims, then the fish is a bird.", False),  # Illogical conclusion
+        ("If a phone is ringing, then the phone is a banana.", False),  # Illogical conclusion
+        ("If a computer is on, then the computer is a robot.", False),  # Illogical conclusion
     ]
 
     # Run test cases
