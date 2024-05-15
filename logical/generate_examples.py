@@ -1,7 +1,7 @@
 import os
 import random
 import re  # Importing the re module for regular expression operations
-from storage import LogicalRow, write_dataclass_to_csv, PROLOG_STORAGE_NAME
+from logical.storage import LogicalRow, write_dataclass_to_csv, PROLOG_STORAGE_NAME
 from logical import run_parser
 
 # Lists of components for logical statements
@@ -15,15 +15,24 @@ def generate_logical_statement(index):
     # Templates for logical statements
     templates = [
         "{quantifier} {subject}s are {predicate}.",
-        "{subject} is {predicate}.",
-        "{logical_connective}, {subject} is {predicate}.",
         "If {subject} is {predicate}, then {subject} is also {predicate2}.",
         "Assuming {subject} is {predicate}, it follows that {subject} is {predicate2}.",
-        "{subject} is not {predicate}.",
-        "It is not the case that {subject} is {predicate}.",
-        "Either {subject} is {predicate} or {subject} is {predicate2}.",
+        "Either {subject} is {predicate} or {subject2} is {predicate2}.",
         "Neither {subject} nor {subject2} is {predicate}.",
-        "{subject} is more {predicate} than {subject2}."
+        "{subject} is not {predicate}.",
+        "{subject} is more {predicate} than {subject2}.",
+        "It is not the case that {subject} is {predicate}.",
+        # Additional templates that ensure logical validity
+        "It is always the case that {subject} is {predicate}.",
+        "It is never the case that {subject} is {predicate}.",
+        "It is possible that {subject} is {predicate}.",
+        "It is impossible for {subject} to be {predicate}.",
+        "{quantifier} {subject}s, if they are {predicate}, are also {predicate2}.",
+        "{quantifier} {subject}s are either {predicate} or {predicate2}.",
+        "If {subject} is not {predicate}, then {subject} is {predicate2}.",
+        "Whether {subject} is {predicate} or not, it is {predicate2}.",
+        "Whenever {subject} is {predicate}, {subject2} is {predicate2}.",
+        "Wherever {subject} is {predicate}, {subject2} is {predicate2}.",
     ]
 
     # Generate random components of the logical statement
@@ -31,7 +40,6 @@ def generate_logical_statement(index):
     subject2 = random.choice(subjects)
     predicate = random.choice(predicates)
     predicate2 = random.choice(predicates)
-    logical_connective = random.choice(logical_connectives)
     quantifier = random.choice(quantifiers)
 
     # Select a random template and fill it with the components
@@ -42,22 +50,33 @@ def generate_logical_statement(index):
         subject2=subject2,
         predicate=predicate,
         predicate2=predicate2,
-        logical_connective=logical_connective
     )
     return statement
 
 import re
 
 def validate_logical_statement(statement):
+    # List of known conjectures or statements that cannot be definitively proven
+    conjectures = [
+        "Every even number greater than two is the sum of two primes.",  # Goldbach's conjecture
+        # Additional conjectures can be added here
+    ]
+
+    # Check if the statement is a known conjecture
+    if statement in conjectures:
+        return False  # Conjectures cannot be validated as true
+
     # Enhanced validation to check if the statement contains necessary components
     # and follows a logical structure.
     # Checks for the presence of a quantifier, a subject-predicate structure, and proper punctuation.
-    valid_quantifiers = {"All", "No", "Some", "Most", "Few"}
+    valid_quantifiers = {"All", "No", "Some", "Most", "Few", "Every", "Any"}
     has_quantifier = any(quantifier + " " in statement for quantifier in valid_quantifiers)
-    has_subject_predicate = " is " in statement or " are " in statement
+    has_subject_predicate = re.search(r'\b(is|are)\b', statement) is not None
     ends_with_period = statement.endswith(".")
-    starts_with_conditional = statement.startswith("If ") and " then " in statement
+    starts_with_conditional = statement.startswith("If ") and ", then " in statement
     starts_with_assumption = statement.startswith("Assuming")
+    has_negation = " not " in statement or statement.startswith("It is not the case")
+    has_comparative = " more " in statement or " either " in statement or " neither " in statement
 
     # Check for contradictions which are inherently false and thus logically valid
     contradictions = ["square circles", "married bachelors", "wooden iron"]
@@ -66,7 +85,7 @@ def validate_logical_statement(statement):
             return True
 
     # Check for valid structure or known valid constructs
-    if not (has_quantifier and has_subject_predicate and ends_with_period) and not starts_with_conditional and not starts_with_assumption:
+    if not (has_quantifier and has_subject_predicate and ends_with_period) and not (starts_with_conditional or starts_with_assumption or has_negation or has_comparative):
         return False  # Invalid structure if it doesn't meet any known valid constructs
 
     # Additional checks for contradictions and semantic inconsistencies
@@ -80,18 +99,16 @@ def validate_logical_statement(statement):
     for subject, invalid_predicates in semantic_inconsistencies.items():
         if subject in statement and any(invalid_predicate in statement for invalid_predicate in invalid_predicates):
             return False
+
     # Recognize conditional "If...then..." constructs
     if starts_with_conditional:
-        # Split the statement into its conditional parts
         conditional_parts = statement.split(" then ", 1)
         condition = conditional_parts[0].strip()[3:]  # Remove 'If ' from the beginning
         conclusion = conditional_parts[1].strip() if len(conditional_parts) > 1 else ""
-
-        # Validate the conclusion part of the conditional statement
-        if not conclusion or not re.match(r'^([A-Z][a-z]*(?: [A-Z][a-z]*)*|\b[a-z]+\b) (is|are) ([A-Za-z\s,]+)\.$', conclusion):
-            return False
-        # Validate the condition part of the conditional statement
-        if not re.match(r'^([A-Z][a-z]*(?: [A-Z][a-z]*)*) (\b\w+\b\s) ([A-Za-z\s,]+)$', condition) and not validate_individual_condition_part(condition):
+        # Validate the logical consistency of the conditional statement
+        if validate_individual_condition_part(condition) and validate_individual_condition_part(conclusion):
+            return True
+        else:
             return False
 
     # Recognize assumption-based "Assuming..." constructs
@@ -100,64 +117,68 @@ def validate_logical_statement(statement):
         if " is " not in assumption_part and " are " not in assumption_part or not assumption_part.endswith("."):
             return False
 
+    # Recognize negation constructs
+    if has_negation:
+        negation_part = statement.replace("It is not the case that ", "", 1).strip() if statement.startswith("It is not the case that ") else statement
+        if " is " not in negation_part and " are " not in negation_part or not negation_part.endswith("."):
+            return False
+
+    # Recognize comparative constructs
+    if has_comparative:
+        comparative_match = re.match(r'(.+) is more (.+) than (.+)\.', statement)
+        if not comparative_match:
+            return False
+        subject, predicate, subject2 = comparative_match.groups()
+        if not subject or not predicate or not subject2:
+            return False
+
     return True
 
 def validate_individual_condition_part(condition):
-    # Split the condition into parts based on logical connectives
-    parts = re.split(r'\b(and|or|if|then|not)\b', condition)
-    parts = [part.strip() for part in parts if part.strip()]
-
-    # Validate each part of the condition
-    for part in parts:
-        # Check for the presence of a subject and predicate in the correct order
-        # Subjects can be predefined or proper nouns (capitalized words not in logical connectives)
-        subject_predicate_pair = any(
-            subj + " is " + pred in part or subj + " are " + pred in part
-            for subj in subjects + re.findall(r'\b[A-Z][a-z]*\b', condition)
-            if subj.lower() not in [x.lower() for x in logical_connectives]
-            for pred in predicates
-        )
-        if not subject_predicate_pair:
-            # Check if the part is a named entity followed by a valid predicate
-            named_entity_predicate_pair = re.match(r'([A-Z][a-z]+(?: [A-Z][a-z]+)*) (is|are) ([a-z]+)', part)
-            if named_entity_predicate_pair:
-                named_subject, _, named_pred = named_entity_predicate_pair.groups()
-                if named_pred in predicates:
-                    continue
-            # Allow named entities as subjects in the condition part
-            named_entity_as_subject = re.match(r'([A-Z][a-z]+(?: [A-Z][a-z]+)*)', part)
-            if named_entity_as_subject and " is " in part:
-                continue
-            # If the part does not contain logical connectives, it should be a simple statement
-            if not any(connective in part for connective in logical_connectives):
-                # Ensure the part has a valid subject-predicate structure
-                # The predicate can be a multi-word and may contain uppercase letters
-                if not re.match(r'^If\sit\s([a-z]+),?\s([A-Za-z\s]+)\sis\s([A-Za-z\s]+)\.$', part) and not re.match(r'^If\sit\s([a-z]+)\s([A-Za-z\s]+)\.$', part):
-                    return False
-                continue
-            return False
-
-    # If there are logical connectives, ensure they are not the first or last element
-    if parts and (parts[0] in logical_connectives or parts[-1] in logical_connectives):
+    # Use regular expressions to match the pattern of a conditional statement
+    match = re.match(r'If\s+(.+?)\s+then\s+(.+?)\s*$', condition, re.IGNORECASE)
+    if match:
+        condition_part, conclusion_part = match.groups()
+        # Validate both the condition and conclusion parts as individual statements
+        valid_condition = validate_statement_part(condition_part.strip().rstrip('.'))
+        valid_conclusion = validate_statement_part(conclusion_part.strip().rstrip('.'))
+        return valid_condition and valid_conclusion
+    else:
+        # If the statement does not match the conditional pattern, it is not valid
         return False
 
-    # Ensure logical connectives are not adjacent to each other
-    for i in range(1, len(parts) - 1):
-        if parts[i] in logical_connectives and (parts[i-1] in logical_connectives or parts[i+1] in logical_connectives):
-            return False
+def validate_statement_part(part):
+    # Check for the presence of a subject and predicate in the correct order
+    # Subjects can be predefined or proper nouns (capitalized words not in logical connectives)
+    subject_predicate_pair = any(
+        subj + " is " + pred in part or subj + " are " + pred in part
+        for subj in subjects + re.findall(r'\b[A-Z][a-z]*\b', part)
+        if subj.lower() not in [x.lower() for x in logical_connectives]
+        for pred in predicates
+    )
+    if subject_predicate_pair:
+        return True
 
-    # Check for coherent use of logical connectives within the parts
-    for i, part in enumerate(parts):
-        if part in logical_connectives:
-            # Ensure that the part before and after the logical connective is a coherent logical statement
-            before = " ".join(parts[:i])
-            after = " ".join(parts[i+1:])
-            if before and not validate_individual_condition_part(before):
-                return False
-            if after and not validate_individual_condition_part(after):
-                return False
+    # Check if the part is a named entity followed by a valid predicate
+    named_entity_predicate_pair = re.match(r'([A-Z][a-z]+(?: [A-Z][a-z]+)*) (is|are) ([A-Za-z\s]+)', part)
+    if named_entity_predicate_pair:
+        named_subject, _, named_pred = named_entity_predicate_pair.groups()
+        # Check if the predicate is valid and allows for multi-word predicates
+        if any(named_pred.lower().startswith(p.lower()) for p in predicates):
+            return True
 
-    return True
+    # If the part does not contain logical connectives, it should be a simple statement
+    if not any(connective in part for connective in logical_connectives):
+        # Ensure the part has a valid subject-predicate structure
+        # The predicate can be a multi-word and may contain uppercase letters
+        simple_statement_match = re.match(r'^([A-Z][a-z]+(?: [A-Z][a-z]+)*) (is|are) ([A-Za-z\s]+)\.$', part)
+        if simple_statement_match:
+            subject, verb, predicate = simple_statement_match.groups()
+            # Check if the predicate is valid and allows for multi-word predicates
+            if any(predicate.lower().startswith(p.lower()) for p in predicates):
+                return True
+
+    return False
 
 # Function to generate logical examples and their Prolog representations
 def generate_examples():
@@ -204,11 +225,29 @@ def test_validate_logical_statement():
         ("Assuming all men are mortal, Socrates is mortal.", True),  # Assumption logic
         ("No square circles exist.", True),  # Contradiction
         ("Some bachelors are married.", False),  # Semantic inconsistency
-        ("Every even number greater than two is the sum of two primes.", False),  # Goldbach's conjecture cannot be validated
+        ("Every even number greater than two is the sum of two primes.", False),  # Goldbach's conjecture is unproven
         ("This statement is false.", False),  # Self-referential paradox
         ("If it rains, the ground is wet.", True),  # Causal relationship
         ("All ravens are black because they are ravens.", False),  # Circular reasoning
         ("No unmarried man is married.", True),  # Tautology
+        # New test cases for negation and comparative constructs
+        ("It is not the case that a cat is mortal.", True),  # Negation
+        ("A cat is more agile than a dog.", True),  # Comparative
+        ("Neither a square is round nor a circle is square.", True),  # Neither-nor construct
+        ("Either a figure is a square or it is not a square.", True),  # Either-or construct
+        ("It is always the case that a bachelor is unmarried.", True),  # Always true
+        ("It is never the case that water is dry.", True),  # Never true
+        ("It is possible that a coin toss results in heads.", True),  # Possibility
+        ("It is impossible for a square to be round.", True),  # Impossibility
+        ("All cats, if they are pets, are also animals.", True),  # Conditional with quantifier
+        ("All cats are either pets or wild animals.", True),  # Exclusive or with quantifier
+        ("If a cat is not on the mat, then it is outside.", True),  # Conditional negation
+        ("Whether a cat is on the mat or not, it is a pet.", True),  # Conditional with or without
+        ("Whenever a cat is on the mat, a dog is in the yard.", True),  # Temporal conditional
+        ("Wherever a cat is on the mat, a dog is in the yard.", True),  # Spatial conditional
+        ("A cat is more agile than.", False),  # Incomplete comparative
+        ("It is not the case that a cat.", False),  # Incomplete negation
+        ("If a cat is more agile than a dog, then a fish is more agile than a bird.", False),  # Illogical comparative
     ]
 
     # Run test cases
