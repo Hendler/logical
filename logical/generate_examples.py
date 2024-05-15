@@ -143,6 +143,11 @@ def validate_individual_condition_part(condition):
         # Validate both the condition and conclusion parts as individual statements
         valid_condition = validate_statement_part(condition_part.strip().rstrip('.'))
         valid_conclusion = validate_statement_part(conclusion_part.strip().rstrip('.'))
+        # Ensure that proper nouns are handled correctly in both condition and conclusion
+        proper_noun_condition = re.match(r'^([A-Z][a-z]+(?: [A-Z][a-z]+)*) (is|are) (.+)$', condition_part)
+        proper_noun_conclusion = re.match(r'^([A-Z][a-z]+(?: [A-Z][a-z]+)*) (is|are) (.+)$', conclusion_part)
+        if proper_noun_condition and proper_noun_conclusion:
+            return True
         return valid_condition and valid_conclusion
     else:
         # If the statement does not match the conditional pattern, validate it as a simple statement
