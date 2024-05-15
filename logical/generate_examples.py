@@ -2,7 +2,7 @@ import os
 import random
 import re  # Importing the re module for regular expression operations
 from storage import LogicalRow, write_dataclass_to_csv, PROLOG_STORAGE_NAME
-from __init__ import run_parser
+from logical import run_parser
 
 # Lists of components for logical statements
 subjects = ["cat", "dog", "bird", "car", "tree"]
@@ -160,12 +160,12 @@ def validate_individual_condition_part(condition):
     return True
 
 # Function to generate logical examples and their Prolog representations
-def generate_examples(count):
+def generate_examples():
     generated_statements = set()  # Set to keep track of generated statements to avoid duplicates
-    for i in range(count):
+    while len(generated_statements) < NUM_EXAMPLES_TO_GENERATE:
         try:
             # Generate a logical English statement
-            english_statement = generate_logical_statement(i)
+            english_statement = generate_logical_statement(len(generated_statements))
             # Validate the logical consistency of the statement
             if not validate_logical_statement(english_statement):
                 raise ValueError(f"Invalid logical statement: {english_statement}")
@@ -178,11 +178,11 @@ def generate_examples(count):
                 logical_row = LogicalRow(input_text=english_statement, prolog_text=prolog_statement)
                 # Write the LogicalRow instance to the CSV file
                 write_dataclass_to_csv(logical_row, PROLOG_STORAGE_NAME)
-                print(f"Generated example {i+1}/{count}: {english_statement}")
+                print(f"Generated example {len(generated_statements)}/{NUM_EXAMPLES_TO_GENERATE}: {english_statement}")
             else:
                 print(f"Duplicate statement detected, skipping: {english_statement}")
         except Exception as e:
-            print(f"An error occurred while generating example {i+1}: {e}")
+            print(f"An error occurred while generating example {len(generated_statements)}: {e}")
 
 # Test cases for validate_logical_statement function
 def test_validate_logical_statement():
@@ -221,7 +221,7 @@ def test_validate_logical_statement():
 NUM_EXAMPLES_TO_GENERATE = 1000
 
 # Generate the examples
-generate_examples(NUM_EXAMPLES_TO_GENERATE)
+generate_examples()
 
 # To run tests, uncomment the line below and execute the script.
 # This should be done in a development environment to verify changes.
