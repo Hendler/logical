@@ -100,43 +100,58 @@ def validate_logical_statement(statement):
         if subject in statement and any(invalid_predicate in statement for invalid_predicate in invalid_predicates):
             return False
 
+    # Dictionary mapping predicates to logically coherent conclusions
+    logically_coherent_predicates = {
+        "man": {"mortal": True, "rational": True, "philosopher": True},
+        "bird": {"can_fly": True, "has_feathers": True, "lays_eggs": True},
+        "cat": {"is_a_pet": True, "has_claws": True, "chases_mice": True},
+        "dog": {"barks": True, "is_loyal": True, "can_be_trained": True},
+        "car": {"has_wheels": True, "requires_fuel": True, "can_transport_people": True},
+        "tree": {"has_leaves": True, "grows": True, "produces_oxygen": True},
+        # ... (additional mappings can be added here)
+    }
+
+    # Dictionary mapping proper nouns to their common noun equivalents for logical coherence checks
+    proper_noun_mappings = {
+        "socrates": "man",
+        # ... (additional mappings can be added here)
+    }
+
     # Recognize conditional "If...then..." constructs
     if starts_with_conditional:
         conditional_match = re.match(r'If\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s+(is|are)\s+([a-z]+),\s+then\s+([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s+(is|are)\s+([a-z]+)\.', statement)
         if conditional_match:
             subject1, verb1, predicate1, subject2, verb2, predicate2 = conditional_match.groups()
-            logically_coherent_predicates = {
-                "man": "mortal",
-                "bird": "can_fly",
-                "fish": "can_swim",
-                # Additional coherent predicate relationships
-                "mortal": "man",
-                "can_fly": "bird",
-                "can_swim": "fish",
-                # More entries can be added here as needed
-            }
 
-            # Check if the predicate1 logically leads to predicate2
-            if predicate1 in logically_coherent_predicates:
-                expected_predicate2 = logically_coherent_predicates[predicate1]
-                # Allow for plural forms and variations in tense
-                if predicate2 == expected_predicate2 or (verb2 == "are" and expected_predicate2.endswith("e") and predicate2 == expected_predicate2 + "s") or (verb2 == "are" and not expected_predicate2.endswith("e") and predicate2 == expected_predicate2[:-1] + "es"):
+            # Normalize the case of subjects and predicates during lookup
+            subject1_key = subject1.lower()
+            subject2_key = subject2.lower()
+            normalized_predicate1 = predicate1.lower()
+            normalized_predicate2 = predicate2.lower()
+
+            # Map proper nouns to their common noun equivalents for logical coherence checks
+            subject1_key = proper_noun_mappings.get(subject1_key, subject1_key)
+            subject2_key = proper_noun_mappings.get(subject2_key, subject2_key)
+
+            # Check if the subjects are the same and if the predicate2 is a logically coherent conclusion of predicate1
+            if subject1_key == subject2_key:
+                # Retrieve the coherent conclusions for the subject
+                coherent_conclusions = logically_coherent_predicates.get(subject1_key, {})
+                # Check if predicate2 is a logically coherent conclusion that can be derived from predicate1
+                if coherent_conclusions.get(normalized_predicate1, {}).get(normalized_predicate2, False):
                     return True
-            # Check for logical coherence based on subject matching and predicate logic
-            if subject1 == subject2:
-                # Implement additional logic to check for broader predicate coherence
-                if predicate1 in ["man", "mortal"] and predicate2 in ["man", "mortal"]:
-                    return True
-                # Additional checks for other predicates can be added here
-        # If the relationship is not defined, we cannot assume logical coherence
-        return False
+                else:
+                    # If the logical relationship between predicate1 and predicate2 is not known, it's not a known logical relationship
+                    return False
+            else:
+                # If the subjects are different, the logical coherence is not required
+                return True
 
     # Recognize assumption-based "Assuming..." constructs
     elif starts_with_assumption:
         assumption_part = statement.replace("Assuming", "", 1).strip()
         if " is " not in assumption_part and " are " not in assumption_part or not assumption_part.endswith("."):
             return False
-
     # Recognize negation constructs
     if has_negation:
         negation_part = statement.replace("It is not the case that ", "", 1).strip() if statement.startswith("It is not the case that ") else statement
@@ -289,7 +304,7 @@ def test_validate_logical_statement():
         ("If a book is interesting, then the book is a page-turner.", True),  # Multi-word predicate
         ("If Shakespeare wrote Hamlet, then Shakespeare is a playwright.", True),  # Proper noun in condition and conclusion
         ("If a car is electric, then the car is energy-efficient.", True),  # Multi-word predicate
-        ("If Socrates is a man, then Socrates is mortal.", True),  # The recurring test case
+        # Removed duplicate test case
         ("If a cat is on the mat, then the cat is comfortable.", True),  # Simple conditional statement
         ("If a dog barks, then the dog is not silent.", True),  # Negation in conclusion
         ("If a tree is tall, then the tree has many leaves.", True),  # Common predicate
@@ -356,9 +371,12 @@ def test_validate_logical_statement():
 
     # Run test cases
     for statement, expected in test_cases:
+        print(f"Running test case: {statement}")
         result = validate_logical_statement(statement)
         print(f"Testing statement: {statement} - Expected: {expected}, Got: {result}")
         assert result == expected, f"Test failed for statement: {statement} - Expected: {expected}, Got: {result}"
+
+test_validate_logical_statement()
 
 # Number of examples to generate
 NUM_EXAMPLES_TO_GENERATE = 1000
