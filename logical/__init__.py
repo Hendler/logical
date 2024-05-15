@@ -10,7 +10,7 @@ load_dotenv(find_dotenv())
 OPEN_AI_MODEL_TYPE = os.getenv("OPEN_AI_MODEL_TYPE")
 
 
-from storage import (
+from .storage import (
     LogicalRow,
     QueryRow,
     write_dataclass_to_csv,
@@ -105,10 +105,37 @@ def parse_query(input_text):
 
 
 def run_parser(input_text: str):
-    result = parse_logic(input_text)
-    row = LogicalRow(input_text=input_text, prolog_text=result)
+    # Mapping English logical constructs to Prolog
+    # This is a simplified version and may need to be expanded for more complex logic
+    mapping = {
+        " is ": " :- ",
+        " are ": " :- ",
+        "If ": "if(",
+        ", then ": ") then ",
+        "Assuming ": "assume(",
+        ", it follows that ": ") then ",
+        " not ": " \\+ ",
+        "It is not the case that ": " \\+ ",
+        "Either ": "either(",
+        " or ": ") or ",
+        "Neither ": "neither(",
+        " nor ": ") nor ",
+        " is more ": " is_more_than ",
+    }
+
+    # Convert the English statement to Prolog using the mapping
+    prolog_statement = input_text
+    for english_construct, prolog_construct in mapping.items():
+        prolog_statement = prolog_statement.replace(english_construct, prolog_construct)
+
+    # Additional logic to handle the end of statements and other Prolog-specific syntax
+    prolog_statement = prolog_statement.replace(".", "").strip() + "."
+
+    # Write the Prolog statement to the CSV file
+    row = LogicalRow(input_text=input_text, prolog_text=prolog_statement)
     write_dataclass_to_csv(row, PROLOG_STORAGE_NAME)
-    return result
+
+    return prolog_statement
 
 
 def run_logic(input_text: str):

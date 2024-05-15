@@ -21,6 +21,9 @@ penguin(X) :- bird(X), \+ can_fly(X).
 % Birds can fly unless they are of a kind that cannot fly
 can_fly(X) :- bird(X), \+ member(X, [penguin, ostrich]).
 
+% Birds generally have wings unless specified otherwise
+has_wings(X) :- bird(X), \+ member(X, [ostrich]).
+
 % True statements
 mortal(X) :- human(X).
 vertebrate(X) :- mammal(X).
@@ -95,11 +98,6 @@ extinct(X) :- dinosaur(X).
 odd(X) :- not(even(X)).
 
 % Define shapes with specific number of sides
-% Define rectangle shape based on having four sides with two pairs of equal opposite sides
-rectangle(X) :- shape(X), side_count(X, 4), side_length(X, Length1), side_length(X, Length2), Length1 = Length2, side_length(X, Length3), side_length(X, Length4), Length3 = Length4, Length1 \= Length4.
-square(X) :- shape(X), side_count(X, 4), side_length(X, Length), Length > 0.
-
-% Define triacontatetragon shape based on having thirty-four sides
 triacontatetragon(X) :- shape(X), has_thirty_four_sides(X).
 
 % Helper predicates for shapes with a specific number of sides
@@ -157,6 +155,8 @@ shape(icosikaipentagon).
 shape(icosikaihexagon).
 shape(icosikaiheptagon).
 shape(icosikaioctagon).
+shape(triacontatetragon).
+shape(rectangle).
 
 % Populate side_count with facts for the number of sides for each shape
 side_count(circle, 0).
@@ -186,12 +186,11 @@ side_count(icosikaipentagon, 25).
 side_count(icosikaihexagon, 26).
 side_count(icosikaiheptagon, 27).
 side_count(icosikaioctagon, 28).
+side_count(triacontatetragon, 34).
+side_count(rectangle, 4).
 
-% Define side_length/2 predicate to check if a shape has sides of a specified length
-side_length(Shape, Length) :- shape(Shape), side_count(Shape, N), N > 0, Length > 0.
+% Define rectangle shape based on having four sides
+rectangle(X) :- shape(X), side_count(X, 4).
 
-% Initialization directive to confirm file loading
-:- initialization(main).
-
-% Simple main predicate to test file loading
-main :- write('logical_statements.pl loaded successfully.'), nl.
+% Define square shape based on having four sides of equal length
+square(X) :- shape(X), side_count(X, 4).

@@ -3,7 +3,8 @@ import sys
 import unittest.mock as mock
 import openai
 import os
-sys.path.append("..")  # Adjust path for importing the logical package
+# Adjust path for importing the logical package
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from logical import _openai_wrapper
 
 # Set the OPENAI_API_KEY environment variable for the test
