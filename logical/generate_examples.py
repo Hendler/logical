@@ -73,7 +73,7 @@ def validate_logical_statement(statement):
     has_quantifier = any(quantifier + " " in statement for quantifier in valid_quantifiers)
     has_subject_predicate = re.search(r'\b(is|are)\b', statement) is not None
     ends_with_period = statement.endswith(".")
-    starts_with_conditional = statement.startswith("If ") and ", then " in statement
+    starts_with_conditional = re.match(r'If\s+(.+?),\s+then\s+(.+)\.', statement) is not None
     starts_with_assumption = statement.startswith("Assuming")
     has_negation = " not " in statement or statement.startswith("It is not the case")
     has_comparative = " more " in statement or " either " in statement or " neither " in statement
