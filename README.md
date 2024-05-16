@@ -8,11 +8,13 @@ First developed at the [OpenAI emergency hackathon on 3/5/2023](https://twitter.
 
 ## status 3/16/2023
 
-GPT-3.5 outputs prolog along with additional text sometimes breaking the automated push to the . It may refuse to generate prolog if there are no obvious logical statements.
+The logic engine has been updated to use the "gpt-4o" model for generating Prolog statements. This update aims to improve the accuracy and coherence of the logical outputs.
 
 ## usage
 
 To use this logic engine, you need to set up the environment variables in a `.env` file. Copy the `.env-example` to `.env` and set the `OPEN_AI_MODEL_TYPE` to the desired model, such as "gpt-4o".
+
+The ASSISTANT_PARSING_PROMPT has been enhanced with detailed examples to demonstrate the conversion of English statements into Prolog syntax, providing a more intuitive experience for users.
 
 ```
 $ inv logic.run
@@ -82,6 +84,7 @@ You can load the generated file in swipl to test also
 
     $ swipl
     ?- ['myprolog.pl'].
+
 
 ## see also
 
