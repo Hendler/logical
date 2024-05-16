@@ -48,7 +48,7 @@ def _openai_wrapper(
 
         # Use the new method for creating chat completions
         result = client.chat.completions.create(
-            model="gpt-4o",
+            model=OPEN_AI_MODEL_TYPE,
             messages=messages,
         )
 
