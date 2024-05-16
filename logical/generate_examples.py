@@ -143,9 +143,13 @@ def validate_logical_statement(statement):
         # ... (additional mappings can be added here)
     }
 
-    # Recognize conditional "If...then..." constructs
+    # Regular expression pattern for conditional statements
+    conditional_pattern = r'If\s+([A-Za-z][a-z]*(?:\s+[A-Za-z][a-z]*)*)\s+(is|are)\s+([a-z]+),\s+then\s+([A-Za-z][a-z]*(?:\s+[A-Za-z][a-z]*)*)\s+(is|are)\s+([a-z]+)\s*\.'
+    starts_with_conditional = re.match(conditional_pattern, statement.strip(), re.IGNORECASE) is not None
+
+    # Check if the subjects are the same and if predicate2 is a logically coherent conclusion of predicate1
     if starts_with_conditional:
-        conditional_match = re.match(r'If\s+([A-Za-z][a-z]*(?:\s+[A-Za-z][a-z]*)*)\s+(is|are)\s+([a-z]+),\s+then\s+([A-Za-z][a-z]*(?:\s+[A-Za-z][a-z]*)*)\s+(is|are)\s+([a-z]+)\s*\.', statement)
+        conditional_match = re.match(conditional_pattern, statement)
         if conditional_match:
             subject1, verb1, predicate1, subject2, verb2, predicate2 = conditional_match.groups()
 
@@ -159,17 +163,16 @@ def validate_logical_statement(statement):
             subject1_key = proper_noun_mappings.get(subject1_key, subject1_key)
             subject2_key = proper_noun_mappings.get(subject2_key, subject2_key)
 
-            # Check if the subjects are the same and if predicate2 is a logically coherent conclusion of predicate1
-            if subject1_key == subject2_key:
-                # Retrieve the coherent conclusions for the subject
-                coherent_conclusions = logically_coherent_predicates.get(subject1_key, {})
-                # Check if predicate2 is a coherent conclusion of predicate1
-                if coherent_conclusions.get(normalized_predicate1, False) and coherent_conclusions.get(normalized_predicate2, False):
+            # Retrieve the coherent conclusions for the subject
+            coherent_conclusions = logically_coherent_predicates.get(subject1_key, {})
+
+            # Check if predicate2 is a logically coherent conclusion of predicate1
+            if coherent_conclusions.get(normalized_predicate1) == True:
+                if normalized_predicate2 in coherent_conclusions and coherent_conclusions[normalized_predicate2]:
                     return True
-                else:
-                    return False
-            else:
-                return False  # If the subjects are not the same, the statement is not logically coherent
+            return False
+        else:
+            return False  # If the subjects are not the same, the statement is not logically coherent
 
     # Recognize assumption-based "Assuming..." constructs
     elif starts_with_assumption:
