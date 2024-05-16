@@ -54,13 +54,13 @@ def _openai_wrapper(
 
         # Update response handling to use the new Pydantic model accessors
         return result.choices[0].message.content
-    except openai.error.AuthenticationError:
+    except openai.AuthenticationError:
         # Handle invalid API key error
         return "Error: Invalid OpenAI API key."
-    except openai.error.RateLimitError:
+    except openai.RateLimitError:
         # Handle API rate limit exceeded error
         return "Error: OpenAI API rate limit exceeded."
-    except openai.error.OpenAIError as e:
+    except openai.OpenAIError as e:
         # Handle general OpenAI API errors
         return f"Error: An unexpected OpenAI API error occurred: {str(e)}"
     except Exception as e:
