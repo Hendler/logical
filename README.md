@@ -12,9 +12,11 @@ The logic engine has been updated to use the "gpt-4o" model for generating Prolo
 
 ## usage
 
-To use this logic engine, you need to set up the environment variables in a `.env` file. Copy the `.env-example` to `.env` and set the `OPENAI_API_KEY` to your actual OpenAI API key and `OPEN_AI_MODEL_TYPE` to the desired model, such as "gpt-4o".
+To use this logic engine, you need to set up the environment variables in a `.env` file. Copy the `.env-example` to `.env` and set the `OPENAI_API_KEY` to your actual OpenAI API key. The `OPEN_AI_MODEL_TYPE` should be set to the desired model, such as "gpt-4o", which can be configured via the environment variable.
 
 The ASSISTANT_PARSING_PROMPT has been enhanced with detailed examples to demonstrate the conversion of English statements into Prolog syntax, providing a more intuitive experience for users.
+
+The logic engine can handle any English logical statements. OpenAI is used to generate the corresponding Prolog code, which is then run through a parser to ensure syntactical and semantical correctness before execution.
 
 ```
 $ inv logic.run
@@ -66,6 +68,8 @@ python3.11 -m pip install -r requirements.txt
 chmod +x main.pl
 ```
 
+Note: Python 3.11 is currently a release candidate. For a more stable version, you may consider using Python 3.10.
+
 Then copy the `.env-example` to `.env` and configure the necessary environment variables as described in the usage section.
 
 ## Commands:
@@ -78,12 +82,14 @@ Then copy the `.env-example` to `.env` and configure the necessary environment v
 
 ## debug
 
-You can load the generated file in swipl to test also
+To debug the logic engine and test the generated Prolog code, you can load the Prolog file in the SWI-Prolog interpreter:
 
 ```
 $ swipl
 ?- ['myprolog.pl'].
 ```
+
+This will allow you to interact with the Prolog code and verify its correctness.
 
 ## updates
 
