@@ -512,6 +512,8 @@ def test_validate_logical_statement():
 
 # test_validate_logical_statement()
 
+# test_validate_logical_statement()
+
 # test_validate_logical_statement()  # Uncomment to run tests
 
 # test_validate_logical_statement()
