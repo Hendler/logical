@@ -334,6 +334,28 @@ def generate_examples():
         except Exception as e:
             print(f"An error occurred while generating example {len(generated_statements)}: {e}")
 
+# test_validate_logical_statement()  # Uncomment to run tests
+
+# test_validate_logical_statement()  # Uncomment to run tests
+
+# Number of examples to generate
+NUM_EXAMPLES_TO_GENERATE = 1000
+
+# Generate the examples
+generate_examples()
+
+# test_validate_logical_statement()  # Uncomment to run tests
+
+# test_validate_logical_statement()  # Uncomment to run tests
+
+# test_validate_logical_statement()  # Uncomment to run tests
+
+# test_validate_logical_statement()  # Uncomment to run tests
+
+# test_validate_logical_statement()
+
+# test_validate_logical_statement()  # Uncomment to run tests
+
 # test_validate_logical_statement()
 
 # test_validate_logical_statement()
