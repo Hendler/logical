@@ -456,6 +456,8 @@ def test_validate_logical_statement():
         print(f"Testing statement: {statement} - Expected: {expected}, Got: {result}")
         assert result == expected, f"Test failed for statement: {statement} - Expected: {expected}, Got: {result}"
 
+# test_validate_logical_statement()
+
 test_validate_logical_statement()
 
 # Number of examples to generate
