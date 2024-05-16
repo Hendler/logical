@@ -336,6 +336,8 @@ def generate_examples():
 
 # test_validate_logical_statement()
 
+# test_validate_logical_statement()
+
 # Test cases for validate_logical_statement function
 # Test cases for validate_logical_statement function
 # def test_validate_logical_statement():
