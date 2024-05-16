@@ -56,15 +56,13 @@ Via ChatGPT:
 
 ## install
 
-To install the necessary dependencies for this project, follow the steps below:
+To install the necessary dependencies for this project on a Linux system, follow the steps below:
 
 ```
-brew install pyenv pyenv-virtualenv git
-brew install swi-prolog --HEAD
-pyenv install 3.11.2
-pyenv virtualenv 3.11.2 logical
-pip install --upgrade pip
-pip install -r requirements.txt
+sudo apt update
+sudo apt install python3.11 python3-pip swi-prolog -y
+python3.11 -m pip install --upgrade pip
+python3.11 -m pip install -r requirements.txt
 chmod +x main.pl
 ```
 
