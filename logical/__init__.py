@@ -116,6 +116,9 @@ def parse_logic(input_text, query_only=False):
     # Additional validation to ensure the response is in valid Prolog format
     elif not is_valid_prolog(openai_response):
         return "Error: The response from OpenAI API is not valid Prolog."
+    # Further semantic validation of the Prolog response
+    elif not is_semantically_valid_prolog(openai_response):
+        return "Error: The response from OpenAI API is not semantically valid Prolog."
 
     # Process the response through run_parser to generate Prolog
     return run_parser(openai_response)
