@@ -12,6 +12,8 @@ GPT-3.5 outputs prolog along with additional text sometimes breaking the automat
 
 ## usage
 
+To use this logic engine, you need to set up the environment variables in a `.env` file. Copy the `.env-example` to `.env` and set the `OPEN_AI_MODEL_TYPE` to the desired model, such as "gpt-4o".
+
 ```
 $ inv logic.run
 $ parse
@@ -20,6 +22,7 @@ $ ask
 $ Am I mortal?
 
 ```
+
 ## background
 
 One of the promises of logic is that it can give formal grounding for truth.
@@ -51,15 +54,19 @@ Via ChatGPT:
 
 ## install
 
-    brew install pyenv pyenv-virtualenv git
-    brew install swi-prolog --HEAD
-    pyenv install 3.11.2
-    pyenv virtualenv 3.11.2 logical
-    pip install --upgrade pip
-    chmod +x main.pl
+To install the necessary dependencies for this project, follow the steps below:
 
-Then copy the `.env-example` to `.env`
+```
+brew install pyenv pyenv-virtualenv git
+brew install swi-prolog --HEAD
+pyenv install 3.11.2
+pyenv virtualenv 3.11.2 logical
+pip install --upgrade pip
+pip install -r requirements.txt
+chmod +x main.pl
+```
 
+Then copy the `.env-example` to `.env` and configure the necessary environment variables as described in the usage section.
 
 # Commands:
 
