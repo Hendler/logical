@@ -148,7 +148,7 @@ def validate_logical_statement(statement):
 
         if quantifier == "All":  # For universal quantifiers, the predicate must be coherent for all instances
             # Check if the subject is in the dictionary and the predicate is true for all instances
-            return coherent_conclusions.get(normalized_predicate, False) and subject_key in logically_coherent_predicates
+            return subject_key in logically_coherent_predicates and coherent_conclusions.get(normalized_predicate, False)
         elif quantifier in ["Most", "Few"]:  # For these quantifiers, the predicate must be coherent for most or few instances
             return coherent_conclusions.get(normalized_predicate, False)
         elif quantifier == "Some":  # For the existential quantifier "Some", the predicate must be coherent for at least one instance
