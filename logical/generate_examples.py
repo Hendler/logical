@@ -458,6 +458,10 @@ def test_validate_logical_statement():
 
 # test_validate_logical_statement()
 
+# test_validate_logical_statement()
+
+# test_validate_logical_statement()
+
 test_validate_logical_statement()
 
 # Number of examples to generate
