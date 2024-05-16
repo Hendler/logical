@@ -334,6 +334,8 @@ def generate_examples():
         except Exception as e:
             print(f"An error occurred while generating example {len(generated_statements)}: {e}")
 
+# test_validate_logical_statement()
+
 # Test cases for validate_logical_statement function
 # Test cases for validate_logical_statement function
 # def test_validate_logical_statement():
