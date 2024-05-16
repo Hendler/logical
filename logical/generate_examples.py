@@ -55,6 +55,47 @@ def generate_logical_statement(index):
 
 import re
 
+# Dictionary mapping predicates to logically coherent conclusions
+logically_coherent_predicates = {
+    "man": {
+        "mortal": True,
+        "rational": True,
+        "philosopher": True,
+    },
+    "bird": {
+        "can_fly": True,
+        "has_feathers": True,
+        "lays_eggs": True,
+    },
+    "cat": {
+        "is_a_pet": True,
+        "has_claws": True,
+        "chases_mice": True,
+    },
+    "dog": {
+        "barks": True,
+        "is_loyal": True,
+        "can_be_trained": True,
+    },
+    "car": {
+        "has_wheels": True,
+        "requires_fuel": True,
+        "can_transport_people": True,
+    },
+    "tree": {
+        "has_leaves": True,
+        "grows": True,
+        "produces_oxygen": True,
+    },
+    # ... (additional mappings can be added here)
+}
+
+# Dictionary mapping proper nouns to their common noun equivalents for logical coherence checks
+proper_noun_mappings = {
+    "socrates": "man",
+    # ... (additional mappings can be added here)
+}
+
 def validate_logical_statement(statement):
     # List of known conjectures or statements that cannot be definitively proven
     conjectures = [
@@ -65,6 +106,22 @@ def validate_logical_statement(statement):
     # Check if the statement is a known conjecture
     if statement in conjectures:
         return False  # Conjectures cannot be validated as true
+
+    # Check for universally quantified statements
+    quantified_statement_match = re.match(r'^(All|No|Some|Most|Few)\s+([A-Za-z]+)s\s+are\s+([a-z]+)\.', statement.strip(), re.IGNORECASE)
+    if quantified_statement_match:
+        quantifier, subject, predicate = quantified_statement_match.groups()
+        subject_key = subject.lower()
+        normalized_predicate = predicate.lower()
+
+        # Map proper nouns to their common noun equivalents for logical coherence checks
+        subject_key = proper_noun_mappings.get(subject_key, subject_key)
+
+        # Retrieve the coherent conclusions for the subject
+        coherent_conclusions = logically_coherent_predicates.get(subject_key, {})
+
+        # Check if the predicate is a logically coherent conclusion for the subject
+        return coherent_conclusions.get(normalized_predicate, False)
 
     # Enhanced validation to check if the statement contains necessary components
     # and follows a logical structure.
@@ -102,80 +159,40 @@ def validate_logical_statement(statement):
             print(f"Semantic inconsistency check for {subject}: False")
             return False
 
-    # Dictionary mapping predicates to logically coherent conclusions
-    logically_coherent_predicates = {
-        "man": {
-            "mortal": True,
-            "rational": True,
-            "philosopher": True,
-        },
-        "bird": {
-            "can_fly": True,
-            "has_feathers": True,
-            "lays_eggs": True,
-        },
-        "cat": {
-            "is_a_pet": True,
-            "has_claws": True,
-            "chases_mice": True,
-        },
-        "dog": {
-            "barks": True,
-            "is_loyal": True,
-            "can_be_trained": True,
-        },
-        "car": {
-            "has_wheels": True,
-            "requires_fuel": True,
-            "can_transport_people": True,
-        },
-        "tree": {
-            "has_leaves": True,
-            "grows": True,
-            "produces_oxygen": True,
-        },
-        # ... (additional mappings can be added here)
-    }
-
-    # Dictionary mapping proper nouns to their common noun equivalents for logical coherence checks
-    proper_noun_mappings = {
-        "socrates": "man",
-        # ... (additional mappings can be added here)
-    }
-
     # Regular expression pattern for conditional statements
     conditional_pattern = r'If\s+([A-Za-z][a-z]*(?:\s+[A-Za-z][a-z]*)*)\s+(is|are)\s+([a-z]+),\s+then\s+([A-Za-z][a-z]*(?:\s+[A-Za-z][a-z]*)*)\s+(is|are)\s+([a-z]+)\s*\.'
-    starts_with_conditional = re.match(conditional_pattern, statement.strip(), re.IGNORECASE) is not None
+    conditional_match = re.match(conditional_pattern, statement.strip(), re.IGNORECASE)
 
-    # Check if the subjects are the same and if predicate2 is a logically coherent conclusion of predicate1
-    if starts_with_conditional:
-        conditional_match = re.match(conditional_pattern, statement)
-        if conditional_match:
-            subject1, verb1, predicate1, subject2, verb2, predicate2 = conditional_match.groups()
+    # Check if the statement is a conditional
+    if conditional_match:
+        subject1, verb1, predicate1, subject2, verb2, predicate2 = conditional_match.groups()
 
-            # Normalize the case of subjects and predicates during lookup
-            subject1_key = subject1.lower()
-            subject2_key = subject2.lower()
-            normalized_predicate1 = predicate1.lower()
-            normalized_predicate2 = predicate2.lower()
+        # Normalize the case of subjects and predicates during lookup
+        subject1_key = subject1.lower()
+        subject2_key = subject2.lower()
+        normalized_predicate1 = predicate1.lower()
+        normalized_predicate2 = predicate2.lower()
 
-            # Map proper nouns to their common noun equivalents for logical coherence checks
-            subject1_key = proper_noun_mappings.get(subject1_key, subject1_key)
-            subject2_key = proper_noun_mappings.get(subject2_key, subject2_key)
+        # Map proper nouns to their common noun equivalents for logical coherence checks
+        subject1_key = proper_noun_mappings.get(subject1_key, subject1_key)
+        subject2_key = proper_noun_mappings.get(subject2_key, subject2_key)
 
-            # Retrieve the coherent conclusions for the subject
-            coherent_conclusions = logically_coherent_predicates.get(subject1_key, {})
+        # Retrieve the coherent conclusions for the subject
+        coherent_conclusions = logically_coherent_predicates.get(subject1_key, {})
 
-            # Check if predicate2 is a logically coherent conclusion of predicate1
-            if coherent_conclusions.get(normalized_predicate1) == True:
-                if normalized_predicate2 in coherent_conclusions and coherent_conclusions[normalized_predicate2]:
-                    return True
-            return False
-        else:
-            return False  # If the subjects are not the same, the statement is not logically coherent
+        # Check if the subjects are the same after mapping
+        if subject1_key != subject2_key:
+            return False  # The subjects must be the same for the statement to be coherent
+
+        # Check if predicate2 is a logically coherent conclusion of predicate1
+        if coherent_conclusions.get(normalized_predicate1) == True:
+            return coherent_conclusions.get(normalized_predicate2, False)
+        return False
+    else:
+        return False  # If the statement is not a conditional, it is not logically coherent
 
     # Recognize assumption-based "Assuming..." constructs
-    elif starts_with_assumption:
+    if starts_with_assumption:
         assumption_part = statement.replace("Assuming", "", 1).strip()
         if " is " not in assumption_part and " are " not in assumption_part or not assumption_part.endswith("."):
             print("Assumption-based construct check: False")
