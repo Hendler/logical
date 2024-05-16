@@ -42,17 +42,26 @@ def _openai_wrapper(
         {"role": "user", "content": user_message},
     )
 
-    # Instantiate a new OpenAI client
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    try:
+        # Instantiate a new OpenAI client
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-    # Use the new method for creating chat completions
-    result = client.chat.completions.create(
-        model="gpt-4o",
-        messages=messages,
-    )
+        # Use the new method for creating chat completions
+        result = client.chat.completions.create(
+            model="gpt-4o",
+            messages=messages,
+        )
 
-    # Update response handling to use the new Pydantic model accessors
-    return result.choices[0].message.content
+        # Update response handling to use the new Pydantic model accessors
+        return result.choices[0].message.content
+    except openai.error.AuthenticationError:
+        return "Error: Invalid OpenAI API key."
+    except openai.error.RateLimitError:
+        return "Error: OpenAI API rate limit exceeded."
+    except openai.error.OpenAIError as e:
+        return f"Error: An unexpected OpenAI API error occurred: {str(e)}"
+    except Exception as e:
+        return f"Error: An unexpected error occurred: {str(e)}"
 
 
 def parse_logic(input_text, query_only=False):
@@ -95,10 +104,35 @@ def parse_logic(input_text, query_only=False):
     Please convert the following English statement into Prolog: \n
     """
 
-    return _openai_wrapper(
+    # Get the response from the OpenAI API
+    openai_response = _openai_wrapper(
         system_message=SYSTEM_PARSING_PROMPT,
         user_message=f"{ASISSITANT_PARSING_PROMPT}{input_text}",
     )
+
+    # Check if the response is valid Prolog before processing
+    if not openai_response or "Mocked response" in openai_response:
+        return "Error: Invalid response from OpenAI API."
+    # Additional validation to ensure the response is in valid Prolog format
+    elif not is_valid_prolog(openai_response):
+        return "Error: The response from OpenAI API is not valid Prolog."
+
+    # Process the response through run_parser to generate Prolog
+    return run_parser(openai_response)
+
+
+def is_valid_prolog(response: str) -> bool:
+    """
+    Validates if the given response string is in valid Prolog format.
+    This is a basic check and may need to be expanded for more complex validations.
+    """
+    # Basic checks for Prolog syntax validity
+    if not response.endswith('.'):
+        return False
+    if ':-' in response and not response.strip().endswith('.'):
+        return False
+    # Add more complex syntax checks as needed
+    return True
 
 
 def parse_query(input_text):
@@ -121,30 +155,46 @@ def parse_query(input_text):
 
 def run_parser(input_text: str):
     # Mapping English logical constructs to Prolog
-    # This is a simplified version and may need to be expanded for more complex logic
+    # Expanded to handle more complex logic
     mapping = {
         " is ": " :- ",
         " are ": " :- ",
-        "If ": "if(",
-        ", then ": ") then ",
-        "Assuming ": "assume(",
-        ", it follows that ": ") then ",
+        ", then ": " :- ",  # Correctly map ", then " to ":-" for Prolog rules
+        "Assuming ": ":- ",  # Assuming X, Y is equivalent to Y if X in Prolog
+        ", it follows that ": " -> ",  # Use " -> " for implication in Prolog rules
         " not ": " \\+ ",
         "It is not the case that ": " \\+ ",
-        "Either ": "either(",
-        " or ": ") or ",
-        "Neither ": "neither(",
-        " nor ": ") nor ",
-        " is more ": " is_more_than ",
+        # "Either ... or ..." is represented as a disjunction in Prolog
+        "Either ": "",  # Remove "Either " as it will be handled in the logic below
+        # "Neither ... nor ..." is represented as a negation of a disjunction in Prolog
+        "Neither ": "\\+ (",  # Start the negation of a disjunction
+        " nor ": "); ",  # End the disjunction and the negation
+        " is more ": " is_more_than ",  # Placeholder for a more complex comparison logic
+        " and ": ", ",  # Conjunction in Prolog is represented by ","
+        " or ": "; ",  # Disjunction in Prolog is represented by ";"
+        " implies ": " -> ",  # Implication in Prolog
+        " if and only if ": " <-> ",  # Biconditional in Prolog
+        " for all ": "forall(",  # Universal quantification in Prolog
+        " exists ": "exists(",  # Existential quantification in Prolog
+        # Additional mappings can be added here as needed
     }
+
+    # Remove "If" from the beginning of the statement if present
+    if input_text.startswith("If "):
+        input_text = input_text[3:]
 
     # Convert the English statement to Prolog using the mapping
     prolog_statement = input_text
     for english_construct, prolog_construct in mapping.items():
         prolog_statement = prolog_statement.replace(english_construct, prolog_construct)
 
-    # Additional logic to handle the end of statements and other Prolog-specific syntax
-    prolog_statement = prolog_statement.replace(".", "").strip() + "."
+    # Handle the end of statements and other Prolog-specific syntax
+    prolog_statement = prolog_statement.replace(".", "").strip()
+    if " :- " in prolog_statement and prolog_statement.endswith(" :- "):
+        # Remove trailing " :- " if it's at the end of the statement
+        prolog_statement = prolog_statement[:-4]
+    if not prolog_statement.endswith('.'):
+        prolog_statement += "."  # Add a period to the end of the statement if it's not already there
 
     # Write the Prolog statement to the CSV file
     row = LogicalRow(input_text=input_text, prolog_text=prolog_statement)
