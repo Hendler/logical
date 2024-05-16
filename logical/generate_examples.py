@@ -104,60 +104,25 @@ proper_noun_mappings = {
 }
 
 def validate_logical_statement(statement):
-    print(f"Function called for statement: {statement}")
-    print(f"Received statement for validation: {statement}")
-    print(f"Validating statement: {statement}")
-    # List of known conjectures or statements that cannot be definitively proven
-    conjectures = [
-        "Every even number greater than two is the sum of two primes.",  # Goldbach's conjecture
-        # Additional conjectures can be added here
-    ]
-
-    # Check if the statement is a known conjecture
-    if statement in conjectures:
-        return False  # Conjectures cannot be validated as true
-
     # Check for universally or existentially quantified statements
     quantified_statement_match = re.match(r'^(All|No|Some|Most|Few)\s+([A-Za-z]+)s?\s+(is|are)\s+([a-z]+)\.', statement.strip(), re.IGNORECASE)
-    print(f"Regex match for quantified statement: {quantified_statement_match}")
     if quantified_statement_match:
         quantifier, subject, verb, predicate = quantified_statement_match.groups()
-        # Print the extracted quantifier, subject, and predicate
-        print(f"Quantifier: {quantifier}, Subject: {subject}, Predicate: {predicate}")
-        # Add a print statement to confirm the value of the quantifier variable
-        print(f"Quantifier value before conditional checks: {quantifier}")
-
-        # Print the extracted quantifier, subject, and predicate
-        print(f"Extracted quantifier: {quantifier}, subject: {subject}, predicate: {predicate}")
-
         subject_key = subject.lower()
         normalized_predicate = predicate.lower()
-
-        # Print the extracted quantifier, subject, and predicate
-        print(f"Quantifier: {quantifier}, Subject: {subject_key}, Predicate: {normalized_predicate}")
-
-        # Map proper nouns to their common noun equivalents for logical coherence checks
         subject_key = proper_noun_mappings.get(subject_key, subject_key)
-
-        # Retrieve the coherent conclusions for the subject
         coherent_conclusions = logically_coherent_predicates.get(subject_key, {})
-
-        # Print the coherent conclusions for debugging
-        print(f"Coherent conclusions for {subject_key}: {coherent_conclusions}")
-
-        if quantifier == "All":  # For universal quantifiers, the predicate must be coherent for all instances
-            # Check if the subject is in the dictionary and the predicate is true for all instances
+        if quantifier == "All":
             return subject_key in logically_coherent_predicates and coherent_conclusions.get(normalized_predicate, False)
-        elif quantifier in ["Most", "Few"]:  # For these quantifiers, the predicate must be coherent for most or few instances
+        elif quantifier in ["Most", "Few"]:
             return coherent_conclusions.get(normalized_predicate, False)
-        elif quantifier == "Some":  # For the existential quantifier "Some", the predicate must be coherent for at least one instance
-            return True  # If the subject exists in the dictionary, we assume "Some" are always true
-        elif quantifier == "No":  # For the quantifier "No", the predicate must not be coherent for any instance
+        elif quantifier == "Some":
+            return True
+        elif quantifier == "No":
             return coherent_conclusions.get(normalized_predicate) == False
 
     # Enhanced validation to check if the statement contains necessary components
     # and follows a logical structure.
-    # Checks for the presence of a quantifier, a subject-predicate structure, and proper punctuation.
     valid_quantifiers = {"All", "No", "Some", "Most", "Few", "Every", "Any"}
     has_quantifier = any(quantifier + " " in statement for quantifier in valid_quantifiers)
     has_subject_predicate = re.search(r'\b(is|are)\b', statement) is not None
@@ -175,76 +140,50 @@ def validate_logical_statement(statement):
 
     # Check for valid structure or known valid constructs
     if not (has_quantifier and has_subject_predicate and ends_with_period) and not (starts_with_conditional or starts_with_assumption or has_negation or has_comparative):
-        print("Invalid structure or known valid constructs check: False")
         return False  # Invalid structure if it doesn't meet any known valid constructs
 
-    # Additional checks for contradictions and semantic inconsistencies
+    # Check for semantic inconsistencies which are inherently false
     semantic_inconsistencies = {
         "bachelors": ["married"],
         "dry": ["water"],
         "square": ["circle"]
     }
-
-    # Check for semantic inconsistencies which are inherently false
     for subject, invalid_predicates in semantic_inconsistencies.items():
         if subject in statement and any(invalid_predicate in statement for invalid_predicate in invalid_predicates):
-            print(f"Semantic inconsistency check for {subject}: False")
             return False
 
     # Regular expression pattern for conditional statements
     conditional_pattern = r'If\s+([A-Za-z][a-z]*(?:\s+[A-Za-z][a-z]*)*)\s+(is|are)\s+([a-z]+),\s+then\s+([A-Za-z][a-z]*(?:\s+[A-Za-z][a-z]*)*)\s+(is|are)\s+([a-z]+)\s*\.'
     conditional_match = re.match(conditional_pattern, statement.strip(), re.IGNORECASE)
-
-    # Check if the statement is a conditional
     if conditional_match:
         subject1, verb1, predicate1, subject2, verb2, predicate2 = conditional_match.groups()
-
-        # Normalize the case of subjects and predicates during lookup
-        subject1_key = subject1.lower()
-        subject2_key = subject2.lower()
-        normalized_predicate1 = predicate1.lower()
-        normalized_predicate2 = predicate2.lower()
-
-        # Map proper nouns to their common noun equivalents for logical coherence checks
-        subject1_key = proper_noun_mappings.get(subject1_key, subject1_key)
-        subject2_key = proper_noun_mappings.get(subject2_key, subject2_key)
-
-        # Retrieve the coherent conclusions for the subject
-        coherent_conclusions = logically_coherent_predicates.get(subject1_key, {})
-
-        # Check if the subjects are the same after mapping
+        subject1_key = proper_noun_mappings.get(subject1.lower(), subject1.lower())
+        subject2_key = proper_noun_mappings.get(subject2.lower(), subject2.lower())
         if subject1_key != subject2_key:
             return False  # The subjects must be the same for the statement to be coherent
-
-        # Check if predicate2 is a logically coherent conclusion of predicate1
-        if coherent_conclusions.get(normalized_predicate1) == True:
-            return coherent_conclusions.get(normalized_predicate2, False)
+        coherent_conclusions = logically_coherent_predicates.get(subject1_key, {})
+        if coherent_conclusions.get(predicate1.lower()) == True:
+            return coherent_conclusions.get(predicate2.lower(), False)
         return False
-    else:
-        return False  # If the statement is not a conditional, it is not logically coherent
 
     # Recognize assumption-based "Assuming..." constructs
     if starts_with_assumption:
         assumption_part = statement.replace("Assuming", "", 1).strip()
         if " is " not in assumption_part and " are " not in assumption_part or not assumption_part.endswith("."):
-            print("Assumption-based construct check: False")
             return False
     # Recognize negation constructs
     if has_negation:
         negation_part = statement.replace("It is not the case that ", "", 1).strip() if statement.startswith("It is not the case that ") else statement
         if " is " not in negation_part and " are " not in negation_part or not negation_part.endswith("."):
-            print("Negation construct check: False")
             return False
 
     # Recognize comparative constructs
     if has_comparative:
         comparative_match = re.match(r'(.+) is more (.+) than (.+)\.', statement)
         if not comparative_match:
-            print("Comparative construct check: False")
             return False
         subject, predicate, subject2 = comparative_match.groups()
         if not subject or not predicate or not subject2:
-            print("Comparative construct subject/predicate check: False")
             return False
 
     return True
