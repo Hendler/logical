@@ -75,7 +75,15 @@ def parse_logic(input_text, query_only=False):
 
     ASISSITANT_PARSING_PROMPT = f"""
     Please generate Prolog, even if the parser fails, by extracting a set of logical statements, rules, and object definitions from the following:
-    Ensure the output is in a simple conditional format that can be parsed by a boolean logic parser, such as 'x > 1 and y < 2'. \n
+    Ensure the output is in a simple conditional format that can be parsed by a boolean logic parser, such as 'x > 1 and y < 2'.
+
+    Example 1: English: 'If it is raining, then the ground is wet.'
+               Prolog: 'raining :- ground_wet.'
+
+    Example 2: English: 'All birds can fly except for penguins.'
+               Prolog: 'can_fly(X) :- bird(X), not(penguin(X)).'
+
+    Please convert the following English statement into Prolog: \n
     """
 
     return _openai_wrapper(
