@@ -93,6 +93,8 @@ The `run_parser` function has been enhanced to handle a wider range of logical c
 
 Additionally, new error handling mechanisms have been implemented to provide informative messages for common issues such as authentication failures and rate limits when interfacing with the OpenAI API. This ensures a smoother experience during both testing and production use.
 
+The `parse_logic` function now includes additional validation steps to ensure the semantic validity of the Prolog code generated from the OpenAI API responses. This helps in maintaining the integrity of the logic engine's output and ensures that the generated Prolog code is not only syntactically correct but also semantically meaningful.
+
 ## see also
 
 https://github.com/klaudiosinani/awesome-prolog
