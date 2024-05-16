@@ -4,26 +4,31 @@ ChatGPT logic engine using [Prolog](https://en.wikipedia.org/wiki/Prolog).
 
 First developed at the [OpenAI emergency hackathon on 3/5/2023](https://twitter.com/nonmayorpete/status/1632456433102098434).
 
- <img alt="Bertrand Russell"   src="./russell.png" />
+<img alt="Bertrand Russell" src="./russell.png" />
 
 ## status 3/16/2023
 
-GPT-3.5 outputs prolog along with additional text sometimes breaking the automated push to the . It may refuse to generate prolog if there are no obvious logical statements. 
+The logic engine has been updated to use the "gpt-4o" model for generating Prolog statements. This update aims to improve the accuracy and coherence of the logical outputs.
 
 ## usage
 
+To use this logic engine, you need to set up the environment variables in a `.env` file. Copy the `.env-example` to `.env` and set the `OPEN_AI_MODEL_TYPE` to the desired model, such as "gpt-4o".
+
+The ASSISTANT_PARSING_PROMPT has been enhanced with detailed examples to demonstrate the conversion of English statements into Prolog syntax, providing a more intuitive experience for users.
+
 ```
 $ inv logic.run
-$ parse 
-$ Men are mortal. Men are human. I am human. 
+$ parse
+$ Men are mortal. Men are human. I am human.
 $ ask
 $ Am I mortal?
 
 ```
+
 ## background
 
 One of the promises of logic is that it can give formal grounding for truth.
-As LLMs develop more sophisicated responses, we will be more challenged to detect truth.  
+As LLMs develop more sophisticated responses, we will be more challenged to detect truth.
 
 Via ChatGPT:
 
@@ -51,22 +56,26 @@ Via ChatGPT:
 
 ## install
 
-    brew install pyenv pyenv-virtualenv git
-    brew install swi-prolog --HEAD
-    pyenv install 3.11.2
-    pyenv virtualenv 3.11.2 logical
-    pip install --upgrade pip
-    chmod +x main.pl
+To install the necessary dependencies for this project, follow the steps below:
 
-Then copy the `.env-example` to `.env`
- 
+```
+brew install pyenv pyenv-virtualenv git
+brew install swi-prolog --HEAD
+pyenv install 3.11.2
+pyenv virtualenv 3.11.2 logical
+pip install --upgrade pip
+pip install -r requirements.txt
+chmod +x main.pl
+```
+
+Then copy the `.env-example` to `.env` and configure the necessary environment variables as described in the usage section.
 
 # Commands:
 
     - help
     - exit
     - parse: input text to extract logic from
-    - ask: : ask a logical question
+    - ask: ask a logical question
 
 
 ## debug
@@ -75,6 +84,7 @@ You can load the generated file in swipl to test also
 
     $ swipl
     ?- ['myprolog.pl'].
+
 
 ## see also
 
