@@ -72,7 +72,7 @@ def parse_logic(input_text, query_only=False):
     if query_only:
         output = """a query statement noted by 'user query:' to query over our knowledge base.
         You can use the original prolog starting with 'original:' to make sure the same vocabulary is generated.
-        Only ouput the new prolog query generated from the user query.
+        Only output the new prolog query generated from the user query.
         """
     else:
         output = """a set of logical statements, rules, and object definitions in Prolog.
@@ -83,12 +83,14 @@ def parse_logic(input_text, query_only=False):
     Output correct and complete Prolog code that can be compiled in swi-prolog.
     Your Prolog output should be thorough, including necessary assumptions about the world.
     Ensure the output is in a simple conditional format for parsing by a boolean logic parser.
+    Avoid common errors such as incorrect implications, conditionals without proper predicates, and ensure proper use of quantifiers.
     Thank you!
     """
 
     ASISSITANT_PARSING_PROMPT = f"""
     Please generate Prolog, even if the parser fails, by extracting a set of logical statements, rules, and object definitions from the following:
     Ensure the output is in a simple conditional format that can be parsed by a boolean logic parser, such as 'x > 1 and y < 2'.
+    Pay special attention to implication structures, conditional predicates, and the correct use of quantifiers to avoid common errors.
 
     Example 1: English: 'If it is raining, then the ground is wet.'
                Prolog: 'raining :- ground_wet.'
@@ -164,47 +166,13 @@ def parse_query(input_text):
 
 
 def run_parser(input_text: str):
-    # Mapping English logical constructs to Prolog
-    # Expanded to handle more complex logic
-    mapping = {
-        " is ": " :- ",
-        " are ": " :- ",
-        ", then ": " :- ",  # Map ", then " to ":-" for Prolog rules
-        "Assuming ": ":- ",  # "Assuming X, Y" is equivalent to "Y if X" in Prolog
-        ", it follows that ": " -> ",  # " -> " for implication in Prolog rules
-        " not ": " \\+ ",
-        "It is not the case that ": " \\+ ",  # Negation in Prolog
-        # "Either ... or ..." is represented as a disjunction in Prolog
-        "Either ": "",  # Remove "Either " as it will be handled in the logic below
-        # "Neither ... nor ..." is represented as a negation of a disjunction in Prolog
-        "Neither ": "\\+ (",  # Start the negation of a disjunction
-        " nor ": "); ",  # End the disjunction and the negation
-        " is more ": " is_more_than ",  # Placeholder for a more complex comparison logic
-        " and ": ", ",  # Conjunction in Prolog is represented by ","
-        " or ": "; ",  # Disjunction in Prolog is represented by ";"
-        " implies ": " -> ",  # Implication in Prolog
-        " if and only if ": " <-> ",  # Biconditional in Prolog
-        " for all ": "forall(",  # Universal quantification in Prolog
-        " exists ": "exists(",  # Existential quantification in Prolog
-        # Additional mappings can be added here as needed
-    }
+    # Call parse_logic to use OpenAI for generating Prolog from English
+    prolog_statement = parse_logic(input_text)
 
-    # Remove "If" from the beginning of the statement if present
-    if input_text.startswith("If "):
-        input_text = input_text[3:]
-
-    # Convert the English statement to Prolog using the mapping
-    prolog_statement = input_text
-    for english_construct, prolog_construct in mapping.items():
-        prolog_statement = prolog_statement.replace(english_construct, prolog_construct)
-
-    # Handle the end of statements and other Prolog-specific syntax
-    prolog_statement = prolog_statement.replace(".", "").strip()
-    if " :- " in prolog_statement and prolog_statement.endswith(" :- "):
-        # Remove trailing " :- " if it's at the end of the statement
-        prolog_statement = prolog_statement[:-4]
-    if not prolog_statement.endswith('.'):
-        prolog_statement += "."  # Add a period to the end of the statement if it's not already there
+    # Check if the Prolog statement is valid before returning
+    if prolog_statement.startswith("Error:"):
+        # Handle error in Prolog generation
+        return prolog_statement
 
     # Write the Prolog statement to the CSV file
     row = LogicalRow(input_text=input_text, prolog_text=prolog_statement)
