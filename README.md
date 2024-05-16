@@ -4,18 +4,50 @@ ChatGPT logic engine using [Prolog](https://en.wikipedia.org/wiki/Prolog).
 
 First developed at the [OpenAI emergency hackathon on 3/5/2023](https://twitter.com/nonmayorpete/status/1632456433102098434).
 
- <img alt="Bertrand Russell"   src="./russell.png" />
+<img alt="Bertrand Russell" src="./russell.png" />
 
 ## status 3/16/2023
 
-GPT-3.5 outputs prolog along with additional text sometimes breaking the automated push to the . It may refuse to generate prolog if there are no obvious logical statements. 
+GPT-3.5 outputs prolog along with additional text sometimes breaking the automated push to the . It may refuse to generate prolog if there are no obvious logical statements.
 
 ## usage
 
+To use this logic engine, follow the steps below:
+
+### Set up requirements
+
+Ensure you have Python 3.11.2 and pip installed on your system. Then run:
+
+```
+pip install -r requirements.txt
+```
+
+This will install all the necessary Python packages, including the OpenAI library version 1.30.1 which supports the "gpt-4o" model.
+
+### Set up folpy
+
+Folpy is a First Order Logic Python Library used in this project. To install Folpy, run:
+
+```
+pip install folpy
+```
+
+For more details on using Folpy, refer to the `documentation/folpy_setup_and_usage.md` file.
+
+### Run tests
+
+To verify that everything is set up correctly and the logic engine is functioning as expected, run the tests with:
+
+```
+python -m unittest
+```
+
+This command will execute all the test cases in the `tests` directory.
+
 ```
 $ inv logic.run
-$ parse 
-$ Men are mortal. Men are human. I am human. 
+$ parse
+$ Men are mortal. Men are human. I am human.
 $ ask
 $ Am I mortal?
 
@@ -23,7 +55,7 @@ $ Am I mortal?
 ## background
 
 One of the promises of logic is that it can give formal grounding for truth.
-As LLMs develop more sophisicated responses, we will be more challenged to detect truth.  
+As LLMs develop more sophisticated responses, we will be more challenged to detect truth.
 
 Via ChatGPT:
 
@@ -59,7 +91,7 @@ Via ChatGPT:
     chmod +x main.pl
 
 Then copy the `.env-example` to `.env`
- 
+
 
 # Commands:
 
