@@ -56,7 +56,6 @@ def generate_logical_statement(index):
 import re
 
 # Dictionary mapping predicates to logically coherent conclusions
-# Dictionary mapping predicates to logically coherent conclusions
 logically_coherent_predicates = {
     "man": {
         "mortal": True,
@@ -333,3 +332,9 @@ def generate_examples():
                     print(f"Duplicate statement detected, skipping: {english_statement}")
         except Exception as e:
             print(f"An error occurred while generating example {len(generated_statements)}: {e}")
+
+# Define the number of examples to generate
+NUM_EXAMPLES_TO_GENERATE = 1000
+
+# Call the function to generate examples
+generate_examples()
