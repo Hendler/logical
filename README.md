@@ -12,7 +12,7 @@ The logic engine has been updated to use the "gpt-4o" model for generating Prolo
 
 ## usage
 
-To use this logic engine, you need to set up the environment variables in a `.env` file. Copy the `.env-example` to `.env` and set the `OPEN_AI_MODEL_TYPE` to the desired model, such as "gpt-4o".
+To use this logic engine, you need to set up the environment variables in a `.env` file. Copy the `.env-example` to `.env` and set the `OPENAI_API_KEY` to your actual OpenAI API key and `OPEN_AI_MODEL_TYPE` to the desired model, such as "gpt-4o".
 
 The ASSISTANT_PARSING_PROMPT has been enhanced with detailed examples to demonstrate the conversion of English statements into Prolog syntax, providing a more intuitive experience for users.
 
@@ -82,8 +82,10 @@ Then copy the `.env-example` to `.env` and configure the necessary environment v
 
 You can load the generated file in swipl to test also
 
-    $ swipl
-    ?- ['myprolog.pl'].
+```
+$ swipl
+?- ['myprolog.pl'].
+```
 
 
 ## see also

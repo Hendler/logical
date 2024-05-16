@@ -83,6 +83,15 @@ def parse_logic(input_text, query_only=False):
     Example 2: English: 'All birds can fly except for penguins.'
                Prolog: 'can_fly(X) :- bird(X), not(penguin(X)).'
 
+    Example 3: English: 'Every human is mortal.'
+               Prolog: 'mortal(X) :- human(X).'
+
+    Example 4: English: 'Socrates is a human.'
+               Prolog: 'human(socrates).'
+
+    Example 5: English: 'Therefore, Socrates is mortal.'
+               Prolog: 'mortal(socrates) :- human(socrates).'
+
     Please convert the following English statement into Prolog: \n
     """
 
