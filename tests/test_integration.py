@@ -26,4 +26,6 @@ def test_openai_wrapper():
         # Assert that the response is a string
         assert isinstance(response, str), "The response from the OpenAI API should be a string."
 
-        # TODO: Add more specific assertions based on the expected format of the response
+        # Additional assertions to check the expected format of the response
+        # Since the response is mocked, we check for the mocked content
+        assert "Mocked response" in response, "The response should contain the mocked content."
