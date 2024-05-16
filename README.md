@@ -23,7 +23,7 @@ $ Am I mortal?
 ## background
 
 One of the promises of logic is that it can give formal grounding for truth.
-As LLMs develop more sophisicated responses, we will be more challenged to detect truth.
+As LLMs develop more sophisticated responses, we will be more challenged to detect truth.
 
 Via ChatGPT:
 
