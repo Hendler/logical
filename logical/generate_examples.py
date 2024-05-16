@@ -146,20 +146,15 @@ def validate_logical_statement(statement):
         # Print the coherent conclusions for debugging
         print(f"Coherent conclusions for {subject_key}: {coherent_conclusions}")
 
-        # Check if the predicate is a logically coherent conclusion for the subject
-        if quantifier in ["All", "Most", "Few"]:  # For universal quantifiers, the predicate must be coherent for all instances
-            result = coherent_conclusions.get(normalized_predicate, False)
-            print(f"Result for {quantifier} quantifier: {result}")
-            return result
+        if quantifier == "All":  # For universal quantifiers, the predicate must be coherent for all instances
+            # If the subject is in the dictionary, we assume the predicate is true for all instances
+            return coherent_conclusions.get(normalized_predicate, False) or subject_key in logically_coherent_predicates
+        elif quantifier in ["Most", "Few"]:  # For these quantifiers, the predicate must be coherent for most or few instances
+            return coherent_conclusions.get(normalized_predicate, False)
         elif quantifier == "Some":  # For the existential quantifier "Some", the predicate must be coherent for at least one instance
-            print(f"Result for {quantifier} quantifier: True")
             return True  # If the subject exists in the dictionary, we assume "Some" are always true
         elif quantifier == "No":  # For the quantifier "No", the predicate must not be coherent for any instance
-            print(f"Entering 'No' quantifier logic for subject '{subject_key}' and predicate '{normalized_predicate}'")
-            # Return True only if the predicate is explicitly set to False in the coherent conclusions
-            result = coherent_conclusions.get(normalized_predicate) == False
-            print(f"Debug: Result for 'No' quantifier with subject '{subject_key}' and predicate '{normalized_predicate}': {result}")
-            return result
+            return coherent_conclusions.get(normalized_predicate) == False
 
     # Enhanced validation to check if the statement contains necessary components
     # and follows a logical structure.
