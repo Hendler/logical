@@ -70,7 +70,7 @@ chmod +x main.pl
 
 Then copy the `.env-example` to `.env` and configure the necessary environment variables as described in the usage section.
 
-# Commands:
+## Commands:
 
     - help
     - exit
@@ -87,6 +87,11 @@ $ swipl
 ?- ['myprolog.pl'].
 ```
 
+## updates
+
+The `run_parser` function has been enhanced to handle a wider range of logical constructs, including conjunctions, disjunctions, implications, biconditionals, and quantifications. This allows for more complex English statements to be accurately translated into Prolog syntax.
+
+Additionally, new error handling mechanisms have been implemented to provide informative messages for common issues such as authentication failures and rate limits when interfacing with the OpenAI API. This ensures a smoother experience during both testing and production use.
 
 ## see also
 
