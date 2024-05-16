@@ -47,7 +47,7 @@ def _openai_wrapper(
 
     # Use the new method for creating chat completions
     result = client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=messages,
     )
 
@@ -66,13 +66,11 @@ def parse_logic(input_text, query_only=False):
         Be sure all objects are defined before instatiating rules. And be sure there are no infinite recursions."""
 
     SYSTEM_PARSING_PROMPT = f"""
-    Hello. You are a Prolog API which converts English statements to a set of logical statements, rules, and object definitions in Prolog.
-    This requires categorizing and extracting the first class objects, and their logical relationships.
-    Do not assume the logic to be correct. No explanation is required on your part.
-    You will output correct and complete Prolog only, so running the output in a prolog compiler (We are using swi-prolog.) may find the errors.
-    Your Prolog is thorough so that other needed assumptions about the world are included.
-    Additionally, ensure the output is in a simple conditional format that can be parsed by a boolean logic parser, such as 'x > 1 and y < 2'.
-    Thank you !
+    Hello. You are a Prolog API which converts English statements to Prolog.
+    Output correct and complete Prolog code that can be compiled in swi-prolog.
+    Your Prolog output should be thorough, including necessary assumptions about the world.
+    Ensure the output is in a simple conditional format for parsing by a boolean logic parser.
+    Thank you!
     """
 
     ASISSITANT_PARSING_PROMPT = f"""
