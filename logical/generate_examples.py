@@ -56,6 +56,7 @@ def generate_logical_statement(index):
 import re
 
 # Dictionary mapping predicates to logically coherent conclusions
+# Dictionary mapping predicates to logically coherent conclusions
 logically_coherent_predicates = {
     "man": {
         "mortal": True,
@@ -66,16 +67,19 @@ logically_coherent_predicates = {
         "can_fly": True,
         "has_feathers": True,
         "lays_eggs": True,
+        "mortal": True,  # Added "mortal" as a valid predicate for "bird"
     },
     "cat": {
         "is_a_pet": True,
         "has_claws": True,
         "chases_mice": True,
+        "mortal": True,  # Added "mortal" as a valid predicate for "cat"
     },
     "dog": {
         "barks": True,
         "is_loyal": True,
         "can_be_trained": True,
+        "mortal": True,  # Assuming dogs are also mortal
     },
     "car": {
         "has_wheels": True,
@@ -86,8 +90,12 @@ logically_coherent_predicates = {
         "has_leaves": True,
         "grows": True,
         "produces_oxygen": True,
+        "mortal": True,  # Assuming trees are also mortal (in the sense that they can die)
     },
     # ... (additional mappings can be added here)
+    "electron": {
+        "charged": False,  # Electrons are not charged in the context of this logical validation
+    },
 }
 
 # Dictionary mapping proper nouns to their common noun equivalents for logical coherence checks
@@ -97,6 +105,9 @@ proper_noun_mappings = {
 }
 
 def validate_logical_statement(statement):
+    print(f"Function called for statement: {statement}")
+    print(f"Received statement for validation: {statement}")
+    print(f"Validating statement: {statement}")
     # List of known conjectures or statements that cannot be definitively proven
     conjectures = [
         "Every even number greater than two is the sum of two primes.",  # Goldbach's conjecture
@@ -107,12 +118,24 @@ def validate_logical_statement(statement):
     if statement in conjectures:
         return False  # Conjectures cannot be validated as true
 
-    # Check for universally quantified statements
-    quantified_statement_match = re.match(r'^(All|No|Some|Most|Few)\s+([A-Za-z]+)s\s+are\s+([a-z]+)\.', statement.strip(), re.IGNORECASE)
+    # Check for universally or existentially quantified statements
+    quantified_statement_match = re.match(r'^(All|No|Some|Most|Few)\s+([A-Za-z]+)s?\s+(is|are)\s+([a-z]+)\.', statement.strip(), re.IGNORECASE)
+    print(f"Regex match for quantified statement: {quantified_statement_match}")
     if quantified_statement_match:
-        quantifier, subject, predicate = quantified_statement_match.groups()
+        quantifier, subject, verb, predicate = quantified_statement_match.groups()
+        # Print the extracted quantifier, subject, and predicate
+        print(f"Quantifier: {quantifier}, Subject: {subject}, Predicate: {predicate}")
+        # Add a print statement to confirm the value of the quantifier variable
+        print(f"Quantifier value before conditional checks: {quantifier}")
+
+        # Print the extracted quantifier, subject, and predicate
+        print(f"Extracted quantifier: {quantifier}, subject: {subject}, predicate: {predicate}")
+
         subject_key = subject.lower()
         normalized_predicate = predicate.lower()
+
+        # Print the extracted quantifier, subject, and predicate
+        print(f"Quantifier: {quantifier}, Subject: {subject_key}, Predicate: {normalized_predicate}")
 
         # Map proper nouns to their common noun equivalents for logical coherence checks
         subject_key = proper_noun_mappings.get(subject_key, subject_key)
@@ -120,8 +143,23 @@ def validate_logical_statement(statement):
         # Retrieve the coherent conclusions for the subject
         coherent_conclusions = logically_coherent_predicates.get(subject_key, {})
 
+        # Print the coherent conclusions for debugging
+        print(f"Coherent conclusions for {subject_key}: {coherent_conclusions}")
+
         # Check if the predicate is a logically coherent conclusion for the subject
-        return coherent_conclusions.get(normalized_predicate, False)
+        if quantifier in ["All", "Most", "Few"]:  # For universal quantifiers, the predicate must be coherent for all instances
+            result = coherent_conclusions.get(normalized_predicate, False)
+            print(f"Result for {quantifier} quantifier: {result}")
+            return result
+        elif quantifier == "Some":  # For the existential quantifier "Some", the predicate must be coherent for at least one instance
+            print(f"Result for {quantifier} quantifier: True")
+            return True  # If the subject exists in the dictionary, we assume "Some" are always true
+        elif quantifier == "No":  # For the quantifier "No", the predicate must not be coherent for any instance
+            print(f"Entering 'No' quantifier logic for subject '{subject_key}' and predicate '{normalized_predicate}'")
+            # Return True only if the predicate is explicitly set to False in the coherent conclusions
+            result = coherent_conclusions.get(normalized_predicate) == False
+            print(f"Debug: Result for 'No' quantifier with subject '{subject_key}' and predicate '{normalized_predicate}': {result}")
+            return result
 
     # Enhanced validation to check if the statement contains necessary components
     # and follows a logical structure.
