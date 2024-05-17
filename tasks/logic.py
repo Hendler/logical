@@ -1,10 +1,9 @@
-from invoke import task, run
+from invoke import task
 from .utils import ROOT_REPO_DIR, printlogo
 import os
 
-
 @task()
-def run(ctx):
+def run_logic_task(ctx):
     printlogo("WELCOME TO LOGICAL - beep \a beep \a")
 
     ENDC = "\033[0m"
