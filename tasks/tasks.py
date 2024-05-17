@@ -53,22 +53,26 @@ def parse(c, input_text):
         prolog_file.write(prolog_code)
 
 @task
-def run_logic_task(c, prolog_code_path):
+@task
+def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     """
     This task takes a file path to Prolog code as input and runs it to determine its truth value.
     It logs the input and output for auditing purposes.
 
-    The main predicate is dynamically determined by parsing the Prolog code and identifying the first
-    non-comment line that contains a predicate definition. This heuristic assumes that the first predicate
-    defined in the code is the main one to be queried.
+    The main predicate can be optionally provided. If not, the task will attempt to determine it
+    by parsing the Prolog code and identifying the first predicate definition with a body.
 
     Parameters:
     - c: The context from the invoke task.
     - prolog_code_path (str): The file path to the Prolog code to be executed.
+    - main_predicate (str): Optional. The main predicate to query.
+    - arity (int): Optional. The arity of the main predicate.
 
     Usage:
     To execute this task, provide the file path to the Prolog code as an argument:
     `invoke run-logic-task --prolog-code-path='./path/to/prolog_code.pl'`
+    Optionally, specify the main predicate and its arity:
+    `invoke run-logic-task --prolog-code-path='./path/to/prolog_code.pl' --main-predicate='mortal' --arity=1`
     The task will read the Prolog code, determine the main predicate, and execute the query to find its truth value.
     """
     # Read the Prolog code from the file
@@ -98,20 +102,24 @@ def run_logic_task(c, prolog_code_path):
                 c.run(f"echo 'Error in Prolog code: {e}'")
                 return
 
-    # Dynamically determine the main predicate from the Prolog code
-    # This is a simple heuristic that assumes the first predicate defined is the main one
-    lines = prolog_code.strip().split('\n')
-    main_predicate = None
-    for line in lines:
-        if not line.startswith('%') and not line.startswith(':-') and ':-' in line:
-            main_predicate = line.split(':-')[0].strip().split('(')[0]
-            break
+    # If main_predicate and arity are not provided, attempt to determine them
+    if not main_predicate or arity is None:
+        for line in prolog_lines:
+            if not line.startswith('%') and ':-' in line:
+                main_predicate = line.split(':-')[0].strip().split('(')[0]
+                arity = line.count(',') + 1  # Count the number of arguments
+                break
 
     if not main_predicate:
         c.run(f"echo 'Error: No main predicate found in Prolog code'")
         return
 
-    query = f"{main_predicate}."
+    # Construct the query using the main predicate and arity
+    if arity == 0:
+        query = f"{main_predicate}."
+    else:
+        args = ','.join(['_' for _ in range(arity)])  # Use underscores for variables
+        query = f"{main_predicate}({args})."
 
     # Query the Prolog interpreter to determine the truth value
     try:
