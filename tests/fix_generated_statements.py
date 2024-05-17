@@ -14,31 +14,48 @@ def fix_prolog_translation(statement):
     # Simplified logic to handle specific translation errors identified in the statements
     # This is a basic example and should be expanded to cover all logical constructs and their Prolog syntax
     fixed_statement = statement
-    if 'have wheels' in statement:
-        fixed_statement = fixed_statement.replace('have wheels', 'wheels(Subject)')
-    if 'have six legs' in statement:
-        fixed_statement = fixed_statement.replace('have six legs', 'six_legs(Subject)')
-    if 'bipedal' in statement:
-        fixed_statement = fixed_statement.replace('bipedal', 'bipedal(Subject)')
-    if 'can fly' in statement:
-        fixed_statement = fixed_statement.replace('can fly', 'can_fly(Subject)')
-    if 'are mortal' in statement:
-        fixed_statement = fixed_statement.replace('are mortal', 'mortal(Subject)')
-    if 'have fur' in statement:
-        fixed_statement = fixed_statement.replace('have fur', 'fur(Subject)')
+    subject = extract_subject(statement)  # Dynamically determine the subject of the statement
 
-    # Replace 'All' with 'forall' to reflect universal quantification in Prolog
-    fixed_statement = fixed_statement.replace('All', 'forall')
-    # Replace 'Some' with 'exists' to reflect existential quantification in Prolog
-    fixed_statement = fixed_statement.replace('Some', 'exists')
-    # Replace 'No' with 'not(exists' and add closing parenthesis for negation in Prolog
-    fixed_statement = fixed_statement.replace('No', 'not(exists')
-    if 'not(exists' in fixed_statement:
-        fixed_statement += ')'
+    # Handling negations and quantifiers
+    if 'No' in statement:
+        # Apply negation to the predicate directly
+        fixed_statement = fixed_statement.replace('No ', 'not ')
+    if 'All' in statement:
+        # Translate 'All' to 'forall' to reflect universal quantification in Prolog
+        fixed_statement = fixed_statement.replace('All ', 'forall(' + subject + ', ')
+        fixed_statement += ')'  # Add closing parenthesis for the 'forall' quantifier
+    if 'Some' in statement:
+        # Translate 'Some' to 'exists' to reflect existential quantification in Prolog
+        fixed_statement = fixed_statement.replace('Some ', 'exists(' + subject + ', ')
+        fixed_statement += ')'  # Add closing parenthesis for the 'exists' quantifier
+
+    # Handling conditional statements starting with 'If'
+    if statement.startswith('If'):
+        # Assuming the format 'If X, then Y' for conditional statements
+        # This will be translated into Prolog as 'Y :- X.'
+        parts = statement.split(' then ')
+        if len(parts) > 1:
+            condition = parts[0].replace('If ', '').strip()
+            conclusion = parts[1].strip()
+            fixed_statement = f'{conclusion} :- {condition}.'
+        else:
+            # If there is no 'then' part, we assume the condition itself is the conclusion
+            condition = parts[0].replace('If ', '').strip()
+            fixed_statement = f'{condition} :- {condition}.'
 
     # Add more translation rules as needed here
 
     return fixed_statement
+
+# New function to extract the subject from the English statement
+def extract_subject(statement):
+    # Implement logic to extract the subject from the statement
+    # Example implementation (this will need to be refined):
+    words = statement.split()
+    for i, word in enumerate(words):
+        if word.lower() in ['no', 'all', 'some', 'every']:
+            return words[i+1]  # Assumes the subject follows these quantifiers
+    return "subject"  # Default subject if none found
 
 # Open the input file and create the output file
 with open(input_file_path, 'r') as infile, open(output_file_path, 'w', newline='') as outfile:
@@ -51,13 +68,33 @@ with open(input_file_path, 'r') as infile, open(output_file_path, 'w', newline='
 
     # Iterate over each line in the input file
     for row in reader:
-        # Split the line into the English statement and the rest
-        english_statement, rest = row[0].split(', Prolog: ')
-        # Extract the truth value from the rest of the line
-        truth_value = 'True' if 'is True' in rest else 'False'
-        # Fix the Prolog translation
-        prolog_statement = fix_prolog_translation(english_statement)
-        # Write the fixed statement and the truth value to the output file
-        writer.writerow([english_statement, prolog_statement, truth_value])
+        try:
+            # Check if the line contains the expected 'Prolog:' separator
+            if ', Prolog: ' in row[0]:
+                # Split the line into the English statement and the rest
+                english_statement, rest = row[0].split(', Prolog: ')
+                # Extract the truth value from the rest of the line
+                truth_value = 'True' if 'is True' in rest else 'False'
+            else:
+                # Handle lines without the 'Prolog:' separator
+                # Assuming the format 'English statement is True/False'
+                if ' is ' in row[0]:
+                    parts = row[0].rsplit(' is ', 1)
+                    english_statement = parts[0]
+                    truth_value = parts[1]
+                else:
+                    # If ' is ' is not in the line, attempt to determine the truth value based on the statement
+                    # For the purpose of this example, we will assume all such statements are 'True'
+                    # This logic should be refined based on the actual requirements for truth value determination
+                    english_statement = row[0]
+                    truth_value = 'True'  # Default truth value for statements without explicit truth value
+
+            # Fix the Prolog translation
+            prolog_statement = fix_prolog_translation(english_statement)
+            # Write the fixed statement and the truth value to the output file
+            writer.writerow([english_statement, prolog_statement, truth_value])
+        except ValueError as e:
+            # Handle lines that do not conform to the expected format
+            print(f"Skipping line due to error: {e} - {row[0]}")
 
 print(f"Fixed statements have been written to {output_file_path}")
