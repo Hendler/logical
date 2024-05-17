@@ -23,9 +23,13 @@ def test_openai_wrapper():
         # Assert that the response is not empty
         assert response != "", "The response from the OpenAI API should not be empty."
 
-        # Assert that the response is a string
-        assert isinstance(response, str), "The response from the OpenAI API should be a string."
+        # Assert that the response is a dictionary
+        assert isinstance(response, dict), "The response from the OpenAI API should be a dictionary."
+
+        # Assert that the response contains the expected keys
+        assert "prolog" in response, "The response should contain the 'prolog' key."
+        assert "notes" in response, "The response should contain the 'notes' key."
 
         # Additional assertions to check the expected format of the response
         # Since the response is mocked, we check for the mocked content
-        assert "Mocked response" in response, "The response should contain the mocked content."
+        assert "Mocked response" in response["prolog"], "The 'prolog' key should contain the mocked content."

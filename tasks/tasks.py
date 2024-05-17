@@ -2,7 +2,7 @@ from invoke import task
 import os
 import json
 import openai
-from .utils import _openai_wrapper, ROOT_REPO_DIR
+from logical import _openai_wrapper, ROOT_REPO_DIR
 from pyswip import Prolog, PrologError
 
 # Load the OpenAI API key from the environment variable
