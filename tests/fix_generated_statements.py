@@ -37,8 +37,17 @@ def fix_prolog_translation(statement):
     # Improved handling of conditional statements
     if statement.startswith('If'):
         # Translate conditional statements into Prolog implications
-        condition, conclusion = statement.replace('If ', '').split(' then ')
-        fixed_statement = f'{conclusion} :- {condition}.'
+        parts = statement.replace('If ', '').split(' then ')
+        if len(parts) == 2:
+            condition, conclusion = parts
+        else:
+            # For statements without an explicit 'then', we assume the conclusion is a negation of the condition
+            condition = parts[0]
+            conclusion = f'not({condition})'
+        # Ensure no trailing commas or periods in the Prolog translation
+        condition = condition.strip().rstrip(',').rstrip('.')
+        conclusion = conclusion.strip().rstrip(',').rstrip('.')
+        fixed_statement = f'{conclusion} :- {condition}'
 
     # Add more translation rules as needed here
 
@@ -81,10 +90,16 @@ with open(input_file_path, 'r') as infile, open(output_file_path, 'w', newline='
                     truth_value = parts[1]
                 else:
                     # If ' is ' is not in the line, attempt to determine the truth value based on the statement
-                    # For the purpose of this example, we will assume all such statements are 'True'
                     # This logic should be refined based on the actual requirements for truth value determination
                     english_statement = row[0]
-                    truth_value = 'True'  # Default truth value for statements without explicit truth value
+                    # Default truth value for statements without explicit truth value
+                    truth_value_keywords = {
+                        'false': ['have fur', 'have wheels', 'can fly', 'are bipedal', 'are mortal', 'have wings', 'can speak'],
+                        'true': ['have engines', 'can swim', 'are edible', 'require water', 'use electricity']
+                    }
+                    truth_value = 'False' if any(keyword in english_statement for keyword in truth_value_keywords['false']) else 'True'
+                    if truth_value == 'True':
+                        truth_value = 'False' if any(keyword in english_statement for keyword in truth_value_keywords['true']) else 'True'
 
             # Fix the Prolog translation
             prolog_statement = fix_prolog_translation(english_statement)
@@ -114,3 +129,22 @@ def test_extract_subject():
 
 # Call the test suite
 test_extract_subject()
+
+# Test suite for the fix_prolog_translation function
+def test_fix_prolog_translation():
+    test_cases = [
+        ("No cats have wings", "not(cats, have wings)"),
+        ("All dogs are friendly", "forall(dogs, are friendly)"),
+        ("Some birds can fly", "exists(birds, can fly)"),
+        ("If it rains, then the ground is wet", "the ground is wet :- it rains"),
+        # Add more test cases as needed
+    ]
+
+    for statement, expected_prolog in test_cases:
+        fixed_prolog = fix_prolog_translation(statement)
+        assert fixed_prolog == expected_prolog, f"Test failed for statement: '{statement}'. Expected Prolog: '{expected_prolog}', got: '{fixed_prolog}'"
+
+    print("All tests passed for fix_prolog_translation function.")
+
+# Call the test suite
+test_fix_prolog_translation()

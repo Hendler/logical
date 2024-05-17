@@ -1,4 +1,5 @@
 import re
+import datetime
 
 def process_file(file_path):
     print('Processing file...')
@@ -34,8 +35,9 @@ def summarize_errors(file_path):
                 error_summary['Chained Predicate Error'] = error_summary.get('Chained Predicate Error', 0) + 1
     return error_summary
 
-# Path to the output file
-output_file_path = '/home/ubuntu/full_outputs/python3_11_validate__1715898805.815742.txt'
+# Generate a dynamic output file path based on the current timestamp
+timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+output_file_path = f'/home/ubuntu/full_outputs/analyze_invalid_prolog_{timestamp}.txt'
 
 # Process the file and print a summary of invalid statements
 invalid_summary = process_file(output_file_path)
