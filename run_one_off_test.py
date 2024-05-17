@@ -5,7 +5,7 @@ from logical import parse_logic
 # This script will use the parse_logic function to generate Prolog from a given English statement.
 
 # The English statement to be converted into Prolog.
-english_statement = "Some trees are fast."
+english_statement = "J is taller than X. X is taller than D. D is taller than J."
 
 # Debug: Print the OpenAI API key to verify it's being read correctly.
 print(f"Debug: OPENAI_API_KEY from environment: {os.getenv('OPENAI_API_KEY')}")

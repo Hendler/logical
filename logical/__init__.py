@@ -1,4 +1,5 @@
 import openai
+import re  # Importing the re module for regular expression operations
 from pyswip import Prolog
 import pendulum
 import os
