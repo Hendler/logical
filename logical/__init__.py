@@ -141,9 +141,7 @@ def is_valid_prolog(response: str) -> bool:
     # Basic checks for Prolog syntax validity
     if not response.endswith('.'):
         return False
-    if ':-' in response and not response.strip().endswith('.'):
-        return False
-    # Add more complex syntax checks as needed
+    # Removed the incorrect check for ':-' followed by a period
     return True
 
 def is_semantically_valid_prolog(response: str) -> bool:
@@ -157,8 +155,8 @@ def is_semantically_valid_prolog(response: str) -> bool:
         parts = response.split(':-')
         if len(parts) != 2:
             return False
-        # Check for valid predicate structure
-        if not all(re.match(r'^[a-z][a-zA-Z0-9_]*\(.*\)$', part.strip()) for part in parts):
+        # Check for valid predicate structure with a more permissive regex pattern
+        if not all(re.match(r'^[a-z][a-zA-Z0-9_]*(\(.*\))?$', part.strip()) for part in parts):
             return False
     return True
 
