@@ -14,25 +14,26 @@ To set up and use this logic engine, follow these steps:
 2. Ensure the `OPENAI_API_KEY` is set to your actual OpenAI API key.
 3. Configure the `OPEN_AI_MODEL_TYPE` environment variable to specify the desired model, such as "gpt-4o".
 
-The `ASSISTANT_PARSING_PROMPT` has been updated with detailed examples to facilitate the conversion of English statements into Prolog syntax. The logic engine can process any English logical statements, using OpenAI to generate the corresponding Prolog code. The generated code is then parsed to ensure both syntactical and semantical correctness before execution.
+The logic engine can process any English logical statements, using OpenAI to generate the corresponding Prolog code. The generated code is then parsed to ensure both syntactical and semantical correctness before execution.
 
-Example usage:
+Example usage for parsing English to Prolog:
 ```
-$ inv logic.run
-$ parse
-$ Men are mortal. Men are human. I am human.
-$ ask
-$ Am I mortal?
+$ invoke parse "All humans are mortal. Socrates is a human."
 ```
+This will generate Prolog code for the given English statements and validate its correctness.
+
+To execute Prolog code and determine its truth value, use the `run_logic_task` function:
+```
+$ invoke run-logic-task --prolog-code-path='./path/to/prolog_code.pl'
+```
+This function dynamically determines the main predicate and executes the Prolog query to find its truth value.
 
 To run tests and verify the correctness of the Prolog statements generated, use the following command:
 ```
 $ pytest
 ```
 
-The `analyze_invalid_prolog.py` script now includes a dynamic file naming feature, which appends a timestamp to the output file name to ensure uniqueness. This script summarizes common error patterns found in invalid Prolog statements and helps in identifying areas for improvement in the logic engine.
-
-Logging of OpenAI API requests and responses is done through `openai_requests.log`, which can be found in the project's root directory. This log file is useful for auditing and debugging purposes.
+Logging of OpenAI API requests and responses is done through `openai_requests.log`, which can be found in the project's root directory. This log file is useful for auditing and debugging purposes. It includes detailed information about the requests sent to the OpenAI API and the responses received, including any errors encountered.
 
 ## background
 
