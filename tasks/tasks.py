@@ -90,6 +90,8 @@ def run_logic_task(c, prolog_code_path):
     # Iterate over each line and assert it into the interpreter
     for line in prolog_lines:
         if line and not line.startswith('%'):  # Skip empty lines and comments
+            # Remove any surrounding parentheses from the line
+            line = line.strip().rstrip('.').strip()
             try:
                 prolog.assertz(line)
             except PrologError as e:
