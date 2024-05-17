@@ -123,14 +123,14 @@ def parse_logic(input_text, query_only=False):
     # Additional validation to ensure the response is in valid Prolog format
     elif not is_valid_prolog(openai_response):
         # Handle response that is not in valid Prolog syntax
-        return "Error: The response from OpenAI API is not valid Prolog."
+        return f"Error: The response from OpenAI API is not valid Prolog. Response: {openai_response}"
     # Further semantic validation of the Prolog response
     elif not is_semantically_valid_prolog(openai_response):
         # Handle response that is not semantically valid Prolog
-        return "Error: The response from OpenAI API is not semantically valid Prolog."
+        return f"Error: The response from OpenAI API is not semantically valid Prolog. Response: {openai_response}"
 
     # Process the response through run_parser to generate Prolog
-    return run_parser(openai_response)
+    return run_parser(input_text, openai_response)
 
 
 def is_valid_prolog(response: str) -> bool:
@@ -146,6 +146,21 @@ def is_valid_prolog(response: str) -> bool:
     # Add more complex syntax checks as needed
     return True
 
+def is_semantically_valid_prolog(response: str) -> bool:
+    """
+    Validates if the given response string is semantically valid Prolog.
+    This is a simplified check that looks for common patterns and structures in Prolog statements.
+    """
+    # Simplified semantic validation checks
+    # Check for valid implication structure
+    if ':-' in response:
+        parts = response.split(':-')
+        if len(parts) != 2:
+            return False
+        # Check for valid predicate structure
+        if not all(re.match(r'^[a-z][a-zA-Z0-9_]*\(.*\)$', part.strip()) for part in parts):
+            return False
+    return True
 
 def parse_query(input_text):
     SYSTEM_ASKING_PROMPT = """
@@ -165,10 +180,7 @@ def parse_query(input_text):
     )
 
 
-def run_parser(input_text: str):
-    # Call parse_logic to use OpenAI for generating Prolog from English
-    prolog_statement = parse_logic(input_text)
-
+def run_parser(input_text: str, prolog_statement: str):
     # Check if the Prolog statement is valid before returning
     if prolog_statement.startswith("Error:"):
         # Handle error in Prolog generation
