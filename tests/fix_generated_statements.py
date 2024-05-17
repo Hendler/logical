@@ -16,32 +16,29 @@ def fix_prolog_translation(statement):
     fixed_statement = statement
     subject = extract_subject(statement)  # Dynamically determine the subject of the statement
 
-    # Handling negations and quantifiers
+    # Improved handling of negations
     if 'No' in statement:
-        # Apply negation to the predicate directly
-        fixed_statement = fixed_statement.replace('No ', 'not ')
+        # Apply negation to the predicate directly, considering the context and the subject
+        predicate = ' '.join(statement.split(' ')[2:])  # Assuming the predicate follows the subject
+        fixed_statement = f'not({subject}, {predicate})'
+
+    # Improved handling of universal quantifiers
     if 'All' in statement:
         # Translate 'All' to 'forall' to reflect universal quantification in Prolog
-        fixed_statement = fixed_statement.replace('All ', 'forall(' + subject + ', ')
-        fixed_statement += ')'  # Add closing parenthesis for the 'forall' quantifier
+        predicate = ' '.join(statement.split(' ')[2:])  # Assuming the predicate follows the subject
+        fixed_statement = f'forall({subject}, {predicate})'
+
+    # Improved handling of existential quantifiers
     if 'Some' in statement:
         # Translate 'Some' to 'exists' to reflect existential quantification in Prolog
-        fixed_statement = fixed_statement.replace('Some ', 'exists(' + subject + ', ')
-        fixed_statement += ')'  # Add closing parenthesis for the 'exists' quantifier
+        predicate = ' '.join(statement.split(' ')[2:])  # Assuming the predicate follows the subject
+        fixed_statement = f'exists({subject}, {predicate})'
 
-    # Handling conditional statements starting with 'If'
+    # Improved handling of conditional statements
     if statement.startswith('If'):
-        # Assuming the format 'If X, then Y' for conditional statements
-        # This will be translated into Prolog as 'Y :- X.'
-        parts = statement.split(' then ')
-        if len(parts) > 1:
-            condition = parts[0].replace('If ', '').strip()
-            conclusion = parts[1].strip()
-            fixed_statement = f'{conclusion} :- {condition}.'
-        else:
-            # If there is no 'then' part, we assume the condition itself is the conclusion
-            condition = parts[0].replace('If ', '').strip()
-            fixed_statement = f'{condition} :- {condition}.'
+        # Translate conditional statements into Prolog implications
+        condition, conclusion = statement.replace('If ', '').split(' then ')
+        fixed_statement = f'{conclusion} :- {condition}.'
 
     # Add more translation rules as needed here
 
