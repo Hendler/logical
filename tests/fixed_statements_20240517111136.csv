@@ -1,0 +1,2 @@
+English Statement,Prolog Statement,Truth Value
+All vehicles have fur or vehicles have six legs,forall vehicles fur(Subject) or vehicles six_legs(Subject),True

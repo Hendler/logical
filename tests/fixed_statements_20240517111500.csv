@@ -1,0 +1,582 @@
+English Statement,Prolog Statement,Truth Value
+All vehicles have fur or vehicles have six legs,forall vehicles fur(Subject) or vehicles six_legs(Subject),True
+All mammals have wheels or mammals have six legs,forall mammals wheels(Subject) or mammals six_legs(Subject),False
+All birds have fur and birds have wheels,forall birds fur(Subject) and birds wheels(Subject),True
+All vehicles can fly and vehicles have wheels,forall vehicles can_fly(Subject) and vehicles wheels(Subject),True
+No insects can fly and insects have six legs,not(exists insects can_fly(Subject) and insects six_legs(Subject)),False
+All mammals are bipedal or mammals have fur,forall mammals are bipedal(Subject) or mammals fur(Subject),False
+No insects are mortal and insects can fly,not(exists insects mortal(Subject) and insects can_fly(Subject)),True
+No vehicles are bipedal or vehicles can fly,not(exists vehicles are bipedal(Subject) or vehicles can_fly(Subject)),True
+No students can fly and students are mortal,not(exists students can_fly(Subject) and students mortal(Subject)),False
+Some insects can fly or insects are mortal,exists insects can_fly(Subject) or insects mortal(Subject),True
+All vehicles have fur or vehicles are bipedal,forall vehicles fur(Subject) or vehicles are bipedal(Subject),False
+No students are mortal or students have fur,not(exists students mortal(Subject) or students fur(Subject)),True
+All vehicles are bipedal or vehicles have fur,forall vehicles are bipedal(Subject) or vehicles fur(Subject),False
+No vehicles have six legs or vehicles can fly,not(exists vehicles six_legs(Subject) or vehicles can_fly(Subject)),True
+Some mammals can fly or mammals are bipedal,exists mammals can_fly(Subject) or mammals are bipedal(Subject),False
+All vehicles can fly and vehicles have six legs,forall vehicles can_fly(Subject) and vehicles six_legs(Subject),True
+No insects can fly or insects have wheels,not(exists insects can_fly(Subject) or insects wheels(Subject)),False
+Some insects have fur and insects can fly,exists insects fur(Subject) and insects can_fly(Subject),True
+All mammals are mortal and mammals can fly,forall mammals mortal(Subject) and mammals can_fly(Subject),True
+Some students are bipedal or students have wheels,exists students are bipedal(Subject) or students wheels(Subject),False
+No birds can fly and birds are mortal,not(exists birds can_fly(Subject) and birds mortal(Subject)),True
+No mammals are mortal or mammals are bipedal,not(exists mammals mortal(Subject) or mammals are bipedal(Subject)),True
+Some men have fur and men are mortal,exists men fur(Subject) and men mortal(Subject),True
+Some mammals are mortal and mammals have wheels,exists mammals mortal(Subject) and mammals wheels(Subject),False
+No birds have wheels and birds are bipedal,not(exists birds wheels(Subject) and birds are bipedal(Subject)),False
+All birds are mortal and birds are bipedal,forall birds mortal(Subject) and birds are bipedal(Subject),False
+No mammals have fur and mammals can fly,not(exists mammals fur(Subject) and mammals can_fly(Subject)),False
+All mammals can fly and mammals are bipedal,forall mammals can_fly(Subject) and mammals are bipedal(Subject),True
+Some vehicles have wheels or vehicles have six legs,exists vehicles wheels(Subject) or vehicles six_legs(Subject),False
+All birds have wheels and birds have six legs,forall birds wheels(Subject) and birds six_legs(Subject),False
+No men have six legs or men have wheels,not(exists men six_legs(Subject) or men wheels(Subject)),True
+No mammals have fur or mammals are mortal,not(exists mammals fur(Subject) or mammals mortal(Subject)),True
+All insects are mortal and insects are bipedal,forall insects mortal(Subject) and insects are bipedal(Subject),False
+All birds have wheels or birds have fur,forall birds wheels(Subject) or birds fur(Subject),False
+Some men have fur or men have wheels,exists men fur(Subject) or men wheels(Subject),True
+No vehicles can fly or vehicles have wheels,not(exists vehicles can_fly(Subject) or vehicles wheels(Subject)),True
+No men have six legs and men can fly,not(exists men six_legs(Subject) and men can_fly(Subject)),True
+Some students are mortal and students have fur,exists students mortal(Subject) and students fur(Subject),False
+No men are mortal and men have wheels,not(exists men mortal(Subject) and men wheels(Subject)),False
+No vehicles have fur and vehicles are bipedal,not(exists vehicles fur(Subject) and vehicles are bipedal(Subject)),True
+No insects have six legs or insects have wheels,not(exists insects six_legs(Subject) or insects wheels(Subject)),False
+All men have six legs or men are bipedal,forall men six_legs(Subject) or men are bipedal(Subject),False
+Some mammals are bipedal and mammals are mortal,exists mammals are bipedal(Subject) and mammals mortal(Subject),True
+No vehicles are mortal or vehicles are bipedal,not(exists vehicles mortal(Subject) or vehicles are bipedal(Subject)),True
+All vehicles have six legs and vehicles have wheels,forall vehicles six_legs(Subject) and vehicles wheels(Subject),True
+All mammals have six legs or mammals are mortal,forall mammals six_legs(Subject) or mammals mortal(Subject),True
+No students can fly and students are mortal,not(exists students can_fly(Subject) and students mortal(Subject)),False
+All vehicles have fur or vehicles can fly,forall vehicles fur(Subject) or vehicles can_fly(Subject),True
+Some birds have fur or birds have six legs,exists birds fur(Subject) or birds six_legs(Subject),False
+Some men have wheels and men have fur,exists men wheels(Subject) and men fur(Subject),False
+Some students have wheels and students are mortal,exists students wheels(Subject) and students mortal(Subject),True
+No birds are bipedal or birds are mortal,not(exists birds are bipedal(Subject) or birds mortal(Subject)),True
+Some insects have wheels and insects can fly,exists insects wheels(Subject) and insects can_fly(Subject),True
+All men have fur or men are bipedal,forall men fur(Subject) or men are bipedal(Subject),False
+All mammals have wheels and mammals can fly,forall mammals wheels(Subject) and mammals can_fly(Subject),False
+No vehicles can fly and vehicles are bipedal,not(exists vehicles can_fly(Subject) and vehicles are bipedal(Subject)),True
+All mammals have wheels and mammals are bipedal,forall mammals wheels(Subject) and mammals are bipedal(Subject),True
+All vehicles have fur and vehicles are bipedal,forall vehicles fur(Subject) and vehicles are bipedal(Subject),False
+All men are bipedal and men have six legs,forall men are bipedal(Subject) and men six_legs(Subject),False
+Some mammals have fur or mammals are mortal,exists mammals fur(Subject) or mammals mortal(Subject),True
+All vehicles are mortal or vehicles can fly,forall vehicles mortal(Subject) or vehicles can_fly(Subject),False
+No birds are mortal and birds have six legs,not(exists birds mortal(Subject) and birds six_legs(Subject)),True
+No birds are mortal or birds have fur,not(exists birds mortal(Subject) or birds fur(Subject)),False
+No men can fly and men are bipedal,not(exists men can_fly(Subject) and men are bipedal(Subject)),False
+All mammals have fur or mammals have six legs,forall mammals fur(Subject) or mammals six_legs(Subject),False
+Some students have wheels and students have six legs,exists students wheels(Subject) and students six_legs(Subject),False
+All vehicles have fur and vehicles are mortal,forall vehicles fur(Subject) and vehicles mortal(Subject),False
+Some birds are mortal and birds have fur,exists birds mortal(Subject) and birds fur(Subject),True
+Some vehicles are bipedal and vehicles have wheels,exists vehicles are bipedal(Subject) and vehicles wheels(Subject),False
+No insects are bipedal or insects can fly,not(exists insects are bipedal(Subject) or insects can_fly(Subject)),False
+Some students have fur and students are mortal,exists students fur(Subject) and students mortal(Subject),False
+All vehicles can fly or vehicles are mortal,forall vehicles can_fly(Subject) or vehicles mortal(Subject),True
+No vehicles have wheels or vehicles have six legs,not(exists vehicles wheels(Subject) or vehicles six_legs(Subject)),False
+All students have six legs or students can fly,forall students six_legs(Subject) or students can_fly(Subject),True
+All birds are mortal and birds have six legs,forall birds mortal(Subject) and birds six_legs(Subject),False
+Some students have six legs or students are mortal,exists students six_legs(Subject) or students mortal(Subject),True
+No students are mortal and students have fur,not(exists students mortal(Subject) and students fur(Subject)),True
+No insects can fly or insects are mortal,not(exists insects can_fly(Subject) or insects mortal(Subject)),True
+No vehicles are bipedal or vehicles have wheels,not(exists vehicles are bipedal(Subject) or vehicles wheels(Subject)),True
+No mammals have fur or mammals can fly,not(exists mammals fur(Subject) or mammals can_fly(Subject)),False
+All birds have fur or birds can fly,forall birds fur(Subject) or birds can_fly(Subject),False
+All men can fly and men have fur,forall men can_fly(Subject) and men fur(Subject),False
+Some insects have six legs or insects have wheels,exists insects six_legs(Subject) or insects wheels(Subject),False
+Some men are bipedal or men have six legs,exists men are bipedal(Subject) or men six_legs(Subject),True
+All vehicles have fur or vehicles can fly,forall vehicles fur(Subject) or vehicles can_fly(Subject),False
+All vehicles have wheels or vehicles are mortal,forall vehicles wheels(Subject) or vehicles mortal(Subject),True
+All insects are bipedal and insects can fly,forall insects are bipedal(Subject) and insects can_fly(Subject),False
+All insects can fly or insects have wheels,forall insects can_fly(Subject) or insects wheels(Subject),False
+All mammals have six legs and mammals have wheels,forall mammals six_legs(Subject) and mammals wheels(Subject),True
+Some mammals are bipedal and mammals have wheels,exists mammals are bipedal(Subject) and mammals wheels(Subject),False
+Some men have six legs and men have wheels,exists men six_legs(Subject) and men wheels(Subject),False
+No birds have six legs and birds have fur,not(exists birds six_legs(Subject) and birds fur(Subject)),False
+All vehicles have fur and vehicles are bipedal,forall vehicles fur(Subject) and vehicles are bipedal(Subject),True
+All vehicles have six legs or vehicles have wheels,forall vehicles six_legs(Subject) or vehicles wheels(Subject),False
+All students are bipedal or students have fur,forall students are bipedal(Subject) or students fur(Subject),True
+Some students have fur or students have six legs,exists students fur(Subject) or students six_legs(Subject),False
+No vehicles can fly and vehicles have fur,not(exists vehicles can_fly(Subject) and vehicles fur(Subject)),True
+All vehicles have fur or vehicles can fly,forall vehicles fur(Subject) or vehicles can_fly(Subject),True
+Some students are bipedal and students have six legs,exists students are bipedal(Subject) and students six_legs(Subject),True
+Some vehicles can fly and vehicles are bipedal,exists vehicles can_fly(Subject) and vehicles are bipedal(Subject),True
+All vehicles have fur or vehicles can fly,forall vehicles fur(Subject) or vehicles can_fly(Subject),True
+Some vehicles are bipedal and vehicles can fly,exists vehicles are bipedal(Subject) and vehicles can_fly(Subject),True
+Some vehicles have wheels or vehicles are mortal,exists vehicles wheels(Subject) or vehicles mortal(Subject),True
+All vehicles are mortal and vehicles have fur,forall vehicles mortal(Subject) and vehicles fur(Subject),False
+All insects can fly or insects have wheels,forall insects can_fly(Subject) or insects wheels(Subject),True
+Some men are bipedal and men have six legs,exists men are bipedal(Subject) and men six_legs(Subject),False
+No vehicles can fly and vehicles have six legs,not(exists vehicles can_fly(Subject) and vehicles six_legs(Subject)),False
+No mammals are mortal and mammals have fur,not(exists mammals mortal(Subject) and mammals fur(Subject)),False
+All birds are bipedal or birds can fly,forall birds are bipedal(Subject) or birds can_fly(Subject),True
+Some men are bipedal or men have wheels,exists men are bipedal(Subject) or men wheels(Subject),False
+No students have six legs or students have fur,not(exists students six_legs(Subject) or students fur(Subject)),False
+Some mammals have fur and mammals have wheels,exists mammals fur(Subject) and mammals wheels(Subject),False
+No vehicles are bipedal and vehicles are mortal,not(exists vehicles are bipedal(Subject) and vehicles mortal(Subject)),True
+All vehicles can fly or vehicles are bipedal,forall vehicles can_fly(Subject) or vehicles are bipedal(Subject),True
+Some students have fur and students are mortal,exists students fur(Subject) and students mortal(Subject),True
+No men can fly and men are mortal,not(exists men can_fly(Subject) and men mortal(Subject)),True
+Some students have fur or students have wheels,exists students fur(Subject) or students wheels(Subject),True
+All vehicles have six legs or vehicles can fly,forall vehicles six_legs(Subject) or vehicles can_fly(Subject),False
+All insects have wheels or insects are bipedal,forall insects wheels(Subject) or insects are bipedal(Subject),False
+No birds are mortal and birds have six legs,not(exists birds mortal(Subject) and birds six_legs(Subject)),False
+Some birds have six legs or birds have fur,exists birds six_legs(Subject) or birds fur(Subject),False
+Some vehicles are mortal and vehicles have fur,exists vehicles mortal(Subject) and vehicles fur(Subject),True
+No insects have wheels or insects are bipedal,not(exists insects wheels(Subject) or insects are bipedal(Subject)),False
+All insects have wheels and insects are bipedal,forall insects wheels(Subject) and insects are bipedal(Subject),True
+No insects are bipedal and insects are mortal,not(exists insects are bipedal(Subject) and insects mortal(Subject)),False
+All men have six legs and men are bipedal,forall men six_legs(Subject) and men are bipedal(Subject),True
+No students can fly and students have six legs,not(exists students can_fly(Subject) and students six_legs(Subject)),True
+Some mammals have fur or mammals have six legs,exists mammals fur(Subject) or mammals six_legs(Subject),False
+No insects have wheels and insects have fur,not(exists insects wheels(Subject) and insects fur(Subject)),False
+No birds are mortal or birds can fly,not(exists birds mortal(Subject) or birds can_fly(Subject)),False
+All men have fur and men have wheels,forall men fur(Subject) and men wheels(Subject),True
+No students are bipedal and students are mortal,not(exists students are bipedal(Subject) and students mortal(Subject)),False
+All birds can fly and birds are mortal,forall birds can_fly(Subject) and birds mortal(Subject),False
+Some mammals are bipedal or mammals have wheels,exists mammals are bipedal(Subject) or mammals wheels(Subject),False
+No birds are mortal or birds are bipedal,not(exists birds mortal(Subject) or birds are bipedal(Subject)),False
+No vehicles can fly or vehicles have six legs,not(exists vehicles can_fly(Subject) or vehicles six_legs(Subject)),True
+No vehicles have fur and vehicles have wheels,not(exists vehicles fur(Subject) and vehicles wheels(Subject)),True
+Some birds can fly and birds have fur,exists birds can_fly(Subject) and birds fur(Subject),True
+No students have six legs and students are bipedal,not(exists students six_legs(Subject) and students are bipedal(Subject)),True
+No men have six legs or men are mortal,not(exists men six_legs(Subject) or men mortal(Subject)),False
+Some students can fly and students have wheels,exists students can_fly(Subject) and students wheels(Subject),False
+No birds are bipedal or birds have fur,not(exists birds are bipedal(Subject) or birds fur(Subject)),True
+All students are mortal or students can fly,forall students mortal(Subject) or students can_fly(Subject),False
+Some insects have six legs or insects are mortal,exists insects six_legs(Subject) or insects mortal(Subject),False
+All insects can fly and insects are mortal,forall insects can_fly(Subject) and insects mortal(Subject),False
+All mammals have six legs or mammals have fur,forall mammals six_legs(Subject) or mammals fur(Subject),False
+Some mammals have fur or mammals are mortal,exists mammals fur(Subject) or mammals mortal(Subject),False
+Some vehicles have fur and vehicles have six legs,exists vehicles fur(Subject) and vehicles six_legs(Subject),False
+All insects have fur and insects are mortal,forall insects fur(Subject) and insects mortal(Subject),True
+Some vehicles have wheels and vehicles have six legs,exists vehicles wheels(Subject) and vehicles six_legs(Subject),True
+No birds can fly or birds are bipedal,not(exists birds can_fly(Subject) or birds are bipedal(Subject)),False
+No men have fur or men are bipedal,not(exists men fur(Subject) or men are bipedal(Subject)),True
+Some mammals can fly and mammals are mortal,exists mammals can_fly(Subject) and mammals mortal(Subject),True
+No students can fly or students are mortal,not(exists students can_fly(Subject) or students mortal(Subject)),False
+All birds have fur and birds have six legs,forall birds fur(Subject) and birds six_legs(Subject),False
+No vehicles have wheels and vehicles have six legs,not(exists vehicles wheels(Subject) and vehicles six_legs(Subject)),True
+No birds are bipedal and birds can fly,not(exists birds are bipedal(Subject) and birds can_fly(Subject)),False
+No students have fur or students have six legs,not(exists students fur(Subject) or students six_legs(Subject)),False
+No mammals are bipedal or mammals have fur,not(exists mammals are bipedal(Subject) or mammals fur(Subject)),True
+All students are bipedal and students have six legs,forall students are bipedal(Subject) and students six_legs(Subject),True
+Some students have fur and students are bipedal,exists students fur(Subject) and students are bipedal(Subject),False
+No mammals have six legs and mammals have wheels,not(exists mammals six_legs(Subject) and mammals wheels(Subject)),True
+No mammals are mortal and mammals have wheels,not(exists mammals mortal(Subject) and mammals wheels(Subject)),False
+Some men have six legs and men have wheels,exists men six_legs(Subject) and men wheels(Subject),True
+No birds have six legs or birds have fur,not(exists birds six_legs(Subject) or birds fur(Subject)),True
+All mammals have fur and mammals are mortal,forall mammals fur(Subject) and mammals mortal(Subject),False
+No vehicles have six legs or vehicles are bipedal,not(exists vehicles six_legs(Subject) or vehicles are bipedal(Subject)),True
+No men are bipedal and men can fly,not(exists men are bipedal(Subject) and men can_fly(Subject)),False
+No students can fly or students are bipedal,not(exists students can_fly(Subject) or students are bipedal(Subject)),False
+No men have fur and men have wheels,not(exists men fur(Subject) and men wheels(Subject)),False
+All students have wheels or students are mortal,forall students wheels(Subject) or students mortal(Subject),False
+Some students have fur or students can fly,exists students fur(Subject) or students can_fly(Subject),False
+All birds are mortal or birds have wheels,forall birds mortal(Subject) or birds wheels(Subject),False
+All birds have six legs and birds are bipedal,forall birds six_legs(Subject) and birds are bipedal(Subject),False
+Some mammals can fly and mammals have fur,exists mammals can_fly(Subject) and mammals fur(Subject),True
+All students have six legs or students have fur,forall students six_legs(Subject) or students fur(Subject),True
+All vehicles are mortal and vehicles can fly,forall vehicles mortal(Subject) and vehicles can_fly(Subject),True
+Some mammals have wheels and mammals are mortal,exists mammals wheels(Subject) and mammals mortal(Subject),True
+All birds are bipedal and birds have wheels,forall birds are bipedal(Subject) and birds wheels(Subject),False
+No mammals have wheels and mammals have fur,not(exists mammals wheels(Subject) and mammals fur(Subject)),False
+No men have six legs or men can fly,not(exists men six_legs(Subject) or men can_fly(Subject)),True
+No insects have wheels or insects are bipedal,not(exists insects wheels(Subject) or insects are bipedal(Subject)),True
+Some mammals have six legs and mammals are mortal,exists mammals six_legs(Subject) and mammals mortal(Subject),False
+Some mammals have six legs or mammals are bipedal,exists mammals six_legs(Subject) or mammals are bipedal(Subject),True
+No students have six legs and students are mortal,not(exists students six_legs(Subject) and students mortal(Subject)),True
+Some mammals have six legs or mammals can fly,exists mammals six_legs(Subject) or mammals can_fly(Subject),True
+Some men have fur or men have wheels,exists men fur(Subject) or men wheels(Subject),True
+No vehicles have six legs and vehicles can fly,not(exists vehicles six_legs(Subject) and vehicles can_fly(Subject)),False
+Some vehicles are mortal or vehicles have six legs,exists vehicles mortal(Subject) or vehicles six_legs(Subject),True
+No men have wheels or men have six legs,not(exists men wheels(Subject) or men six_legs(Subject)),False
+Some vehicles are mortal or vehicles have six legs,exists vehicles mortal(Subject) or vehicles six_legs(Subject),True
+All men can fly or men have wheels,forall men can_fly(Subject) or men wheels(Subject),True
+No insects are bipedal and insects are mortal,not(exists insects are bipedal(Subject) and insects mortal(Subject)),False
+Some students have six legs or students are bipedal,exists students six_legs(Subject) or students are bipedal(Subject),True
+Some birds have six legs and birds are bipedal,exists birds six_legs(Subject) and birds are bipedal(Subject),False
+All mammals can fly and mammals have fur,forall mammals can_fly(Subject) and mammals fur(Subject),True
+Some mammals are bipedal or mammals have six legs,exists mammals are bipedal(Subject) or mammals six_legs(Subject),False
+No mammals are bipedal or mammals are mortal,not(exists mammals are bipedal(Subject) or mammals mortal(Subject)),True
+No men have six legs or men are mortal,not(exists men six_legs(Subject) or men mortal(Subject)),True
+Some mammals are mortal or mammals can fly,exists mammals mortal(Subject) or mammals can_fly(Subject),False
+Some students have six legs and students can fly,exists students six_legs(Subject) and students can_fly(Subject),True
+All students are mortal and students have fur,forall students mortal(Subject) and students fur(Subject),True
+Some birds have fur or birds are bipedal,exists birds fur(Subject) or birds are bipedal(Subject),False
+All men can fly or men are mortal,forall men can_fly(Subject) or men mortal(Subject),False
+Some insects have six legs or insects are bipedal,exists insects six_legs(Subject) or insects are bipedal(Subject),False
+All insects have wheels and insects have six legs,forall insects wheels(Subject) and insects six_legs(Subject),True
+No birds are mortal or birds have wheels,not(exists birds mortal(Subject) or birds wheels(Subject)),True
+Some vehicles have six legs and vehicles are bipedal,exists vehicles six_legs(Subject) and vehicles are bipedal(Subject),True
+No birds are bipedal and birds have fur,not(exists birds are bipedal(Subject) and birds fur(Subject)),True
+All vehicles have six legs and vehicles have wheels,forall vehicles six_legs(Subject) and vehicles wheels(Subject),True
+Some students have six legs or students are bipedal,exists students six_legs(Subject) or students are bipedal(Subject),True
+Some men can fly or men have wheels,exists men can_fly(Subject) or men wheels(Subject),True
+No men have wheels and men can fly,not(exists men wheels(Subject) and men can_fly(Subject)),True
+Some insects have fur or insects can fly,exists insects fur(Subject) or insects can_fly(Subject),False
+No men are bipedal and men have six legs,not(exists men are bipedal(Subject) and men six_legs(Subject)),False
+Some insects have six legs or insects can fly,exists insects six_legs(Subject) or insects can_fly(Subject),True
+All mammals have six legs or mammals are bipedal,forall mammals six_legs(Subject) or mammals are bipedal(Subject),False
+Some birds are bipedal and birds can fly,exists birds are bipedal(Subject) and birds can_fly(Subject),True
+Some vehicles have wheels and vehicles can fly,exists vehicles wheels(Subject) and vehicles can_fly(Subject),False
+No vehicles are bipedal and vehicles can fly,not(exists vehicles are bipedal(Subject) and vehicles can_fly(Subject)),False
+No mammals have fur and mammals are bipedal,not(exists mammals fur(Subject) and mammals are bipedal(Subject)),True
+Some birds are mortal or birds can fly,exists birds mortal(Subject) or birds can_fly(Subject),True
+Some mammals have wheels and mammals can fly,exists mammals wheels(Subject) and mammals can_fly(Subject),True
+All insects are mortal or insects are bipedal,forall insects mortal(Subject) or insects are bipedal(Subject),False
+All vehicles have wheels and vehicles can fly,forall vehicles wheels(Subject) and vehicles can_fly(Subject),False
+Some vehicles are bipedal and vehicles have wheels,exists vehicles are bipedal(Subject) and vehicles wheels(Subject),True
+No insects have wheels or insects are bipedal,not(exists insects wheels(Subject) or insects are bipedal(Subject)),False
+All mammals are bipedal or mammals have six legs,forall mammals are bipedal(Subject) or mammals six_legs(Subject),False
+No students have fur and students are mortal,not(exists students fur(Subject) and students mortal(Subject)),False
+No vehicles have wheels and vehicles have fur,not(exists vehicles wheels(Subject) and vehicles fur(Subject)),True
+No vehicles can fly and vehicles are mortal,not(exists vehicles can_fly(Subject) and vehicles mortal(Subject)),False
+Some birds have fur or birds have wheels,exists birds fur(Subject) or birds wheels(Subject),False
+No birds can fly and birds have wheels,not(exists birds can_fly(Subject) and birds wheels(Subject)),True
+Some mammals have six legs or mammals are bipedal,exists mammals six_legs(Subject) or mammals are bipedal(Subject),True
+All birds have wheels and birds have six legs,forall birds wheels(Subject) and birds six_legs(Subject),True
+Some birds have wheels and birds are mortal,exists birds wheels(Subject) and birds mortal(Subject),False
+Some men have six legs or men are bipedal,exists men six_legs(Subject) or men are bipedal(Subject),False
+No vehicles are bipedal and vehicles have fur,not(exists vehicles are bipedal(Subject) and vehicles fur(Subject)),False
+No insects have fur or insects can fly,not(exists insects fur(Subject) or insects can_fly(Subject)),True
+Some men are bipedal and men have wheels,exists men are bipedal(Subject) and men wheels(Subject),True
+No students have fur or students have wheels,not(exists students fur(Subject) or students wheels(Subject)),False
+No students have wheels and students have fur,not(exists students wheels(Subject) and students fur(Subject)),True
+Some men have fur or men have wheels,exists men fur(Subject) or men wheels(Subject),False
+Some birds have wheels or birds have fur,exists birds wheels(Subject) or birds fur(Subject),True
+All mammals have wheels or mammals are bipedal,forall mammals wheels(Subject) or mammals are bipedal(Subject),False
+All vehicles have six legs or vehicles are bipedal,forall vehicles six_legs(Subject) or vehicles are bipedal(Subject),False
+All insects are mortal or insects have six legs,forall insects mortal(Subject) or insects six_legs(Subject),False
+No mammals are bipedal and mammals have wheels,not(exists mammals are bipedal(Subject) and mammals wheels(Subject)),True
+Some students are bipedal or students are mortal,exists students are bipedal(Subject) or students mortal(Subject),True
+No men have fur or men have six legs,not(exists men fur(Subject) or men six_legs(Subject)),True
+No students can fly and students have six legs,not(exists students can_fly(Subject) and students six_legs(Subject)),False
+Some insects can fly or insects have six legs,exists insects can_fly(Subject) or insects six_legs(Subject),False
+All mammals can fly and mammals are bipedal,forall mammals can_fly(Subject) and mammals are bipedal(Subject),False
+No mammals have fur and mammals are mortal,not(exists mammals fur(Subject) and mammals mortal(Subject)),False
+Some birds have six legs and birds have wheels,exists birds six_legs(Subject) and birds wheels(Subject),False
+All insects have fur and insects are mortal,forall insects fur(Subject) and insects mortal(Subject),False
+All students can fly and students are mortal,forall students can_fly(Subject) and students mortal(Subject),False
+Some men have fur or men have six legs,exists men fur(Subject) or men six_legs(Subject),True
+Some men are mortal or men have wheels,exists men mortal(Subject) or men wheels(Subject),False
+Some mammals have six legs and mammals can fly,exists mammals six_legs(Subject) and mammals can_fly(Subject),False
+No men are bipedal or men can fly,not(exists men are bipedal(Subject) or men can_fly(Subject)),False
+All mammals are bipedal or mammals can fly,forall mammals are bipedal(Subject) or mammals can_fly(Subject),False
+No birds are bipedal and birds have fur,not(exists birds are bipedal(Subject) and birds fur(Subject)),False
+Some students have fur and students have six legs,exists students fur(Subject) and students six_legs(Subject),True
+Some insects are bipedal and insects have fur,exists insects are bipedal(Subject) and insects fur(Subject),True
+Some vehicles can fly or vehicles are bipedal,exists vehicles can_fly(Subject) or vehicles are bipedal(Subject),False
+Some men are mortal and men have six legs,exists men mortal(Subject) and men six_legs(Subject),False
+All mammals can fly or mammals are mortal,forall mammals can_fly(Subject) or mammals mortal(Subject),False
+Some students are bipedal and students are mortal,exists students are bipedal(Subject) and students mortal(Subject),False
+No birds are mortal and birds are bipedal,not(exists birds mortal(Subject) and birds are bipedal(Subject)),False
+All birds have wheels and birds are mortal,forall birds wheels(Subject) and birds mortal(Subject),True
+No mammals have six legs or mammals are mortal,not(exists mammals six_legs(Subject) or mammals mortal(Subject)),True
+No insects can fly and insects have fur,not(exists insects can_fly(Subject) and insects fur(Subject)),False
+No men can fly or men have wheels,not(exists men can_fly(Subject) or men wheels(Subject)),False
+All men are bipedal or men have six legs,forall men are bipedal(Subject) or men six_legs(Subject),True
+All mammals have six legs or mammals have wheels,forall mammals six_legs(Subject) or mammals wheels(Subject),True
+Some birds can fly and birds are mortal,exists birds can_fly(Subject) and birds mortal(Subject),True
+All insects are mortal and insects are bipedal,forall insects mortal(Subject) and insects are bipedal(Subject),True
+All vehicles have fur and vehicles can fly,forall vehicles fur(Subject) and vehicles can_fly(Subject),False
+Some students are bipedal or students are mortal,exists students are bipedal(Subject) or students mortal(Subject),True
+No students have wheels and students have fur,not(exists students wheels(Subject) and students fur(Subject)),True
+All insects have six legs and insects are mortal,forall insects six_legs(Subject) and insects mortal(Subject),False
+No insects can fly and insects have six legs,not(exists insects can_fly(Subject) and insects six_legs(Subject)),False
+No birds can fly or birds have wheels,not(exists birds can_fly(Subject) or birds wheels(Subject)),False
+All men are mortal or men can fly,forall men mortal(Subject) or men can_fly(Subject),True
+No insects have fur and insects are bipedal,not(exists insects fur(Subject) and insects are bipedal(Subject)),False
+All mammals have six legs or mammals are bipedal,forall mammals six_legs(Subject) or mammals are bipedal(Subject),True
+Some birds are bipedal and birds have wheels,exists birds are bipedal(Subject) and birds wheels(Subject),False
+Some insects have fur or insects have six legs,exists insects fur(Subject) or insects six_legs(Subject),True
+No vehicles have fur or vehicles are mortal,not(exists vehicles fur(Subject) or vehicles mortal(Subject)),True
+No birds are bipedal and birds are mortal,not(exists birds are bipedal(Subject) and birds mortal(Subject)),False
+Some insects can fly or insects have fur,exists insects can_fly(Subject) or insects fur(Subject),True
+All mammals are mortal or mammals have six legs,forall mammals mortal(Subject) or mammals six_legs(Subject),True
+Some insects are mortal and insects have fur,exists insects mortal(Subject) and insects fur(Subject),False
+No students can fly and students are mortal,not(exists students can_fly(Subject) and students mortal(Subject)),False
+All vehicles have six legs or vehicles can fly,forall vehicles six_legs(Subject) or vehicles can_fly(Subject),False
+Some men can fly or men are mortal,exists men can_fly(Subject) or men mortal(Subject),True
+All students can fly and students have fur,forall students can_fly(Subject) and students fur(Subject),True
+Some birds can fly or birds have wheels,exists birds can_fly(Subject) or birds wheels(Subject),False
+Some men are mortal and men have fur,exists men mortal(Subject) and men fur(Subject),False
+All vehicles are bipedal or vehicles are mortal,forall vehicles are bipedal(Subject) or vehicles mortal(Subject),False
+All vehicles have fur or vehicles can fly,forall vehicles fur(Subject) or vehicles can_fly(Subject),False
+All mammals have fur and mammals have wheels,forall mammals fur(Subject) and mammals wheels(Subject),False
+Some vehicles have wheels and vehicles are bipedal,exists vehicles wheels(Subject) and vehicles are bipedal(Subject),False
+All students can fly and students are bipedal,forall students can_fly(Subject) and students are bipedal(Subject),False
+No mammals have wheels and mammals are bipedal,not(exists mammals wheels(Subject) and mammals are bipedal(Subject)),True
+Some men are bipedal and men are mortal,exists men are bipedal(Subject) and men mortal(Subject),True
+No men have fur and men have six legs,not(exists men fur(Subject) and men six_legs(Subject)),False
+Some vehicles are bipedal or vehicles have fur,exists vehicles are bipedal(Subject) or vehicles fur(Subject),True
+Some students are mortal and students have six legs,exists students mortal(Subject) and students six_legs(Subject),False
+No mammals have six legs or mammals are mortal,not(exists mammals six_legs(Subject) or mammals mortal(Subject)),True
+All men have wheels and men have fur,forall men wheels(Subject) and men fur(Subject),False
+Some mammals are bipedal or mammals have six legs,exists mammals are bipedal(Subject) or mammals six_legs(Subject),True
+No students can fly and students have six legs,not(exists students can_fly(Subject) and students six_legs(Subject)),False
+No insects can fly and insects have fur,not(exists insects can_fly(Subject) and insects fur(Subject)),False
+All men have wheels or men are bipedal,forall men wheels(Subject) or men are bipedal(Subject),True
+No men have six legs and men are mortal,not(exists men six_legs(Subject) and men mortal(Subject)),False
+No men have fur or men have wheels,not(exists men fur(Subject) or men wheels(Subject)),False
+All birds are mortal and birds can fly,forall birds mortal(Subject) and birds can_fly(Subject),True
+Some mammals are bipedal and mammals have wheels,exists mammals are bipedal(Subject) and mammals wheels(Subject),False
+Some birds can fly and birds have six legs,exists birds can_fly(Subject) and birds six_legs(Subject),True
+No insects have wheels and insects have six legs,not(exists insects wheels(Subject) and insects six_legs(Subject)),True
+No men have fur or men have wheels,not(exists men fur(Subject) or men wheels(Subject)),False
+Some insects have fur and insects are mortal,exists insects fur(Subject) and insects mortal(Subject),False
+Some students are mortal and students have six legs,exists students mortal(Subject) and students six_legs(Subject),False
+No mammals have fur or mammals have six legs,not(exists mammals fur(Subject) or mammals six_legs(Subject)),False
+No birds are mortal and birds can fly,not(exists birds mortal(Subject) and birds can_fly(Subject)),False
+All men have wheels or men are mortal,forall men wheels(Subject) or men mortal(Subject),False
+Some mammals have six legs or mammals have fur,exists mammals six_legs(Subject) or mammals fur(Subject),True
+Some mammals have fur or mammals have six legs,exists mammals fur(Subject) or mammals six_legs(Subject),True
+Some students have wheels and students have six legs,exists students wheels(Subject) and students six_legs(Subject),True
+No students have six legs and students are bipedal,not(exists students six_legs(Subject) and students are bipedal(Subject)),False
+No students are mortal and students have wheels,not(exists students mortal(Subject) and students wheels(Subject)),False
+Some students are bipedal or students have fur,exists students are bipedal(Subject) or students fur(Subject),False
+All men have six legs or men are mortal,forall men six_legs(Subject) or men mortal(Subject),True
+No men can fly and men have fur,not(exists men can_fly(Subject) and men fur(Subject)),False
+All students have six legs or students can fly,forall students six_legs(Subject) or students can_fly(Subject),True
+Some vehicles have fur or vehicles are mortal,exists vehicles fur(Subject) or vehicles mortal(Subject),True
+All men have six legs and men have fur,forall men six_legs(Subject) and men fur(Subject),True
+No vehicles are bipedal or vehicles are mortal,not(exists vehicles are bipedal(Subject) or vehicles mortal(Subject)),True
+All students are mortal or students have six legs,forall students mortal(Subject) or students six_legs(Subject),False
+Some mammals have wheels and mammals are mortal,exists mammals wheels(Subject) and mammals mortal(Subject),False
+Some insects have six legs or insects are mortal,exists insects six_legs(Subject) or insects mortal(Subject),False
+Some birds have fur or birds are mortal,exists birds fur(Subject) or birds mortal(Subject),False
+Some vehicles are bipedal and vehicles have fur,exists vehicles are bipedal(Subject) and vehicles fur(Subject),False
+All mammals can fly and mammals have wheels,forall mammals can_fly(Subject) and mammals wheels(Subject),True
+All mammals are mortal or mammals have six legs,forall mammals mortal(Subject) or mammals six_legs(Subject),False
+All men have fur or men have wheels,forall men fur(Subject) or men wheels(Subject),True
+Some mammals have six legs or mammals are mortal,exists mammals six_legs(Subject) or mammals mortal(Subject),False
+All vehicles are mortal and vehicles have fur,forall vehicles mortal(Subject) and vehicles fur(Subject),True
+No men can fly or men are bipedal,not(exists men can_fly(Subject) or men are bipedal(Subject)),False
+No students are bipedal or students have six legs,not(exists students are bipedal(Subject) or students six_legs(Subject)),True
+Some vehicles can fly or vehicles have fur,exists vehicles can_fly(Subject) or vehicles fur(Subject),True
+All birds are bipedal or birds can fly,forall birds are bipedal(Subject) or birds can_fly(Subject),True
+No men can fly or men are bipedal,not(exists men can_fly(Subject) or men are bipedal(Subject)),False
+All men can fly and men have six legs,forall men can_fly(Subject) and men six_legs(Subject),False
+No men are bipedal and men are mortal,not(exists men are bipedal(Subject) and men mortal(Subject)),False
+Some men have wheels and men have fur,exists men wheels(Subject) and men fur(Subject),False
+All birds have fur or birds are mortal,forall birds fur(Subject) or birds mortal(Subject),False
+All birds have wheels and birds are bipedal,forall birds wheels(Subject) and birds are bipedal(Subject),False
+All students can fly or students are mortal,forall students can_fly(Subject) or students mortal(Subject),False
+No vehicles have six legs or vehicles are bipedal,not(exists vehicles six_legs(Subject) or vehicles are bipedal(Subject)),False
+No mammals are bipedal or mammals are mortal,not(exists mammals are bipedal(Subject) or mammals mortal(Subject)),False
+All mammals have fur and mammals can fly,forall mammals fur(Subject) and mammals can_fly(Subject),True
+All men are mortal or men have fur,forall men mortal(Subject) or men fur(Subject),True
+No birds have wheels and birds can fly,not(exists birds wheels(Subject) and birds can_fly(Subject)),False
+No vehicles have fur and vehicles can fly,not(exists vehicles fur(Subject) and vehicles can_fly(Subject)),False
+No insects have fur and insects can fly,not(exists insects fur(Subject) and insects can_fly(Subject)),True
+Some vehicles are mortal or vehicles are bipedal,exists vehicles mortal(Subject) or vehicles are bipedal(Subject),True
+Some birds have fur or birds are mortal,exists birds fur(Subject) or birds mortal(Subject),False
+No mammals have wheels or mammals are bipedal,not(exists mammals wheels(Subject) or mammals are bipedal(Subject)),False
+No men can fly and men have fur,not(exists men can_fly(Subject) and men fur(Subject)),True
+All men are bipedal or men have fur,forall men are bipedal(Subject) or men fur(Subject),True
+All birds have six legs or birds are bipedal,forall birds six_legs(Subject) or birds are bipedal(Subject),True
+All vehicles can fly and vehicles have fur,forall vehicles can_fly(Subject) and vehicles fur(Subject),False
+All men can fly and men are bipedal,forall men can_fly(Subject) and men are bipedal(Subject),False
+All students have wheels or students can fly,forall students wheels(Subject) or students can_fly(Subject),True
+All mammals have six legs and mammals can fly,forall mammals six_legs(Subject) and mammals can_fly(Subject),False
+Some students have wheels and students have six legs,exists students wheels(Subject) and students six_legs(Subject),False
+All men can fly or men have six legs,forall men can_fly(Subject) or men six_legs(Subject),False
+No students are bipedal and students can fly,not(exists students are bipedal(Subject) and students can_fly(Subject)),True
+All mammals have six legs or mammals have wheels,forall mammals six_legs(Subject) or mammals wheels(Subject),True
+All insects can fly or insects are bipedal,forall insects can_fly(Subject) or insects are bipedal(Subject),False
+Some mammals have six legs or mammals have fur,exists mammals six_legs(Subject) or mammals fur(Subject),False
+No students have fur and students are mortal,not(exists students fur(Subject) and students mortal(Subject)),True
+Some vehicles can fly and vehicles have six legs,exists vehicles can_fly(Subject) and vehicles six_legs(Subject),False
+All men can fly or men have wheels,forall men can_fly(Subject) or men wheels(Subject),True
+Some insects can fly and insects have wheels,exists insects can_fly(Subject) and insects wheels(Subject),True
+All insects have fur or insects are mortal,forall insects fur(Subject) or insects mortal(Subject),False
+All insects can fly or insects are bipedal,forall insects can_fly(Subject) or insects are bipedal(Subject),False
+No insects are mortal and insects have wheels,not(exists insects mortal(Subject) and insects wheels(Subject)),True
+All insects have wheels or insects have six legs,forall insects wheels(Subject) or insects six_legs(Subject),False
+All vehicles have six legs or vehicles have fur,forall vehicles six_legs(Subject) or vehicles fur(Subject),False
+Some students have wheels or students are mortal,exists students wheels(Subject) or students mortal(Subject),True
+All students have wheels and students are bipedal,forall students wheels(Subject) and students are bipedal(Subject),True
+No vehicles have fur and vehicles are bipedal,not(exists vehicles fur(Subject) and vehicles are bipedal(Subject)),True
+All birds have wheels and birds are mortal,forall birds wheels(Subject) and birds mortal(Subject),False
+All students are bipedal and students have wheels,forall students are bipedal(Subject) and students wheels(Subject),True
+All insects are bipedal and insects can fly,forall insects are bipedal(Subject) and insects can_fly(Subject),True
+Some students are mortal or students have six legs,exists students mortal(Subject) or students six_legs(Subject),False
+No students can fly or students have wheels,not(exists students can_fly(Subject) or students wheels(Subject)),False
+All insects can fly or insects are mortal,forall insects can_fly(Subject) or insects mortal(Subject),False
+Some mammals have wheels or mammals can fly,exists mammals wheels(Subject) or mammals can_fly(Subject),False
+No vehicles have six legs and vehicles have fur,not(exists vehicles six_legs(Subject) and vehicles fur(Subject)),True
+All vehicles can fly and vehicles have wheels,forall vehicles can_fly(Subject) and vehicles wheels(Subject),True
+No vehicles have fur or vehicles have six legs,not(exists vehicles fur(Subject) or vehicles six_legs(Subject)),False
+All insects have six legs or insects are bipedal,forall insects six_legs(Subject) or insects are bipedal(Subject),False
+Some insects have six legs or insects are bipedal,exists insects six_legs(Subject) or insects are bipedal(Subject),False
+All insects are mortal or insects have wheels,forall insects mortal(Subject) or insects wheels(Subject),True
+All vehicles are bipedal and vehicles can fly,forall vehicles are bipedal(Subject) and vehicles can_fly(Subject),True
+All vehicles are bipedal and vehicles are mortal,forall vehicles are bipedal(Subject) and vehicles mortal(Subject),True
+All insects have wheels or insects have six legs,forall insects wheels(Subject) or insects six_legs(Subject),True
+No insects are mortal or insects have fur,not(exists insects mortal(Subject) or insects fur(Subject)),False
+Some insects are mortal and insects are bipedal,exists insects mortal(Subject) and insects are bipedal(Subject),True
+All students are bipedal or students can fly,forall students are bipedal(Subject) or students can_fly(Subject),False
+All men have wheels or men are bipedal,forall men wheels(Subject) or men are bipedal(Subject),True
+Some vehicles have wheels or vehicles have six legs,exists vehicles wheels(Subject) or vehicles six_legs(Subject),False
+All men are bipedal and men have fur,forall men are bipedal(Subject) and men fur(Subject),True
+No men can fly or men have six legs,not(exists men can_fly(Subject) or men six_legs(Subject)),False
+All birds can fly and birds have wheels,forall birds can_fly(Subject) and birds wheels(Subject),True
+All mammals have six legs and mammals are bipedal,forall mammals six_legs(Subject) and mammals are bipedal(Subject),True
+No mammals are mortal or mammals have wheels,not(exists mammals mortal(Subject) or mammals wheels(Subject)),False
+No mammals are bipedal and mammals can fly,not(exists mammals are bipedal(Subject) and mammals can_fly(Subject)),True
+Some birds have wheels and birds are bipedal,exists birds wheels(Subject) and birds are bipedal(Subject),False
+No birds are mortal and birds are bipedal,not(exists birds mortal(Subject) and birds are bipedal(Subject)),True
+Some mammals are mortal and mammals have fur,exists mammals mortal(Subject) and mammals fur(Subject),True
+Some mammals have fur or mammals have wheels,exists mammals fur(Subject) or mammals wheels(Subject),True
+Some insects have six legs and insects can fly,exists insects six_legs(Subject) and insects can_fly(Subject),True
+No birds have fur or birds are mortal,not(exists birds fur(Subject) or birds mortal(Subject)),True
+No vehicles are bipedal and vehicles are mortal,not(exists vehicles are bipedal(Subject) and vehicles mortal(Subject)),False
+Some students have wheels or students can fly,exists students wheels(Subject) or students can_fly(Subject),True
+All vehicles are mortal and vehicles have fur,forall vehicles mortal(Subject) and vehicles fur(Subject),True
+Some students have wheels and students are bipedal,exists students wheels(Subject) and students are bipedal(Subject),False
+All men have six legs and men are bipedal,forall men six_legs(Subject) and men are bipedal(Subject),False
+Some students have wheels and students have fur,exists students wheels(Subject) and students fur(Subject),True
+No men have wheels and men are bipedal,not(exists men wheels(Subject) and men are bipedal(Subject)),True
+No mammals are bipedal or mammals have fur,not(exists mammals are bipedal(Subject) or mammals fur(Subject)),False
+All birds can fly or birds are bipedal,forall birds can_fly(Subject) or birds are bipedal(Subject),False
+Some birds have six legs or birds have fur,exists birds six_legs(Subject) or birds fur(Subject),False
+All men can fly and men are bipedal,forall men can_fly(Subject) and men are bipedal(Subject),False
+All students can fly and students are mortal,forall students can_fly(Subject) and students mortal(Subject),False
+No birds have wheels or birds can fly,not(exists birds wheels(Subject) or birds can_fly(Subject)),True
+All insects have six legs and insects have wheels,forall insects six_legs(Subject) and insects wheels(Subject),True
+No birds have six legs and birds can fly,not(exists birds six_legs(Subject) and birds can_fly(Subject)),False
+Some birds have fur or birds are bipedal,exists birds fur(Subject) or birds are bipedal(Subject),True
+No vehicles can fly and vehicles have six legs,not(exists vehicles can_fly(Subject) and vehicles six_legs(Subject)),True
+Some men are bipedal and men have wheels,exists men are bipedal(Subject) and men wheels(Subject),False
+No birds have fur or birds can fly,not(exists birds fur(Subject) or birds can_fly(Subject)),True
+All mammals have wheels and mammals are mortal,forall mammals wheels(Subject) and mammals mortal(Subject),False
+No mammals are mortal or mammals can fly,not(exists mammals mortal(Subject) or mammals can_fly(Subject)),True
+No birds are mortal or birds are bipedal,not(exists birds mortal(Subject) or birds are bipedal(Subject)),False
+No mammals have six legs and mammals can fly,not(exists mammals six_legs(Subject) and mammals can_fly(Subject)),False
+Some students are mortal and students can fly,exists students mortal(Subject) and students can_fly(Subject),False
+Some students have six legs or students have wheels,exists students six_legs(Subject) or students wheels(Subject),True
+All birds have six legs and birds can fly,forall birds six_legs(Subject) and birds can_fly(Subject),True
+Some students are mortal and students can fly,exists students mortal(Subject) and students can_fly(Subject),False
+Some insects have wheels and insects have fur,exists insects wheels(Subject) and insects fur(Subject),False
+Some vehicles can fly or vehicles have wheels,exists vehicles can_fly(Subject) or vehicles wheels(Subject),False
+All insects have wheels or insects are bipedal,forall insects wheels(Subject) or insects are bipedal(Subject),False
+Some men have fur or men can fly,exists men fur(Subject) or men can_fly(Subject),True
+All students are mortal or students have six legs,forall students mortal(Subject) or students six_legs(Subject),True
+No vehicles can fly or vehicles have fur,not(exists vehicles can_fly(Subject) or vehicles fur(Subject)),True
+Some mammals have fur or mammals can fly,exists mammals fur(Subject) or mammals can_fly(Subject),False
+Some insects have wheels or insects can fly,exists insects wheels(Subject) or insects can_fly(Subject),True
+Some men are bipedal and men can fly,exists men are bipedal(Subject) and men can_fly(Subject),False
+All men are mortal and men have wheels,forall men mortal(Subject) and men wheels(Subject),True
+Some vehicles can fly or vehicles have six legs,exists vehicles can_fly(Subject) or vehicles six_legs(Subject),False
+No mammals are bipedal or mammals have wheels,not(exists mammals are bipedal(Subject) or mammals wheels(Subject)),True
+No mammals have fur and mammals are mortal,not(exists mammals fur(Subject) and mammals mortal(Subject)),True
+All birds have six legs or birds have wheels,forall birds six_legs(Subject) or birds wheels(Subject),True
+Some insects can fly and insects are bipedal,exists insects can_fly(Subject) and insects are bipedal(Subject),True
+All mammals have wheels or mammals have fur,forall mammals wheels(Subject) or mammals fur(Subject),False
+Some mammals are mortal and mammals have wheels,exists mammals mortal(Subject) and mammals wheels(Subject),False
+All mammals have fur or mammals can fly,forall mammals fur(Subject) or mammals can_fly(Subject),False
+Some students have wheels or students have six legs,exists students wheels(Subject) or students six_legs(Subject),True
+All mammals can fly or mammals have fur,forall mammals can_fly(Subject) or mammals fur(Subject),True
+All birds can fly or birds are mortal,forall birds can_fly(Subject) or birds mortal(Subject),True
+No mammals have fur or mammals are mortal,not(exists mammals fur(Subject) or mammals mortal(Subject)),True
+No students have wheels and students have six legs,not(exists students wheels(Subject) and students six_legs(Subject)),True
+No birds are mortal and birds have fur,not(exists birds mortal(Subject) and birds fur(Subject)),True
+Some birds are mortal or birds have fur,exists birds mortal(Subject) or birds fur(Subject),False
+Some students are bipedal and students have fur,exists students are bipedal(Subject) and students fur(Subject),True
+No students are bipedal and students have six legs,not(exists students are bipedal(Subject) and students six_legs(Subject)),False
+Some men have wheels and men are mortal,exists men wheels(Subject) and men mortal(Subject),False
+No men have fur and men have six legs,not(exists men fur(Subject) and men six_legs(Subject)),False
+All insects are bipedal or insects can fly,forall insects are bipedal(Subject) or insects can_fly(Subject),True
+All students can fly or students have six legs,forall students can_fly(Subject) or students six_legs(Subject),True
+All birds have six legs and birds can fly,forall birds six_legs(Subject) and birds can_fly(Subject),True
+All students are bipedal or students have fur,forall students are bipedal(Subject) or students fur(Subject),True
+All vehicles have wheels or vehicles have six legs,forall vehicles wheels(Subject) or vehicles six_legs(Subject),True
+No vehicles are mortal or vehicles have wheels,not(exists vehicles mortal(Subject) or vehicles wheels(Subject)),True
+Some mammals can fly or mammals have wheels,exists mammals can_fly(Subject) or mammals wheels(Subject),False
+All insects have six legs and insects have wheels,forall insects six_legs(Subject) and insects wheels(Subject),True
+All birds can fly or birds are bipedal,forall birds can_fly(Subject) or birds are bipedal(Subject),True
+All insects are bipedal or insects have six legs,forall insects are bipedal(Subject) or insects six_legs(Subject),True
+Some mammals are mortal and mammals have six legs,exists mammals mortal(Subject) and mammals six_legs(Subject),False
+All insects have six legs and insects have fur,forall insects six_legs(Subject) and insects fur(Subject),False
+All students have wheels and students have fur,forall students wheels(Subject) and students fur(Subject),False
+Some vehicles have six legs and vehicles have fur,exists vehicles six_legs(Subject) and vehicles fur(Subject),True
+All men have six legs and men can fly,forall men six_legs(Subject) and men can_fly(Subject),False
+All insects can fly and insects have fur,forall insects can_fly(Subject) and insects fur(Subject),False
+Some students are mortal and students have fur,exists students mortal(Subject) and students fur(Subject),True
+Some vehicles have wheels and vehicles have six legs,exists vehicles wheels(Subject) and vehicles six_legs(Subject),True
+All vehicles have six legs and vehicles have fur,forall vehicles six_legs(Subject) and vehicles fur(Subject),True
+Some students have wheels and students have fur,exists students wheels(Subject) and students fur(Subject),True
+No mammals are mortal or mammals are bipedal,not(exists mammals mortal(Subject) or mammals are bipedal(Subject)),False
+All vehicles have fur or vehicles are mortal,forall vehicles fur(Subject) or vehicles mortal(Subject),False
+No students have wheels and students are bipedal,not(exists students wheels(Subject) and students are bipedal(Subject)),True
+No vehicles can fly and vehicles are mortal,not(exists vehicles can_fly(Subject) and vehicles mortal(Subject)),False
+No insects have six legs or insects can fly,not(exists insects six_legs(Subject) or insects can_fly(Subject)),True
+No men are mortal and men have six legs,not(exists men mortal(Subject) and men six_legs(Subject)),True
+All students are bipedal or students have wheels,forall students are bipedal(Subject) or students wheels(Subject),True
+Some students have six legs or students have fur,exists students six_legs(Subject) or students fur(Subject),False
+All birds can fly or birds have wheels,forall birds can_fly(Subject) or birds wheels(Subject),True
+Some students are mortal and students can fly,exists students mortal(Subject) and students can_fly(Subject),False
+No insects can fly or insects have six legs,not(exists insects can_fly(Subject) or insects six_legs(Subject)),True
+All mammals are bipedal and mammals have wheels,forall mammals are bipedal(Subject) and mammals wheels(Subject),True
+No mammals are bipedal or mammals have six legs,not(exists mammals are bipedal(Subject) or mammals six_legs(Subject)),True
+All insects are mortal or insects are bipedal,forall insects mortal(Subject) or insects are bipedal(Subject),False
+Some mammals are mortal and mammals have six legs,exists mammals mortal(Subject) and mammals six_legs(Subject),False
+No students have fur or students have wheels,not(exists students fur(Subject) or students wheels(Subject)),True
+No students can fly and students have six legs,not(exists students can_fly(Subject) and students six_legs(Subject)),True
+No students have wheels and students have fur,not(exists students wheels(Subject) and students fur(Subject)),True
+All insects have fur or insects can fly,forall insects fur(Subject) or insects can_fly(Subject),False
+All men have six legs and men are mortal,forall men six_legs(Subject) and men mortal(Subject),True
+Some birds have fur or birds are bipedal,exists birds fur(Subject) or birds are bipedal(Subject),True
+No men have wheels or men are mortal,not(exists men wheels(Subject) or men mortal(Subject)),False
+All vehicles have six legs or vehicles are mortal,forall vehicles six_legs(Subject) or vehicles mortal(Subject),True
+No vehicles can fly and vehicles have fur,not(exists vehicles can_fly(Subject) and vehicles fur(Subject)),False
+All vehicles have wheels or vehicles are bipedal,forall vehicles wheels(Subject) or vehicles are bipedal(Subject),True
+No men have six legs and men are bipedal,not(exists men six_legs(Subject) and men are bipedal(Subject)),True
+No insects are mortal and insects have wheels,not(exists insects mortal(Subject) and insects wheels(Subject)),False
+Some birds are bipedal or birds are mortal,exists birds are bipedal(Subject) or birds mortal(Subject),False
+All vehicles are mortal or vehicles can fly,forall vehicles mortal(Subject) or vehicles can_fly(Subject),True
+No men can fly and men are bipedal,not(exists men can_fly(Subject) and men are bipedal(Subject)),True
+Some students have fur or students are mortal,exists students fur(Subject) or students mortal(Subject),False
+No vehicles are mortal or vehicles are bipedal,not(exists vehicles mortal(Subject) or vehicles are bipedal(Subject)),False
+No mammals are mortal and mammals can fly,not(exists mammals mortal(Subject) and mammals can_fly(Subject)),False
+Some insects have six legs and insects have wheels,exists insects six_legs(Subject) and insects wheels(Subject),False
+No insects have wheels and insects are mortal,not(exists insects wheels(Subject) and insects mortal(Subject)),True
+No vehicles have fur or vehicles are mortal,not(exists vehicles fur(Subject) or vehicles mortal(Subject)),True
+Some birds are bipedal and birds have six legs,exists birds are bipedal(Subject) and birds six_legs(Subject),True
+No men have six legs or men are bipedal,not(exists men six_legs(Subject) or men are bipedal(Subject)),True
+Some students can fly and students have fur,exists students can_fly(Subject) and students fur(Subject),False
+All mammals have fur or mammals have wheels,forall mammals fur(Subject) or mammals wheels(Subject),False
+No birds have fur and birds can fly,not(exists birds fur(Subject) and birds can_fly(Subject)),False
+Some birds are bipedal or birds are mortal,exists birds are bipedal(Subject) or birds mortal(Subject),True
+No insects have wheels and insects have six legs,not(exists insects wheels(Subject) and insects six_legs(Subject)),False
+No vehicles have six legs or vehicles have fur,not(exists vehicles six_legs(Subject) or vehicles fur(Subject)),False
+No vehicles are mortal and vehicles are bipedal,not(exists vehicles mortal(Subject) and vehicles are bipedal(Subject)),True
+No mammals have six legs and mammals have fur,not(exists mammals six_legs(Subject) and mammals fur(Subject)),False
+All mammals are bipedal or mammals can fly,forall mammals are bipedal(Subject) or mammals can_fly(Subject),True
+No insects are bipedal or insects have six legs,not(exists insects are bipedal(Subject) or insects six_legs(Subject)),False
+All students can fly or students have wheels,forall students can_fly(Subject) or students wheels(Subject),True
+No insects can fly and insects have wheels,not(exists insects can_fly(Subject) and insects wheels(Subject)),False
+No mammals have six legs or mammals can fly,not(exists mammals six_legs(Subject) or mammals can_fly(Subject)),True
+Some birds are bipedal or birds have fur,exists birds are bipedal(Subject) or birds fur(Subject),True
+No students can fly or students are mortal,not(exists students can_fly(Subject) or students mortal(Subject)),False
+Some birds have fur and birds are bipedal,exists birds fur(Subject) and birds are bipedal(Subject),True
+No men are mortal and men can fly,not(exists men mortal(Subject) and men can_fly(Subject)),False
+All birds are bipedal and birds have six legs,forall birds are bipedal(Subject) and birds six_legs(Subject),False
+All birds have wheels or birds have fur,forall birds wheels(Subject) or birds fur(Subject),True
+All birds can fly or birds have six legs,forall birds can_fly(Subject) or birds six_legs(Subject),True
+Some students have fur or students are mortal,exists students fur(Subject) or students mortal(Subject),False
+Some students are bipedal or students have fur,exists students are bipedal(Subject) or students fur(Subject),True
+No mammals have six legs and mammals are mortal,not(exists mammals six_legs(Subject) and mammals mortal(Subject)),True
+All insects are bipedal and insects can fly,forall insects are bipedal(Subject) and insects can_fly(Subject),True
+All men can fly or men are bipedal,forall men can_fly(Subject) or men are bipedal(Subject),False
+No students can fly and students have wheels,not(exists students can_fly(Subject) and students wheels(Subject)),True
+Some men are bipedal and men have fur,exists men are bipedal(Subject) and men fur(Subject),False
+No men are bipedal or men can fly,not(exists men are bipedal(Subject) or men can_fly(Subject)),False
+All students have fur and students can fly,forall students fur(Subject) and students can_fly(Subject),True
+No students have six legs or students have fur,not(exists students six_legs(Subject) or students fur(Subject)),False
+Some birds can fly or birds have six legs,exists birds can_fly(Subject) or birds six_legs(Subject),True
+Some mammals can fly and mammals are mortal,exists mammals can_fly(Subject) and mammals mortal(Subject),True
+All students can fly or students have fur,forall students can_fly(Subject) or students fur(Subject),True
+No vehicles have six legs or vehicles are mortal,not(exists vehicles six_legs(Subject) or vehicles mortal(Subject)),False
+Some vehicles have wheels and vehicles have fur,exists vehicles wheels(Subject) and vehicles fur(Subject),False
+All vehicles have wheels or vehicles can fly,forall vehicles wheels(Subject) or vehicles can_fly(Subject),False
+Some birds have fur or birds have six legs,exists birds fur(Subject) or birds six_legs(Subject),True
+All mammals are bipedal and mammals are mortal,forall mammals are bipedal(Subject) and mammals mortal(Subject),True

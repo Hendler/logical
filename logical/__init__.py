@@ -41,7 +41,7 @@ def _openai_wrapper(
     # Check if the function is called in a test environment
     if os.getenv("OPENAI_API_KEY") == "fake-api-key":
         # Return a mock response
-        return "Mocked response"
+        return {"prolog": "Mocked response", "notes": "This is a mock response for testing purposes."}
 
     messages = []
     messages.append({"role": "system", "content": system_message})
@@ -59,26 +59,30 @@ def _openai_wrapper(
         # Use the new method for creating chat completions
         result = client.chat.completions.create(
             model=OPEN_AI_MODEL_TYPE,
-            messages=messages,
+            messages=messages
         )
 
         # Update response handling to use the new Pydantic model accessors
         response_content = result.choices[0].message.content
         # Log the response from OpenAI API
         logging.info(f"OpenAI response: {response_content}")
-        return response_content
+        # Parse the response to extract the Prolog code and any notes
+        response_json = json.loads(response_content)
+        prolog_code = response_json.get("prolog", "Error: Prolog code not found.")
+        notes = response_json.get("notes", "")
+        return {"prolog": prolog_code, "notes": notes}
     except openai.AuthenticationError:
         # Handle invalid API key error
-        return "Error: Invalid OpenAI API key."
+        return {"prolog": "", "notes": "Error: Invalid OpenAI API key."}
     except openai.RateLimitError:
         # Handle API rate limit exceeded error
-        return "Error: OpenAI API rate limit exceeded."
+        return {"prolog": "", "notes": "Error: OpenAI API rate limit exceeded."}
     except openai.OpenAIError as e:
         # Handle general OpenAI API errors
-        return f"Error: An unexpected OpenAI API error occurred: {str(e)}"
+        return {"prolog": "", "notes": f"Error: An unexpected OpenAI API error occurred: {str(e)}"}
     except Exception as e:
         # Handle non-OpenAI related exceptions
-        return f"Error: An unexpected error occurred: {str(e)}"
+        return {"prolog": "", "notes": f"Error: An unexpected error occurred: {str(e)}"}
 
 
 def parse_logic(input_text, query_only=False):
@@ -101,24 +105,22 @@ def parse_logic(input_text, query_only=False):
     """
 
     ASISSITANT_PARSING_PROMPT = f"""
-    Please generate Prolog, even if the parser fails, by extracting a set of logical statements, rules, and object definitions from the following:
-    Ensure the output is in a simple conditional format that can be parsed by a boolean logic parser, such as 'x > 1 and y < 2'.
-    Pay special attention to implication structures, conditional predicates, and the correct use of quantifiers to avoid common errors.
+    Please generate a JSON-formatted response with Prolog code from the following English statement. The response should have two fields: "prolog" for the pure Prolog code that can be run in a Prolog interpreter, and "notes" for any additional comments or context. Ensure the Prolog code is correct and complete, and can be compiled in swi-prolog. Avoid including any extra text outside of the JSON structure.
 
     Example 1: English: 'If it is raining, then the ground is wet.'
-               Prolog: 'raining :- ground_wet.'
+               JSON: '{{"prolog": "raining :- ground_wet.", "notes": ""}}'
 
     Example 2: English: 'All birds can fly except for penguins.'
-               Prolog: 'can_fly(X) :- bird(X), not(penguin(X)).'
+               JSON: '{{"prolog": "can_fly(X) :- bird(X), not(penguin(X)).", "notes": ""}}'
 
     Example 3: English: 'Every human is mortal.'
-               Prolog: 'mortal(X) :- human(X).'
+               JSON: '{{"prolog": "mortal(X) :- human(X).", "notes": ""}}'
 
     Example 4: English: 'Socrates is a human.'
-               Prolog: 'human(socrates).'
+               JSON: '{{"prolog": "human(socrates).", "notes": ""}}'
 
     Example 5: English: 'Therefore, Socrates is mortal.'
-               Prolog: 'mortal(socrates) :- human(socrates).'
+               JSON: '{{"prolog": "mortal(socrates) :- human(socrates).", "notes": ""}}'
 
     Please convert the following English statement into Prolog: \n
     """

@@ -6,26 +6,33 @@ First developed at the [OpenAI emergency hackathon on 3/5/2023](https://twitter.
 
 <img alt="Bertrand Russell" src="./russell.png" />
 
-## status 3/16/2023
+## Usage
 
-The logic engine has been updated to use the "gpt-4o" model for generating Prolog statements. This update aims to improve the accuracy and coherence of the logical outputs.
+To set up and use this logic engine, follow these steps:
 
-## usage
+1. Set up the environment variables in a `.env` file. Use the provided `.env-example` as a template.
+2. Ensure the `OPENAI_API_KEY` is set to your actual OpenAI API key.
+3. Configure the `OPEN_AI_MODEL_TYPE` environment variable to specify the desired model, such as "gpt-4o".
 
-To use this logic engine, you need to set up the environment variables in a `.env` file. Copy the `.env-example` to `.env` and set the `OPENAI_API_KEY` to your actual OpenAI API key. The `OPEN_AI_MODEL_TYPE` should be set to the desired model, such as "gpt-4o", which can be configured via the environment variable.
+The `ASSISTANT_PARSING_PROMPT` has been updated with detailed examples to facilitate the conversion of English statements into Prolog syntax. The logic engine can process any English logical statements, using OpenAI to generate the corresponding Prolog code. The generated code is then parsed to ensure both syntactical and semantical correctness before execution.
 
-The ASSISTANT_PARSING_PROMPT has been enhanced with detailed examples to demonstrate the conversion of English statements into Prolog syntax, providing a more intuitive experience for users.
-
-The logic engine can handle any English logical statements. OpenAI is used to generate the corresponding Prolog code, which is then run through a parser to ensure syntactical and semantical correctness before execution.
-
+Example usage:
 ```
 $ inv logic.run
 $ parse
 $ Men are mortal. Men are human. I am human.
 $ ask
 $ Am I mortal?
-
 ```
+
+To run tests and verify the correctness of the Prolog statements generated, use the following command:
+```
+$ pytest
+```
+
+The `analyze_invalid_prolog.py` script now includes a dynamic file naming feature, which appends a timestamp to the output file name to ensure uniqueness. This script summarizes common error patterns found in invalid Prolog statements and helps in identifying areas for improvement in the logic engine.
+
+Logging of OpenAI API requests and responses is done through `openai_requests.log`, which can be found in the project's root directory. This log file is useful for auditing and debugging purposes.
 
 ## background
 
