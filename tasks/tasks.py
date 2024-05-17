@@ -4,7 +4,7 @@ import json
 import openai
 from logical import _openai_wrapper
 from logical import ROOT_REPO_DIR
-from pyswip import Prolog, PrologError
+from pyswip.prolog import Prolog, PrologError
 
 # Load the OpenAI API key from the environment variable
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -85,12 +85,16 @@ def run_logic_task(c, prolog_code_path):
     # Initialize the Prolog interpreter
     prolog = Prolog()
 
-    # Assert the Prolog code into the interpreter
-    try:
-        prolog.assertz(prolog_code)
-    except PrologError as e:
-        c.run(f"echo 'Error in Prolog code: {e}'")
-        return
+    # Split the Prolog code into individual lines
+    prolog_lines = prolog_code.strip().split('\n')
+    # Iterate over each line and assert it into the interpreter
+    for line in prolog_lines:
+        if line and not line.startswith('%'):  # Skip empty lines and comments
+            try:
+                prolog.assertz(line)
+            except PrologError as e:
+                c.run(f"echo 'Error in Prolog code: {e}'")
+                return
 
     # Dynamically determine the main predicate from the Prolog code
     # This is a simple heuristic that assumes the first predicate defined is the main one
