@@ -66,10 +66,21 @@ def _openai_wrapper(
         response_content = result.choices[0].message.content
         # Log the response from OpenAI API
         logging.info(f"OpenAI response: {response_content}")
-        # Parse the response to extract the Prolog code and any notes
-        response_json = json.loads(response_content)
-        prolog_code = response_json.get("prolog", "Error: Prolog code not found.")
-        notes = response_json.get("notes", "")
+        # Check if the response is wrapped in triple backticks indicating a code block
+        if "```prolog" in response_content and response_content.endswith("```"):
+            # Extract the Prolog code from within the triple backticks
+            prolog_code = re.search(r"```prolog\n([\s\S]*?)```", response_content).group(1)
+            notes = ""
+        else:
+            try:
+                # Attempt to parse the response content as JSON
+                response_json = json.loads(response_content)
+                prolog_code = response_json.get("prolog", "Error: Prolog code not found.")
+                notes = response_json.get("notes", "")
+            except json.JSONDecodeError:
+                # Log the error and return an appropriate message if JSON parsing fails
+                logging.error(f"Failed to parse OpenAI response as JSON: {response_content}")
+                return {"prolog": "", "notes": "Error: Failed to parse OpenAI response as JSON."}
         return {"prolog": prolog_code, "notes": notes}
     except openai.AuthenticationError:
         # Handle invalid API key error
@@ -131,21 +142,24 @@ def parse_logic(input_text, query_only=False):
         user_message=f"{ASISSITANT_PARSING_PROMPT}{input_text}",
     )
 
+    # Extract the Prolog code from the OpenAI response
+    prolog_code = openai_response.get("prolog", "")
+
     # Check if the response is valid Prolog before processing
-    if not openai_response or "Mocked response" in openai_response:
+    if not prolog_code:
         # Handle invalid or mocked response from OpenAI API
         return "Error: Invalid response from OpenAI API."
     # Additional validation to ensure the response is in valid Prolog format
-    elif not is_valid_prolog(openai_response):
+    elif not is_valid_prolog(prolog_code):
         # Handle response that is not in valid Prolog syntax
-        return f"Error: The response from OpenAI API is not valid Prolog. Response: {openai_response}"
+        return f"Error: The response from OpenAI API is not valid Prolog. Response: {prolog_code}"
     # Further semantic validation of the Prolog response
-    elif not is_semantically_valid_prolog(openai_response):
+    elif not is_semantically_valid_prolog(prolog_code):
         # Handle response that is not semantically valid Prolog
-        return f"Error: The response from OpenAI API is not semantically valid Prolog. Response: {openai_response}"
+        return f"Error: The response from OpenAI API is not semantically valid Prolog. Response: {prolog_code}"
 
     # Process the response through run_parser to generate Prolog
-    return run_parser(input_text, openai_response)
+    return run_parser(input_text, prolog_code)
 
 
 def is_valid_prolog(response: str) -> bool:
