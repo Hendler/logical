@@ -2,8 +2,13 @@ import openai
 from pyswip import Prolog
 import pendulum
 import os
+import logging
 from dotenv import load_dotenv, find_dotenv
 from openai import OpenAI
+
+# Configure logging
+logging.basicConfig(filename='openai_requests.log', level=logging.INFO,
+                    format='%(asctime)s:%(levelname)s:%(message)s')
 
 load_dotenv(find_dotenv())
 
@@ -28,6 +33,10 @@ def _openai_wrapper(
     example_user_message: str = None,
     example_assistant_message: str = None,
 ):
+    # Log the input messages
+    logging.info(f"System message: {system_message}")
+    logging.info(f"User message: {user_message}")
+
     # Check if the function is called in a test environment
     if os.getenv("OPENAI_API_KEY") == "fake-api-key":
         # Return a mock response
@@ -53,7 +62,10 @@ def _openai_wrapper(
         )
 
         # Update response handling to use the new Pydantic model accessors
-        return result.choices[0].message.content
+        response_content = result.choices[0].message.content
+        # Log the response from OpenAI API
+        logging.info(f"OpenAI response: {response_content}")
+        return response_content
     except openai.AuthenticationError:
         # Handle invalid API key error
         return "Error: Invalid OpenAI API key."
