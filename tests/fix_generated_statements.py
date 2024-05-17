@@ -98,3 +98,22 @@ with open(input_file_path, 'r') as infile, open(output_file_path, 'w', newline='
             print(f"Skipping line due to error: {e} - {row[0]}")
 
 print(f"Fixed statements have been written to {output_file_path}")
+
+# Test suite for the extract_subject function
+def test_extract_subject():
+    test_cases = [
+        ("No cats have wings", "cats"),
+        ("All dogs are friendly", "dogs"),
+        ("Some birds can fly", "birds"),
+        ("Every car has wheels", "car"),
+        # Add more test cases as needed
+    ]
+
+    for statement, expected_subject in test_cases:
+        extracted_subject = extract_subject(statement)
+        assert extracted_subject == expected_subject, f"Test failed for statement: '{statement}'. Expected subject: '{expected_subject}', got: '{extracted_subject}'"
+
+    print("All tests passed for extract_subject function.")
+
+# Call the test suite
+test_extract_subject()
