@@ -1,5 +1,6 @@
 import openai
 import re  # Importing the re module for regular expression operations
+import json  # Importing the json module for parsing JSON
 from pyswip import Prolog
 import pendulum
 import os
@@ -34,6 +35,29 @@ def _openai_wrapper(
     example_user_message: str = None,
     example_assistant_message: str = None,
 ):
+    """
+    Interacts with the OpenAI API to convert English statements to Prolog code.
+
+    This function sends a request to the OpenAI API with a system message and a user message,
+    and optionally example messages for context. It processes the API's response, extracting
+    the Prolog code and any notes, and handles various potential errors that may occur during
+    the request.
+
+    Parameters:
+    - system_message (str): A message that provides context to the OpenAI model.
+    - user_message (str): The user's input message to be converted into Prolog.
+    - example_user_message (str, optional): An example user message for additional context.
+    - example_assistant_message (str, optional): An example assistant message for additional context.
+
+    Returns:
+    - A dictionary with two keys: "prolog" containing the Prolog code, and "notes" containing any additional comments.
+
+    The function first checks for a test environment and returns a mock response if detected.
+    It then constructs the message payload and sends a request to the OpenAI API. The response
+    is parsed to extract the Prolog code, handling both JSON and plain text formats. The function
+    also includes error handling for common issues such as authentication errors, rate limiting,
+    and other OpenAI API errors.
+    """
     # Log the input messages
     logging.info(f"System message: {system_message}")
     logging.info(f"User message: {user_message}")
@@ -67,34 +91,22 @@ def _openai_wrapper(
         # Log the response from OpenAI API
         logging.info(f"OpenAI response: {response_content}")
 
-        # Check if the response is wrapped in triple backticks indicating a code block
-        if "```prolog" in response_content:
-            # Extract the Prolog code from within the triple backticks
+        # Check if the response is JSON formatted
+        try:
+            # Attempt to parse the response content as JSON
+            response_json = json.loads(response_content)
+            prolog_code = response_json.get("prolog", "Error: Prolog code not found.")
+            notes = response_json.get("notes", "")
+        except json.JSONDecodeError:
+            # If JSON parsing fails, check for code block wrapped in triple backticks
             prolog_code_match = re.search(r"```prolog\s*(.*?)```", response_content, re.DOTALL)
             if prolog_code_match:
                 prolog_code = prolog_code_match.group(1).strip()
                 notes = ""
             else:
-                # If the regex search fails, log the error and return an appropriate message
-                logging.error(f"Regex failed to extract Prolog code: {response_content}")
-                return {"prolog": "", "notes": "Error: Regex failed to extract Prolog code."}
-        elif response_content.startswith('{') and response_content.endswith('}'):
-            try:
-                # Attempt to parse the response content as JSON
-                response_json = json.loads(response_content)
-                prolog_code = response_json.get("prolog", "Error: Prolog code not found.")
-                notes = response_json.get("notes", "")
-            except json.JSONDecodeError:
-                # Log the error and return an appropriate message if JSON parsing fails
-                logging.error(f"Failed to parse OpenAI response as JSON: {response_content}")
-                return {"prolog": "", "notes": "Error: Failed to parse OpenAI response as JSON."}
-        else:
-            # Handle plain Prolog code response
-            prolog_code = response_content.strip()
-            notes = ""
-            if not prolog_code.endswith('.'):
-                logging.error(f"Invalid Prolog code format: {response_content}")
-                return {"prolog": "", "notes": "Error: Invalid Prolog code format."}
+                # If no Prolog code is found, log the error and return an appropriate message
+                logging.error(f"Failed to extract Prolog code: {response_content}")
+                return {"prolog": "", "notes": "Error: Failed to extract Prolog code."}
 
         return {"prolog": prolog_code, "notes": notes}
     except openai.AuthenticationError:
@@ -157,24 +169,33 @@ def parse_logic(input_text, query_only=False):
         user_message=f"{ASISSITANT_PARSING_PROMPT}{input_text}",
     )
 
+    # Log the full OpenAI response for debugging
+    logging.info(f"Full OpenAI response: {openai_response}")
+
     # Extract the Prolog code from the OpenAI response
     prolog_code = openai_response.get("prolog", "")
 
-    # Check if the response is valid Prolog before processing
-    if not prolog_code:
-        # Handle invalid or mocked response from OpenAI API
-        return "Error: Invalid response from OpenAI API."
-    # Additional validation to ensure the response is in valid Prolog format
-    elif not is_valid_prolog(prolog_code):
-        # Handle response that is not in valid Prolog syntax
-        return f"Error: The response from OpenAI API is not valid Prolog. Response: {prolog_code}"
-    # Further semantic validation of the Prolog response
-    elif not is_semantically_valid_prolog(prolog_code):
-        # Handle response that is not semantically valid Prolog
-        return f"Error: The response from OpenAI API is not semantically valid Prolog. Response: {prolog_code}"
+    # Log the extracted Prolog code for debugging
+    logging.info(f"Extracted Prolog code: {prolog_code}")
 
-    # Process the response through run_parser to generate Prolog
-    return run_parser(input_text, prolog_code)
+    # Check if the response is valid Prolog before processing
+    if prolog_code.startswith("Error:"):
+        # Handle error messages from the OpenAI API and return immediately
+        return prolog_code
+    elif not prolog_code:
+        # Handle empty Prolog code response and return immediately
+        return "Error: No Prolog code was returned from the OpenAI API."
+    else:
+        # Additional validation to ensure the response is in valid Prolog format
+        if not is_valid_prolog(prolog_code):
+            # Handle response that is not in valid Prolog syntax
+            return f"Error: The response from OpenAI API is not valid Prolog syntax. Response: {prolog_code}"
+        # Further semantic validation of the Prolog response
+        elif not is_semantically_valid_prolog(prolog_code):
+            # Handle response that is not semantically valid Prolog
+            return f"Error: The response from OpenAI API is not semantically valid Prolog. Response: {prolog_code}"
+        # Process the response through run_parser to generate Prolog
+        return run_parser(input_text, prolog_code)
 
 
 def is_valid_prolog(response: str) -> bool:
@@ -191,20 +212,35 @@ def is_valid_prolog(response: str) -> bool:
 def is_semantically_valid_prolog(response: str) -> bool:
     """
     Validates if the given response string is semantically valid Prolog.
-    This is a simplified check that looks for common patterns and structures in Prolog statements.
+    This function checks for common patterns and structures in Prolog statements.
     """
-    # Simplified semantic validation checks
-    # Check for valid implication structure
+    # Check for valid implication structure or facts
     if ':-' in response:
         parts = response.split(':-')
         if len(parts) != 2:
             return False
-        # Check for valid predicate structure with a more permissive regex pattern
-        if not all(re.match(r'^[a-z][a-zA-Z0-9_]*(\(.*\))?$', part.strip()) for part in parts):
+        # Check for valid predicate structure
+        if not all(re.match(r'^[a-z][a-zA-Z0-9_]*(\(.*\))?\s*\.?$', part.strip()) for part in parts):
+            return False
+    else:
+        # Check for valid Prolog facts
+        if not re.match(r'^[a-z][a-zA-Z0-9_]*(\(.*\))?\.$', response.strip()):
             return False
     return True
 
 def parse_query(input_text):
+    """
+    Sends a query to the OpenAI API to explain the output of a Prolog statement.
+
+    This function is used to understand the correctness of the Prolog output, whether there are logical errors in the database or the query, and to provide explanations for the same.
+
+    Parameters:
+    - input_text (str): The Prolog statement and its output to be explained.
+
+    Returns:
+    - A dictionary with the explanation of the correctness or errors in the Prolog logic.
+    """
+
     SYSTEM_ASKING_PROMPT = """
     You are an assistant to help understand the output of a prolog statement.
     You will be provided the original prolog as well as the output.
@@ -234,40 +270,51 @@ def run_parser(input_text: str, prolog_statement: str):
 
     return prolog_statement
 
+def run_logic(prolog_code: str):
+    """
+    Executes the provided Prolog code using the SWI-Prolog interpreter.
 
-def run_logic(input_text: str):
-    # export all prolog to new file
-    all_prolog = write_all_prolog()
-    prolog = Prolog()
+    This function asserts the given Prolog code to the Prolog interpreter and queries it.
+    If the Prolog code is invalid or the query fails, it returns an error message.
 
-    # get query
-    query = parse_logic(
-        f"user query: {input_text}, \noriginal: {all_prolog}",
-        query_only=True,
-    )
-    print(f"*** sending query {query} \n***")
-    parse_error = None
+    Parameters:
+    - prolog_code (str): The Prolog code to be executed.
+
+    Returns:
+    - A dictionary with the explanation of the correctness or errors in the Prolog logic if successful.
+    - An error message if the Prolog code is invalid or the query fails.
+    """
+    if not prolog_code:
+        return "Error: No Prolog code provided."
+
+    prolog = Prolog()  # Instantiate the Prolog interpreter object
+
+    try:
+        # Assert the Prolog code to the interpreter
+        prolog.assertz(prolog_code)
+    except Exception as e:
+        return f"Error: Invalid Prolog code. {str(e)}"
+
+    # Check if the Prolog code is valid before proceeding
+    if prolog_code.startswith("Error:") or not prolog_code:
+        return prolog_code  # Return the error message or indicate an empty query
+
+    logging.info(f"*** sending query {prolog_code} ***")
     query_error = None
     solutions = []
-    # export prolog to file
     try:
-        prolog.consult(PROLOG_FILE_NAME)
-    except Exception as e:
-        parse_error = str(e)
-        print(parse_error)
-
-    try:
-        solutions = [solution for solution in prolog.query(query)]
+        # Query the Prolog interpreter with the asserted code
+        solutions = [solution for solution in prolog.query(prolog_code)]
     except Exception as e:
         query_error = str(e)
-        print(query_error)
+        logging.error(query_error)
+        return f"Error: Failed to execute Prolog query. {query_error}"
 
     for solution in solutions:
-        print(solution)
-    message = f"original: {all_prolog}"
-    message += f"query: {query}"
+        logging.info(solution)
+    message = f"query: {prolog_code}"
     message += f"\n prolog out: {solutions}"
-    message += f"\nErrors: {parse_error} {query_error}"
+    message += f"\nErrors: {query_error}"
     result = parse_query(message)
 
     return result
