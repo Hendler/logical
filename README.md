@@ -22,11 +22,11 @@ $ invoke parse "All humans are mortal. Socrates is a human."
 ```
 This will generate Prolog code for the given English statements and validate its correctness.
 
-To execute Prolog code and determine its truth value, use the `run_logic_task` function:
+To execute Prolog code and determine its truth value, use the `run_logic_task` command:
 ```
-$ invoke run-logic-task --prolog-code-path='./path/to/prolog_code.pl'
+$ invoke run-logic-task --prolog-code-path='./logical/prolog_output.pl'
 ```
-This function dynamically determines the main predicate and executes the Prolog query to find its truth value.
+This command reads the specified Prolog code file, dynamically determines the main predicate, and executes the Prolog query to find its truth value.
 
 To run tests and verify the correctness of the Prolog statements generated, use the following command:
 ```
@@ -34,6 +34,8 @@ $ pytest
 ```
 
 Logging of OpenAI API requests and responses is done through `openai_requests.log`, which can be found in the project's root directory. This log file is useful for auditing and debugging purposes. It includes detailed information about the requests sent to the OpenAI API and the responses received, including any errors encountered.
+
+The `myprolog.csv` file stores 1000 logical English examples with their truth values and corresponding Prolog statements, which are used for testing and validation purposes.
 
 ## background
 
