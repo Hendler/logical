@@ -70,14 +70,14 @@ def _openai_wrapper(
         # Check if the response is wrapped in triple backticks indicating a code block
         if "```prolog" in response_content:
             # Extract the Prolog code from within the triple backticks
-            prolog_code_match = re.search(r"```prolog\r?\n?([\s\S]*?)\r?\n?```", response_content)
+            prolog_code_match = re.search(r"```prolog(.*?)```", response_content, re.DOTALL)
             if prolog_code_match:
                 prolog_code = prolog_code_match.group(1).strip()
                 notes = ""
             else:
                 # If the regex search fails, log the error and return an appropriate message
-                logging.error(f"Failed to extract Prolog code from response: {response_content}")
-                return {"prolog": "", "notes": "Error: Failed to extract Prolog code from response."}
+                logging.error(f"Regex failed to extract Prolog code: {response_content}")
+                return {"prolog": "", "notes": "Error: Regex failed to extract Prolog code."}
         elif response_content.startswith('{') and response_content.endswith('}'):
             try:
                 # Attempt to parse the response content as JSON
