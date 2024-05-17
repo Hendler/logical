@@ -53,7 +53,6 @@ def parse(c, input_text):
         prolog_file.write(prolog_code)
 
 @task
-@task
 def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     """
     This task takes a file path to Prolog code as input and runs it to determine its truth value.
