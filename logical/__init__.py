@@ -72,7 +72,7 @@ def _openai_wrapper(
             # Extract the Prolog code from within the triple backticks
             prolog_code_match = re.search(r"```prolog\r?\n?([\s\S]*?)\r?\n?```", response_content)
             if prolog_code_match:
-                prolog_code = prolog_code_match.group(1)
+                prolog_code = prolog_code_match.group(1).strip()
                 notes = ""
             else:
                 # If the regex search fails, log the error and return an appropriate message
