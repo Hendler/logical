@@ -8,9 +8,6 @@ output_file_path = f'/home/ubuntu/logical/tests/fixed_statements_{datetime.now()
 
 # Define a function to fix the Prolog translation errors
 def fix_prolog_translation(statement):
-    # This function will contain the logic to fix the Prolog translation
-    # For demonstration purposes, let's assume we replace 'have' with 'possess' and 'and' with 'also'
-    # This is a simplified example and does not represent the actual complexity of Prolog translation
     # The actual logic will involve parsing the English statements, understanding the logical constructs,
     # and then generating the corresponding Prolog statements.
 
@@ -25,9 +22,19 @@ def fix_prolog_translation(statement):
         fixed_statement = fixed_statement.replace('bipedal', 'bipedal(Subject)')
     if 'can fly' in statement:
         fixed_statement = fixed_statement.replace('can fly', 'can_fly(Subject)')
+    if 'are mortal' in statement:
+        fixed_statement = fixed_statement.replace('are mortal', 'mortal(Subject)')
+    if 'have fur' in statement:
+        fixed_statement = fixed_statement.replace('have fur', 'fur(Subject)')
 
     # Replace 'All' with 'forall' to reflect universal quantification in Prolog
     fixed_statement = fixed_statement.replace('All', 'forall')
+    # Replace 'Some' with 'exists' to reflect existential quantification in Prolog
+    fixed_statement = fixed_statement.replace('Some', 'exists')
+    # Replace 'No' with 'not(exists' and add closing parenthesis for negation in Prolog
+    fixed_statement = fixed_statement.replace('No', 'not(exists')
+    if 'not(exists' in fixed_statement:
+        fixed_statement += ')'
 
     # Add more translation rules as needed here
 
