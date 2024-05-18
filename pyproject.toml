@@ -4,6 +4,16 @@ version = "0.1.0"
 description = "A logic engine that processes English logical statements into Prolog."
 authors = ["Jonathan Hendler <jonathan.hendler@example.com>"]
 license = "MIT"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Interpreters"
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"
