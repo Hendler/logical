@@ -58,16 +58,16 @@ def parse(c, input_text):
 
         # Handle different types of logical constructs
         if input_text.lower().startswith('all '):
-            # Extract the subject and predicate from the statement
             parts = input_text[4:].split(' are ', 1)
             if len(parts) == 2:
                 subject = parts[0].strip().lower()
                 predicate = parts[1].strip().rstrip('.').lower()
+                # Ensure subject and predicate are singular for Prolog code
+                subject_singular = subject[:-1] if subject.endswith('s') else subject
+                predicate_singular = predicate[:-1] if predicate.endswith('s') else predicate
                 # Construct the Prolog code for the implication
-                prolog_code = f"{predicate}(X) :- {subject}(X)."
-            else:
-                print(f"Error: Unable to parse the 'All' statement: {input_text}")
-                return
+                prolog_code = f"{predicate_singular}(X) :- {subject_singular}(X)."
+                print(f"Prolog code for 'All' statement: {prolog_code}")
         elif input_text.lower().startswith('some '):
             # Extract the subject and predicate from the statement
             parts = input_text[5:].split(' ', 1)
@@ -118,10 +118,11 @@ def parse(c, input_text):
     # Write the validated and formatted Prolog code to a file for later use
     prolog_file_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
     print(f"Attempting to append to world.pl at path: {prolog_file_path}")
+    print(f"Prolog code to be appended: {prolog_code}")
     try:
         with open(prolog_file_path, 'a') as prolog_file:
             print(f"Appending the following Prolog code to world.pl:\n{prolog_code}")
-            prolog_file.write(f"{prolog_code}\n")
+            prolog_file.write(prolog_code + '\n')
         print("Prolog code appended to world.pl successfully.")
     except Exception as e:
         print(f"Failed to append Prolog code to world.pl: {e}")
@@ -169,9 +170,9 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
         if line and not line.startswith('%'):  # Skip empty lines and comments
             # Trim whitespace from the line
             line = line.strip()
-            # Ensure the line is a single valid statement and ends with a period
-            if not line.endswith('.'):
-                line += '.'
+            # Ensure the line is a single valid statement and does not end with a period
+            if line.endswith('.'):
+                line = line[:-1]
             # Check for balanced parentheses
             if line.count('(') != line.count(')'):
                 c.run(f"echo 'Error: Unbalanced parentheses in Prolog code: {line}'")
