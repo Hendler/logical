@@ -48,8 +48,8 @@ def parse(c, input_text):
     c.run(f"echo 'Prolog code: {prolog_code}'")
 
     # Write the Prolog code to a file for later use
-    prolog_file_path = os.path.join(ROOT_REPO_DIR, 'prolog_output.pl')
-    with open(prolog_file_path, 'w') as prolog_file:
+    prolog_file_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
+    with open(prolog_file_path, 'a') as prolog_file:
         prolog_file.write(prolog_code)
 
 @task
@@ -105,8 +105,14 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     if not main_predicate or arity is None:
         for line in prolog_lines:
             if not line.startswith('%') and ':-' in line:
-                main_predicate = line.split(':-')[0].strip().split('(')[0]
-                arity = line.count(',') + 1  # Count the number of arguments
+                # Extract the predicate name and its arguments
+                predicate_parts = line.split(':-')[0].strip().split('(')
+                main_predicate = predicate_parts[0]
+                if len(predicate_parts) > 1:
+                    # Count the number of arguments based on commas and closing parenthesis
+                    arity = predicate_parts[1].count(',') + (1 if predicate_parts[1].endswith(')') else 0)
+                else:
+                    arity = 0
                 break
 
     if not main_predicate:
