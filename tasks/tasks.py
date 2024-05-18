@@ -54,9 +54,37 @@ def parse(c, input_text):
         prolog_code = re.sub(r'(?<=\(|,|\s)([a-z_]\w*)(?=\s|\,|\))', lambda match: match.group(0).capitalize(), prolog_code)
         print(f"Formatted Prolog code to append: {prolog_code}")
 
-        # Check for balanced parentheses
-        if prolog_code.count('(') != prolog_code.count(')'):
-            c.run(f"echo 'Error: Unbalanced parentheses in Prolog code'")
+        # Implement the validate_prolog_code function
+        def validate_prolog_code(prolog_code):
+            """
+            Validates the syntax of the generated Prolog code.
+
+            Parameters:
+            - prolog_code (str): The generated Prolog code to validate.
+
+            Returns:
+            - (bool, str): A tuple containing a boolean indicating if the validation passed and an error message if it failed.
+            """
+            # Check for balanced parentheses
+            if prolog_code.count('(') != prolog_code.count(')'):
+                return False, 'Error: Unbalanced parentheses in Prolog code.'
+
+            # Check that each statement ends with a period
+            if not all(line.strip().endswith('.') for line in prolog_code.splitlines() if line.strip()):
+                return False, 'Error: Not all Prolog statements end with a period.'
+
+            # Check that variables are correctly capitalized
+            if any(char.islower() for char in re.findall(r'\b[A-Z_][a-zA-Z0-9_]*\b', prolog_code)):
+                return False, 'Error: Variables are not correctly capitalized.'
+
+            # Additional syntax checks can be added here
+
+            return True, 'Prolog code syntax is correct.'
+
+        # Replace the placeholder call with the actual function definition
+        validation_passed, error_message = validate_prolog_code(prolog_code)
+        if not validation_passed:
+            c.run(f"echo '{error_message}'")
             return
 
         # Handle different types of logical constructs
