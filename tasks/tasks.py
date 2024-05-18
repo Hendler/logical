@@ -112,8 +112,13 @@ def parse(c, input_text):
 
     # Write the validated and formatted Prolog code to a file for later use
     prolog_file_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
-    with open(prolog_file_path, 'a') as prolog_file:
-        prolog_file.write(prolog_code + '\n')
+    logging.info(f"Resolved world.pl file path: {prolog_file_path}")
+    try:
+        with open(prolog_file_path, 'a') as prolog_file:
+            prolog_file.write(prolog_code + '\n')
+        logging.info("Prolog code appended to world.pl successfully.")
+    except Exception as e:
+        logging.error(f"Failed to append Prolog code to world.pl: {e}")
 
 @task
 def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
