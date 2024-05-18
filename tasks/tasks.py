@@ -6,6 +6,7 @@ from logical import _openai_wrapper
 from logical import ROOT_REPO_DIR
 from pyswip.prolog import Prolog, PrologError
 import logging
+import re
 
 # Configure logging to display info-level messages
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -45,10 +46,12 @@ def parse(c, input_text):
 
     # Validate and format the Prolog code
     if prolog_code:
-        # Ensure the code ends with a period and starts with a lowercase character
+        # Ensure the code starts with a lowercase character for predicates
         prolog_code = prolog_code.strip().lower()
-        if not prolog_code.endswith('.'):
-            prolog_code += '.'
+        # Capitalize variables (Prolog variables start with an uppercase letter or underscore)
+        # Use a regular expression to find all instances of variables and capitalize them
+        # Variables in Prolog are capitalized and not part of a quoted string or comment
+        prolog_code = re.sub(r'(?<=\(|,|\s)([a-z_]\w*)(?=\s|\,|\))', lambda match: match.group(0).capitalize(), prolog_code)
         print(f"Formatted Prolog code to append: {prolog_code}")
 
         # Check for balanced parentheses
@@ -67,42 +70,17 @@ def parse(c, input_text):
                 predicate_singular = predicate[:-1] if predicate.endswith('s') else predicate
                 # Construct the Prolog code for the implication
                 prolog_code = f"{predicate_singular}(X) :- {subject_singular}(X)."
+                prolog_code = prolog_code.replace('x', 'X')  # Capitalize the variable
                 print(f"Prolog code for 'All' statement: {prolog_code}")
         elif input_text.lower().startswith('some '):
-            # Extract the subject and predicate from the statement
             parts = input_text[5:].split(' can ', 1)
             if len(parts) == 2:
-                subject = parts[0].strip().capitalize()
+                subject = parts[0].strip().lower()
                 predicate = parts[1].strip().rstrip('.').lower()
-                # Initialize the Prolog interpreter
-                prolog = Prolog()
-                # Query the Prolog knowledge base to retrieve all subjects
-                prolog_subjects = list(prolog.query(f"{subject.lower()}(Subject)"))
-                # Extract the subject names from the query results
-                subject_list = [s['Subject'] for s in prolog_subjects if 'Subject' in s]
-                # Construct the Prolog code using member to check for at least one instance where the predicate is true for the subject
-                prolog_code = f"some_{subject.lower()}(X) :- member(X, [{', '.join(subject_list)}]), {predicate}(X)."
+                # Construct the Prolog code for the existence of at least one subject that satisfies the predicate
+                prolog_code = f"findall(X, ({subject}(X), {predicate}(X)), List), length(List, Length), Length > 0."
+                prolog_code = prolog_code.replace('x', 'X')  # Capitalize the variable
                 print(f"Prolog code for 'Some' statement: {prolog_code}")
-        elif input_text.lower().startswith('no '):
-            # Extract the subject and predicate from the statement
-            parts = input_text[3:].split(' ')
-            subject = parts[0]
-            predicate = ' '.join(parts[1:])
-            prolog_code = f"\\+ forall(X, ({subject}(X) -> ({predicate})))"
-        elif input_text.lower().startswith('if '):
-            # Split the statement into condition and conclusion parts
-            parts = input_text[3:].split(' then ')
-            if len(parts) == 2:
-                condition, conclusion = parts
-                # Ensure both condition and conclusion are valid Prolog statements and end with a period
-                condition = condition.rstrip('.').lower()
-                conclusion = conclusion.rstrip('.').lower()
-                if not condition.endswith('.'):
-                    condition += '.'
-                if not conclusion.endswith('.'):
-                    conclusion += '.'
-                # Construct the Prolog code for the implication
-                prolog_code = f"({condition} -> {conclusion})"
 
     # Log the Prolog code to be appended to the world.pl file for verification
     logging.info(f"Appending to world.pl: {prolog_code}")
@@ -157,20 +135,13 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
 
     # Split the Prolog code into individual lines
     prolog_lines = prolog_code.strip().split('\n')
-    # Iterate over each line and assert it into the interpreter
+    # Iterate over each line and handle it appropriately
     for line in prolog_lines:
         if line and not line.startswith('%'):  # Skip empty lines and comments
-            # Trim whitespace from the line
-            line = line.strip()
-            # Ensure the line is a single valid statement and does not end with a period
-            if line.endswith('.'):
-                line = line[:-1]
-            # Check for balanced parentheses
-            if line.count('(') != line.count(')'):
-                c.run(f"echo 'Error: Unbalanced parentheses in Prolog code: {line}'")
-                return
+            # Ensure the line is a complete statement with a single period at the end
+            if not line.endswith('.'):
+                line += '.'
             try:
-                # Assert the Prolog code as a fact or rule
                 prolog.assertz(line)
             except PrologError as e:
                 c.run(f"echo 'Error in Prolog code: {e}'")
@@ -217,24 +188,24 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     # Return the truth value
     return truth_value
 
-@task(help={'input-text': "An English statement to convert to Prolog. If not provided, the task will prompt for input."})
-def interactive_logic(c, input_text=None):
+@task(help={'statement': "An English statement to convert to Prolog."})
+def interactive_logic(c, statement):
     """
     This task provides an interactive mode for the user to input English statements and receive Prolog queries or truth values in response.
     It utilizes the existing `parse` and `run_logic_task` functionalities to process user input and interact with the Prolog interpreter.
 
     Parameters:
     - c: The context from the invoke task.
-    - input_text: Optional. An English statement to be processed.
+    - statement: An English statement to be processed.
     """
-    if input_text is None:
+    if not statement:
         # Interactive mode: prompt the user for an English statement
-        input_text = input("Enter an English statement (or type 'exit' to quit): ")
-        if input_text.lower() == 'exit':
+        statement = input("Enter an English statement (or type 'exit' to quit): ")
+        if statement.lower() == 'exit':
             return
 
     # Call the parse task to convert the English statement to Prolog code
-    parse(c, input_text)
+    parse(c, statement)
 
     # Run the resulting Prolog code to determine its truth value
     prolog_code_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
