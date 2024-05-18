@@ -84,20 +84,20 @@ def _openai_wrapper(
             messages=messages
         )
 
-        # Update response handling to use the new Pydantic model accessors
+        # Log the raw response content from OpenAI API
         response_content = result.choices[0].message.content
-        # Log the response from OpenAI API
-        logging.info(f"OpenAI response: {response_content}")
+        logging.info(f"Raw OpenAI response content: {response_content}")
 
-        # Parse the response content as JSON
+        # Attempt to parse the response content as JSON
         response_json = json.loads(response_content)
         prolog_code = response_json.get("prolog", "Error: Prolog code not found.")
         notes = response_json.get("notes", "")
 
         return {"prolog": prolog_code, "notes": notes}
     except json.JSONDecodeError:
-        # If JSON parsing fails, log the error and return an appropriate message
+        # If JSON parsing fails, log the error and the raw response content
         logging.error(f"Failed to parse JSON response: {response_content}")
+        logging.error(f"Raw OpenAI response content causing JSON parsing failure: {response_content}")
         return {"prolog": "", "notes": "Error: Failed to parse JSON response."}
     except openai.AuthenticationError:
         # Handle invalid API key error
