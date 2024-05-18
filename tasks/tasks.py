@@ -38,19 +38,22 @@ def parse(c, input_text):
     # Extract the Prolog code from the response
     prolog_code = openai_response.get("prolog", "")
 
-    # Check for errors in the response
-    if prolog_code.startswith("Error:"):
-        # Log and return the error message
-        c.run(f"echo '{prolog_code}'")
-        return
+    # Validate and format the Prolog code
+    if prolog_code:
+        # Ensure the code ends with a period
+        prolog_code = prolog_code.strip()
+        if not prolog_code.endswith('.'):
+            prolog_code += '.'
 
-    # Log the Prolog code for auditing
-    c.run(f"echo 'Prolog code: {prolog_code}'")
+        # Check for balanced parentheses
+        if prolog_code.count('(') != prolog_code.count(')'):
+            c.run(f"echo 'Error: Unbalanced parentheses in Prolog code'")
+            return
 
-    # Write the Prolog code to a file for later use
+    # Write the validated and formatted Prolog code to a file for later use
     prolog_file_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
     with open(prolog_file_path, 'a') as prolog_file:
-        prolog_file.write(prolog_code)
+        prolog_file.write(prolog_code + '\n')  # Ensure each entry is on a new line
 
 @task
 def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
