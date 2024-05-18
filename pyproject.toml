@@ -1,25 +1,26 @@
-[tool.black]
-line-length = 88
-target-version = ['py39']
-include = '\.pyi?$'
+[tool.poetry]
+name = "logical"
+version = "0.1.0"
+description = "A logic engine that processes English logical statements into Prolog."
+authors = ["Jonathan Hendler <jonathan.hendler@example.com>"]
+license = "MIT"
 
-exclude = '''
-/(
-    \.git
-  | \.mypy_cache
-  | \.tox
-)/
-| docker
-'''
+[tool.poetry.dependencies]
+python = "^3.9"
+openai = "1.30.1"
+pyswip = "0.2.10"
+pendulum = "2.1.2"
+folpy = "0.1.0"
 
+[tool.poetry.dev-dependencies]
+black = "*"
+ipython = "*"
+python-dotenv = "*"
+invoke = "*"
 
-[tool.pytest.ini_options]
-pythonpath = [
-  ".", "tasks"
-]
+[tool.poetry.packages]
+include = [{ from = "logical", include = ["*.py"] }]
 
-# extend-exclude = '''
-# # A regex preceded with ^/ will apply only to files and directories
-# # in the root of the project.
-# ^/foo.py  # exclude a file named foo.py in the root of the project (in addition to the defaults)
-# '''
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
