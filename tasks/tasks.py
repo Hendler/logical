@@ -40,8 +40,8 @@ def parse(c, input_text):
 
     # Validate and format the Prolog code
     if prolog_code:
-        # Ensure the code ends with a period
-        prolog_code = prolog_code.strip()
+        # Ensure the code ends with a period and starts with a lowercase character
+        prolog_code = prolog_code.strip().lower()
         if not prolog_code.endswith('.'):
             prolog_code += '.'
 
@@ -50,12 +50,63 @@ def parse(c, input_text):
             c.run(f"echo 'Error: Unbalanced parentheses in Prolog code'")
             return
 
+        # Handle different types of logical constructs
+        if input_text.lower().startswith('all '):
+            # Extract the subject and predicate from the statement
+            parts = input_text[4:].split(' ')
+            subject = parts[0]
+            predicate = ' '.join(parts[1:])
+            prolog_code = f"forall(X, ({subject}(X) -> ({predicate})))"
+        elif input_text.lower().startswith('some '):
+            # Extract the subject and predicate from the statement
+            parts = input_text[5:].split(' ', 1)
+            subject = parts[0].lower()
+            predicate = parts[1].strip().rstrip('.').lower()
+            # The predicate should be a unary relation for the subject
+            # Split the predicate into parts and reconstruct it into a valid Prolog condition
+            predicate_parts = predicate.split()
+            predicate_conditions = []
+            for part in predicate_parts:
+                if part.isalpha():  # Check if the part is a predicate
+                    predicate_conditions.append(f"{part}(X)")
+                elif part == 'and':
+                    predicate_conditions.append(',')  # Prolog conjunction
+                elif part == 'or':
+                    predicate_conditions.append(';')  # Prolog disjunction
+                else:
+                    predicate_conditions.append(part)
+            # Join the conditions with appropriate spacing and replace English connectors with Prolog operators
+            prolog_condition = ' '.join(predicate_conditions).replace(' ,', ',').replace(' ;', ';').replace(', ', ',').replace('; ', ';')
+            # Ensure the condition is wrapped in parentheses if it contains operators
+            if ',' in prolog_condition or ';' in prolog_condition:
+                prolog_condition = f"({prolog_condition})"
+            # Construct the Prolog code using findall to check for at least one instance where the predicate is true
+            prolog_code = f"findall(X, {prolog_condition}, Instances), length(Instances, Len), Len > 0."
+        elif input_text.lower().startswith('no '):
+            # Extract the subject and predicate from the statement
+            parts = input_text[3:].split(' ')
+            subject = parts[0]
+            predicate = ' '.join(parts[1:])
+            prolog_code = f"\\+ forall(X, ({subject}(X) -> ({predicate})))"
+        elif input_text.lower().startswith('if '):
+            # Split the statement into condition and conclusion parts
+            parts = input_text[3:].split(' then ')
+            if len(parts) == 2:
+                condition, conclusion = parts
+                # Ensure both condition and conclusion are valid Prolog statements and end with a period
+                condition = condition.rstrip('.').lower()
+                conclusion = conclusion.rstrip('.').lower()
+                if not condition.endswith('.'):
+                    condition += '.'
+                if not conclusion.endswith('.'):
+                    conclusion += '.'
+                # Construct the Prolog code for the implication
+                prolog_code = f"({condition} -> {conclusion})"
+
     # Write the validated and formatted Prolog code to a file for later use
     prolog_file_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
     with open(prolog_file_path, 'a') as prolog_file:
-        # Ensure each entry is on a new line and is a single valid statement
-        formatted_prolog_code = prolog_code if prolog_code.endswith('.') else prolog_code + '.'
-        prolog_file.write(formatted_prolog_code + '\n')
+        prolog_file.write(prolog_code + '\n')
 
 @task
 def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
@@ -107,8 +158,8 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
             if line.count('(') != line.count(')'):
                 c.run(f"echo 'Error: Unbalanced parentheses in Prolog code: {line}'")
                 return
-            # Assert the Prolog code as a fact or rule
             try:
+                # Assert the Prolog code as a fact or rule
                 prolog.assertz(line)
             except PrologError as e:
                 c.run(f"echo 'Error in Prolog code: {e}'")
