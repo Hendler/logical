@@ -70,27 +70,13 @@ def parse(c, input_text):
                 print(f"Prolog code for 'All' statement: {prolog_code}")
         elif input_text.lower().startswith('some '):
             # Extract the subject and predicate from the statement
-            parts = input_text[5:].split(' ', 1)
-            subject = parts[0].lower()
-            predicate = parts[1].strip().rstrip('.').lower()
-            # The predicate should be a unary relation for the subject
-            predicate_parts = predicate.split()
-            predicate_conditions = []
-            for part in predicate_parts:
-                if part.isalpha():  # Check if the part is a predicate
-                    predicate_conditions.append(f"{part}(X)")
-                elif part == 'and':
-                    predicate_conditions.append('), (')  # Prolog conjunction
-                elif part == 'or':
-                    predicate_conditions.append('; ')  # Prolog disjunction
-                else:
-                    predicate_conditions.append(part)
-            # Join the conditions with appropriate spacing and replace English connectors with Prolog operators
-            prolog_condition = ''.join(predicate_conditions)
-            # Ensure the condition is wrapped in parentheses
-            prolog_condition = f"({prolog_condition})"
-            # Construct the Prolog code using findall to check for at least one instance where the predicate is true
-            prolog_code = f"findall(X, {prolog_condition}, Instances), length(Instances, Len), Len > 0."
+            parts = input_text[5:].split(' can ', 1)
+            if len(parts) == 2:
+                subject = parts[0].strip().lower()
+                predicate = parts[1].strip().rstrip('.').lower()
+                # Construct the Prolog code using findall to check for at least one instance where the predicate is true for the subject
+                prolog_code = f"findall(X, ({subject}(X), {predicate}(X)), Instances), length(Instances, Len), Len > 0."
+                print(f"Prolog code for 'Some' statement: {prolog_code}")
         elif input_text.lower().startswith('no '):
             # Extract the subject and predicate from the statement
             parts = input_text[3:].split(' ')
