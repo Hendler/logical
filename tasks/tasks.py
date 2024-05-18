@@ -138,14 +138,28 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     # Iterate over each line and handle it appropriately
     for line in prolog_lines:
         if line and not line.startswith('%'):  # Skip empty lines and comments
-            # Ensure the line is a complete statement with a single period at the end
-            if not line.endswith('.'):
-                line += '.'
-            try:
-                prolog.assertz(line)
-            except PrologError as e:
-                c.run(f"echo 'Error in Prolog code: {e}'")
-                return
+            line = line.strip()
+            if line.startswith(':-'):  # Handle Prolog directives differently
+                with open(prolog_code_path, 'a') as prolog_file:
+                    prolog_file.write(line + '\n')  # Write the directive directly to the file
+            else:
+                # Ensure the line is a complete statement with a single period at the end
+                # Only add a period if the line does not already end with one
+                if not line.endswith('.'):
+                    line += '.'
+                try:
+                    # Assert the Prolog fact or rule, ensuring no duplicate periods and correct syntax
+                    # Do not strip parentheses as they might be part of the Prolog syntax
+                    # Check if the line is a rule or fact and handle accordingly
+                    if ':-' in line or (line.count('(') == line.count(')') and line.count('(') > 0):
+                        # It's a rule, assert without changes
+                        prolog.assertz(line)
+                    else:
+                        # It's a fact, ensure it ends with a single period
+                        prolog.assertz(line)
+                except PrologError as e:
+                    c.run(f"echo 'Error in Prolog code: {e}'")
+                    return
 
     # If main_predicate and arity are not provided, attempt to determine them
     if not main_predicate or arity is None:
