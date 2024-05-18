@@ -112,13 +112,14 @@ def parse(c, input_text):
 
     # Write the validated and formatted Prolog code to a file for later use
     prolog_file_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
-    logging.info(f"Resolved world.pl file path: {prolog_file_path}")
+    print(f"Attempting to append to world.pl at path: {prolog_file_path}")
     try:
         with open(prolog_file_path, 'a') as prolog_file:
+            print(f"Appending the following Prolog code to world.pl:\n{prolog_code}")
             prolog_file.write(prolog_code + '\n')
-        logging.info("Prolog code appended to world.pl successfully.")
+        print("Prolog code appended to world.pl successfully.")
     except Exception as e:
-        logging.error(f"Failed to append Prolog code to world.pl: {e}")
+        print(f"Failed to append Prolog code to world.pl: {e}")
 
 @task
 def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
@@ -218,26 +219,27 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     # Return the truth value
     return truth_value
 
-@task
-def interactive_logic(c):
+@task(help={'input-text': "An English statement to convert to Prolog. If not provided, the task will prompt for input."})
+def interactive_logic(c, input_text=None):
     """
     This task provides an interactive mode for the user to input English statements and receive Prolog queries or truth values in response.
     It utilizes the existing `parse` and `run_logic_task` functionalities to process user input and interact with the Prolog interpreter.
 
     Parameters:
     - c: The context from the invoke task.
+    - input_text: Optional. An English statement to be processed.
     """
-    while True:
-        # Prompt the user for an English statement
+    if input_text is None:
+        # Interactive mode: prompt the user for an English statement
         input_text = input("Enter an English statement (or type 'exit' to quit): ")
         if input_text.lower() == 'exit':
-            break
+            return
 
-        # Call the parse task to convert the English statement to Prolog code
-        parse(c, input_text)
+    # Call the parse task to convert the English statement to Prolog code
+    parse(c, input_text)
 
-        # Run the resulting Prolog code to determine its truth value
-        prolog_code_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
-        run_logic_task(c, prolog_code_path)
+    # Run the resulting Prolog code to determine its truth value
+    prolog_code_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
+    run_logic_task(c, prolog_code_path)
 
         # Removed the line that clears the contents of world.pl to allow accumulation of Prolog statements
