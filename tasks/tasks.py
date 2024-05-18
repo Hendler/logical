@@ -72,10 +72,10 @@ def parse(c, input_text):
             # Extract the subject and predicate from the statement
             parts = input_text[5:].split(' can ', 1)
             if len(parts) == 2:
-                subject = parts[0].strip().lower()
+                subject = parts[0].strip().capitalize()
                 predicate = parts[1].strip().rstrip('.').lower()
-                # Construct the Prolog code using findall to check for at least one instance where the predicate is true for the subject
-                prolog_code = f"findall(X, ({subject}(X), {predicate}(X)), Instances), length(Instances, Len), Len > 0."
+                # Construct the Prolog code using member to check for at least one instance where the predicate is true for the subject
+                prolog_code = f"some_{subject.lower()}(X) :- member(X, [{subject}]), {predicate}(X)."
                 print(f"Prolog code for 'Some' statement: {prolog_code}")
         elif input_text.lower().startswith('no '):
             # Extract the subject and predicate from the statement
