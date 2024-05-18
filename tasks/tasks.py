@@ -141,3 +141,28 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
 
     # Return the truth value
     return truth_value
+
+@task
+def interactive_logic(c):
+    """
+    This task provides an interactive mode for the user to input English statements and receive Prolog queries or truth values in response.
+    It utilizes the existing `parse` and `run_logic_task` functionalities to process user input and interact with the Prolog interpreter.
+
+    Parameters:
+    - c: The context from the invoke task.
+    """
+    while True:
+        # Prompt the user for an English statement
+        input_text = input("Enter an English statement (or type 'exit' to quit): ")
+        if input_text.lower() == 'exit':
+            break
+
+        # Call the parse task to convert the English statement to Prolog code
+        parse(c, input_text)
+
+        # Run the resulting Prolog code to determine its truth value
+        prolog_code_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
+        run_logic_task(c, prolog_code_path)
+
+        # Clear the contents of world.pl after each query
+        open(prolog_code_path, 'w').close()
