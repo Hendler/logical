@@ -185,31 +185,73 @@ def parse_logic(input_text, query_only=False):
 def is_valid_prolog(response: str) -> bool:
     """
     Validates if the given response string is in valid Prolog format.
-    This is a basic check and may need to be expanded for more complex validations.
+    This function now includes checks for comments, string literals, and balanced parentheses.
     """
-    # Basic checks for Prolog syntax validity
-    if not response.endswith('.'):
+    # Initialize the finite state machine states
+    NORMAL, IN_STRING, IN_COMMENT, ESCAPE_IN_STRING = range(4)
+    state = NORMAL
+    comment_depth = 0  # Track the depth of nested comments
+    parentheses_stack = []  # Stack to check for balanced parentheses
+
+    # Iterate over each character in the response
+    i = 0  # Initialize the loop counter
+    while i < len(response):
+        char = response[i]
+        if state == NORMAL:
+            if char == "'":
+                state = IN_STRING
+            elif char == '(':
+                parentheses_stack.append(char)
+            elif char == ')':
+                if not parentheses_stack or parentheses_stack[-1] != '(':
+                    return False
+                parentheses_stack.pop()
+            elif char == '/' and i < len(response) - 1 and response[i+1] == '*':
+                state = IN_COMMENT
+                comment_depth += 1
+                i += 1  # Skip the next character as it is part of '/*'
+        elif state == IN_STRING:
+            if char == "\\":
+                state = ESCAPE_IN_STRING
+            elif char == "'":
+                state = NORMAL
+        elif state == ESCAPE_IN_STRING:
+            state = IN_STRING  # Return to IN_STRING state after an escape sequence
+        elif state == IN_COMMENT:
+            if char == '*' and i < len(response) - 1 and response[i+1] == '/':
+                comment_depth -= 1
+                if comment_depth == 0:
+                    state = NORMAL
+                i += 1  # Skip the next character as it is part of '*/'
+        i += 1  # Increment the loop counter
+
+    # Check for unbalanced parentheses
+    if parentheses_stack:
         return False
-    # Removed the incorrect check for ':-' followed by a period
-    return True
+
+    # Check if the response ends with a period outside of string literals and comments
+    return state == NORMAL and response.rstrip().endswith('.')
 
 def is_semantically_valid_prolog(response: str) -> bool:
     """
     Validates if the given response string is semantically valid Prolog.
     This function checks for common patterns and structures in Prolog statements.
     """
-    # Check for valid implication structure or facts
-    if ':-' in response:
-        parts = response.split(':-')
-        if len(parts) != 2:
-            return False
-        # Check for valid predicate structure
-        if not all(re.match(r'^[a-z][a-zA-Z0-9_]*(\(.*\))?\s*\.?$', part.strip()) for part in parts):
-            return False
-    else:
-        # Check for valid Prolog facts
-        if not re.match(r'^[a-z][a-zA-Z0-9_]*(\(.*\))?\.$', response.strip()):
-            return False
+    # Check for correct usage of operators
+    operator_pattern = r'(?<!\S)(:-|;|,|\.)'
+    if re.search(operator_pattern, response) and not re.search(r'\b[a-z]+\([\w, ]+\)\s*(?::-\s*.+)?\.', response):
+        return False
+
+    # Check for directives
+    directive_pattern = r':-\s*[a-z_][a-zA-Z0-9_]*(\s*\([\w, ]+\))?\s*(?=\.)'
+    if ':-' in response and not re.search(directive_pattern, response):
+        return False
+
+    # Check for facts and rules structure
+    fact_rule_pattern = r'\b[a-z]+\([\w, ]+\)(\s*:-\s*.+)?\.'
+    if not re.search(fact_rule_pattern, response):
+        return False
+
     return True
 
 def parse_query(input_text):
