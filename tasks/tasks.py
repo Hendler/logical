@@ -59,27 +59,11 @@ def parse(c, input_text):
         # Handle different types of logical constructs
         if input_text.lower().startswith('all '):
             # Extract the subject and predicate from the statement
-            parts = input_text[4:].split(' ', 1)
+            parts = input_text[4:].split(' are ', 1)
             subject = parts[0].lower()
             predicate = parts[1].strip().rstrip('.').lower()
-            # The predicate should be a unary relation for the subject
-            predicate_parts = predicate.split()
-            predicate_conditions = []
-            for part in predicate_parts:
-                if part.isalpha():  # Check if the part is a predicate
-                    predicate_conditions.append(f"{part}(X)")
-                elif part == 'and':
-                    predicate_conditions.append('), (')  # Prolog conjunction
-                elif part == 'or':
-                    predicate_conditions.append('; ')  # Prolog disjunction
-                else:
-                    predicate_conditions.append(part)
-            # Join the conditions with appropriate spacing and replace English connectors with Prolog operators
-            prolog_condition = ''.join(predicate_conditions)
-            # Ensure the condition is wrapped in parentheses
-            prolog_condition = f"({prolog_condition})"
-            # Construct the Prolog code using forall to assert the universal quantification
-            prolog_code = f"forall(X, {prolog_condition})."
+            # Construct the Prolog code for the implication
+            prolog_code = f"{predicate}(X) :- {subject}(X)."
         elif input_text.lower().startswith('some '):
             # Extract the subject and predicate from the statement
             parts = input_text[5:].split(' ', 1)
