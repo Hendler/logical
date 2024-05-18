@@ -53,7 +53,9 @@ def parse(c, input_text):
     # Write the validated and formatted Prolog code to a file for later use
     prolog_file_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
     with open(prolog_file_path, 'a') as prolog_file:
-        prolog_file.write(prolog_code + '\n')  # Ensure each entry is on a new line
+        # Ensure each entry is on a new line and is a single valid statement
+        formatted_prolog_code = prolog_code if prolog_code.endswith('.') else prolog_code + '.'
+        prolog_file.write(formatted_prolog_code + '\n')
 
 @task
 def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
@@ -96,8 +98,16 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     # Iterate over each line and assert it into the interpreter
     for line in prolog_lines:
         if line and not line.startswith('%'):  # Skip empty lines and comments
-            # Remove any surrounding parentheses from the line
-            line = line.strip().rstrip('.').strip()
+            # Trim whitespace from the line
+            line = line.strip()
+            # Ensure the line is a single valid statement and ends with a period
+            if not line.endswith('.'):
+                line += '.'
+            # Check for balanced parentheses
+            if line.count('(') != line.count(')'):
+                c.run(f"echo 'Error: Unbalanced parentheses in Prolog code: {line}'")
+                return
+            # Assert the Prolog code as a fact or rule
             try:
                 prolog.assertz(line)
             except PrologError as e:
