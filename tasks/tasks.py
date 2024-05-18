@@ -60,10 +60,14 @@ def parse(c, input_text):
         if input_text.lower().startswith('all '):
             # Extract the subject and predicate from the statement
             parts = input_text[4:].split(' are ', 1)
-            subject = parts[0].lower()
-            predicate = parts[1].strip().rstrip('.').lower()
-            # Construct the Prolog code for the implication
-            prolog_code = f"{predicate}(X) :- {subject}(X)."
+            if len(parts) == 2:
+                subject = parts[0].strip().lower()
+                predicate = parts[1].strip().rstrip('.').lower()
+                # Construct the Prolog code for the implication
+                prolog_code = f"{predicate}(X) :- {subject}(X)."
+            else:
+                print(f"Error: Unable to parse the 'All' statement: {input_text}")
+                return
         elif input_text.lower().startswith('some '):
             # Extract the subject and predicate from the statement
             parts = input_text[5:].split(' ', 1)
@@ -117,7 +121,7 @@ def parse(c, input_text):
     try:
         with open(prolog_file_path, 'a') as prolog_file:
             print(f"Appending the following Prolog code to world.pl:\n{prolog_code}")
-            prolog_file.write(prolog_code + '\n')
+            prolog_file.write(f"{prolog_code}\n")
         print("Prolog code appended to world.pl successfully.")
     except Exception as e:
         print(f"Failed to append Prolog code to world.pl: {e}")
