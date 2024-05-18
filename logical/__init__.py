@@ -183,10 +183,6 @@ def parse_logic(input_text, query_only=False):
 
 
 def is_valid_prolog(response: str) -> bool:
-    """
-    Validates if the given response string is in valid Prolog format.
-    This function now includes checks for comments, string literals, and balanced parentheses.
-    """
     # Initialize the finite state machine states
     NORMAL, IN_STRING, IN_COMMENT, ESCAPE_IN_STRING = range(4)
     state = NORMAL
@@ -214,7 +210,10 @@ def is_valid_prolog(response: str) -> bool:
             if char == "\\":
                 state = ESCAPE_IN_STRING
             elif char == "'":
-                state = NORMAL
+                if i < len(response) - 1 and response[i+1] == "'":
+                    i += 1  # Skip the escaped quote
+                else:
+                    state = NORMAL
         elif state == ESCAPE_IN_STRING:
             state = IN_STRING  # Return to IN_STRING state after an escape sequence
         elif state == IN_COMMENT:
@@ -223,6 +222,10 @@ def is_valid_prolog(response: str) -> bool:
                 if comment_depth == 0:
                     state = NORMAL
                 i += 1  # Skip the next character as it is part of '*/'
+            elif char == '\n':  # Handle end of line within a comment
+    pass
+                # No action needed for multi-line comments
+                # Single line comments are handled by the '*' and '/' check
         i += 1  # Increment the loop counter
 
     # Check for unbalanced parentheses
@@ -232,11 +235,8 @@ def is_valid_prolog(response: str) -> bool:
     # Check if the response ends with a period outside of string literals and comments
     return state == NORMAL and response.rstrip().endswith('.')
 
+
 def is_semantically_valid_prolog(response: str) -> bool:
-    """
-    Validates if the given response string is semantically valid Prolog.
-    This function checks for common patterns and structures in Prolog statements.
-    """
     # Check for correct usage of operators
     operator_pattern = r'(?<!\S)(:-|;|,|\.)'
     if re.search(operator_pattern, response) and not re.search(r'\b[a-z]+\([\w, ]+\)\s*(?::-\s*.+)?\.', response):
@@ -254,19 +254,8 @@ def is_semantically_valid_prolog(response: str) -> bool:
 
     return True
 
+
 def parse_query(input_text):
-    """
-    Sends a query to the OpenAI API to explain the output of a Prolog statement.
-
-    This function is used to understand the correctness of the Prolog output, whether there are logical errors in the database or the query, and to provide explanations for the same.
-
-    Parameters:
-    - input_text (str): The Prolog statement and its output to be explained.
-
-    Returns:
-    - A dictionary with the explanation of the correctness or errors in the Prolog logic.
-    """
-
     SYSTEM_ASKING_PROMPT = """
     You are an assistant to help understand the output of a prolog statement.
     You will be provided the original prolog as well as the output.
@@ -296,20 +285,8 @@ def run_parser(input_text: str, prolog_statement: str):
 
     return prolog_statement
 
+
 def run_logic(prolog_code: str):
-    """
-    Executes the provided Prolog code using the SWI-Prolog interpreter.
-
-    This function asserts the given Prolog code to the Prolog interpreter and queries it.
-    If the Prolog code is invalid or the query fails, it returns an error message.
-
-    Parameters:
-    - prolog_code (str): The Prolog code to be executed.
-
-    Returns:
-    - A dictionary with the explanation of the correctness or errors in the Prolog logic if successful.
-    - An error message if the Prolog code is invalid or the query fails.
-    """
     if not prolog_code:
         return "Error: No Prolog code provided."
 
