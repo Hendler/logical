@@ -5,6 +5,10 @@ import openai
 from logical import _openai_wrapper
 from logical import ROOT_REPO_DIR
 from pyswip.prolog import Prolog, PrologError
+import logging
+
+# Configure logging to display info-level messages
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Load the OpenAI API key from the environment variable
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -37,6 +41,7 @@ def parse(c, input_text):
 
     # Extract the Prolog code from the response
     prolog_code = openai_response.get("prolog", "")
+    print(f"Generated Prolog code: {prolog_code}")
 
     # Validate and format the Prolog code
     if prolog_code:
@@ -44,6 +49,7 @@ def parse(c, input_text):
         prolog_code = prolog_code.strip().lower()
         if not prolog_code.endswith('.'):
             prolog_code += '.'
+        print(f"Formatted Prolog code to append: {prolog_code}")
 
         # Check for balanced parentheses
         if prolog_code.count('(') != prolog_code.count(')'):
@@ -63,23 +69,21 @@ def parse(c, input_text):
             subject = parts[0].lower()
             predicate = parts[1].strip().rstrip('.').lower()
             # The predicate should be a unary relation for the subject
-            # Split the predicate into parts and reconstruct it into a valid Prolog condition
             predicate_parts = predicate.split()
             predicate_conditions = []
             for part in predicate_parts:
                 if part.isalpha():  # Check if the part is a predicate
                     predicate_conditions.append(f"{part}(X)")
                 elif part == 'and':
-                    predicate_conditions.append(',')  # Prolog conjunction
+                    predicate_conditions.append('), (')  # Prolog conjunction
                 elif part == 'or':
-                    predicate_conditions.append(';')  # Prolog disjunction
+                    predicate_conditions.append('; ')  # Prolog disjunction
                 else:
                     predicate_conditions.append(part)
             # Join the conditions with appropriate spacing and replace English connectors with Prolog operators
-            prolog_condition = ' '.join(predicate_conditions).replace(' ,', ',').replace(' ;', ';').replace(', ', ',').replace('; ', ';')
-            # Ensure the condition is wrapped in parentheses if it contains operators
-            if ',' in prolog_condition or ';' in prolog_condition:
-                prolog_condition = f"({prolog_condition})"
+            prolog_condition = ''.join(predicate_conditions)
+            # Ensure the condition is wrapped in parentheses
+            prolog_condition = f"({prolog_condition})"
             # Construct the Prolog code using findall to check for at least one instance where the predicate is true
             prolog_code = f"findall(X, {prolog_condition}, Instances), length(Instances, Len), Len > 0."
         elif input_text.lower().startswith('no '):
@@ -102,6 +106,9 @@ def parse(c, input_text):
                     conclusion += '.'
                 # Construct the Prolog code for the implication
                 prolog_code = f"({condition} -> {conclusion})"
+
+    # Log the Prolog code to be appended to the world.pl file for verification
+    logging.info(f"Appending to world.pl: {prolog_code}")
 
     # Write the validated and formatted Prolog code to a file for later use
     prolog_file_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
@@ -228,5 +235,4 @@ def interactive_logic(c):
         prolog_code_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
         run_logic_task(c, prolog_code_path)
 
-        # Clear the contents of world.pl after each query
-        open(prolog_code_path, 'w').close()
+        # Removed the line that clears the contents of world.pl to allow accumulation of Prolog statements

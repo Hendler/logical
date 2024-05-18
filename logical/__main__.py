@@ -7,7 +7,9 @@ def main():
         command = sys.argv[1].lower()
         if command == 'ask':
             # Invoke the parse task if 'ask' is provided as an argument
-            run("invoke parse")
+            # Pass the English statement as an argument to the parse function
+            english_statement = ' '.join(sys.argv[2:])
+            run(f"invoke parse --input-text \"{english_statement}\"")
         elif command == 'run-logic':
             # Invoke the run_logic_task if 'run-logic' is provided as an argument
             run("invoke run-logic")
