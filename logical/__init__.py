@@ -69,14 +69,10 @@ def _openai_wrapper(
         # Return a mock response
         return {"prolog": "Mocked response", "notes": "This is a mock response for testing purposes."}
 
-    messages = []
-    messages.append({"role": "system", "content": system_message})
-    if example_user_message is not None and example_assistant_message is not None:
-        messages.append({"role": "user", "content": example_user_message})
-        messages.append({"role": "assistant", "content": example_assistant_message})
-    messages.append(
-        {"role": "user", "content": user_message},
-    )
+    messages = [
+        {"role": "system", "content": system_message},
+        {"role": "user", "content": user_message}
+    ]
 
     try:
         # Instantiate a new OpenAI client
@@ -93,24 +89,16 @@ def _openai_wrapper(
         # Log the response from OpenAI API
         logging.info(f"OpenAI response: {response_content}")
 
-        # Check if the response is JSON formatted
-        try:
-            # Attempt to parse the response content as JSON
-            response_json = json.loads(response_content)
-            prolog_code = response_json.get("prolog", "Error: Prolog code not found.")
-            notes = response_json.get("notes", "")
-        except json.JSONDecodeError:
-            # If JSON parsing fails, check for code block wrapped in triple backticks
-            prolog_code_match = re.search(r"```prolog\s*(.*?)```", response_content, re.DOTALL)
-            if prolog_code_match:
-                prolog_code = prolog_code_match.group(1).strip()
-                notes = ""
-            else:
-                # If no Prolog code is found, log the error and return an appropriate message
-                logging.error(f"Failed to extract Prolog code: {response_content}")
-                return {"prolog": "", "notes": "Error: Failed to extract Prolog code."}
+        # Parse the response content as JSON
+        response_json = json.loads(response_content)
+        prolog_code = response_json.get("prolog", "Error: Prolog code not found.")
+        notes = response_json.get("notes", "")
 
         return {"prolog": prolog_code, "notes": notes}
+    except json.JSONDecodeError:
+        # If JSON parsing fails, log the error and return an appropriate message
+        logging.error(f"Failed to parse JSON response: {response_content}")
+        return {"prolog": "", "notes": "Error: Failed to parse JSON response."}
     except openai.AuthenticationError:
         # Handle invalid API key error
         return {"prolog": "", "notes": "Error: Invalid OpenAI API key."}
