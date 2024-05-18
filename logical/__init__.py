@@ -88,17 +88,11 @@ def _openai_wrapper(
         response_content = result.choices[0].message.content
         logging.info(f"Raw OpenAI response content: {response_content}")
 
-        # Attempt to parse the response content as JSON
-        response_json = json.loads(response_content)
-        prolog_code = response_json.get("prolog", "Error: Prolog code not found.")
-        notes = response_json.get("notes", "")
+        # Use the response content directly as Prolog code
+        prolog_code = response_content if response_content else "Error: Prolog code not found."
+        notes = ""  # Currently, no additional notes are provided
 
         return {"prolog": prolog_code, "notes": notes}
-    except json.JSONDecodeError:
-        # If JSON parsing fails, log the error and the raw response content
-        logging.error(f"Failed to parse JSON response: {response_content}")
-        logging.error(f"Raw OpenAI response content causing JSON parsing failure: {response_content}")
-        return {"prolog": "", "notes": "Error: Failed to parse JSON response."}
     except openai.AuthenticationError:
         # Handle invalid API key error
         return {"prolog": "", "notes": "Error: Invalid OpenAI API key."}
