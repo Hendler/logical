@@ -20,7 +20,7 @@ Example usage for parsing English to Prolog:
 ```
 $ invoke parse "All humans are mortal. Socrates is a human."
 ```
-This will generate Prolog code for the given English statements and validate its correctness.
+This will append Prolog code for the given English statements to `world.pl`, ensuring that the world state is continuously updated without overwriting previous facts. The `world.pl` file is included in `.gitignore` to prevent it from being tracked in the repository.
 
 To execute Prolog code and determine its truth value, use the `run_logic_task` command:
 ```
