@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "logical"
-version = "0.1.0"
+version = "0.1.1-beta"
 description = "A logic engine that processes English logical statements into Prolog."
 authors = ["Jonathan Hendler <jonathan.hendler@example.com>"]
 license = "MIT"
