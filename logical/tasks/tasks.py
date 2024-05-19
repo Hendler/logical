@@ -2,8 +2,7 @@ from invoke import task
 import os
 import json
 import openai
-from .. import _openai_wrapper
-from .. import ROOT_REPO_DIR
+from .utils import ROOT_REPO_DIR, printlogo
 from pyswip.prolog import Prolog, PrologError
 import logging
 import re
@@ -220,6 +219,8 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
 
     # Initialize the Prolog interpreter
     prolog = Prolog()
+
+    printlogo()
 
     # Split the Prolog code into individual lines
     prolog_lines = prolog_code.strip().split('\n')
