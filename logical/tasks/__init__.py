@@ -8,5 +8,5 @@ from . import _open_ai_wrapper
 
 ns = Collection()
 ns.add_task(parse)
-ns.add_task(run_logic_task, name='run-logic-task')
-ns.add_task(interactive_logic, name='interactive-logic')
+ns.add_task(run_logic_task, name="run-logic-task")
+ns.add_task(interactive_logic, name="interactive-logic")
