@@ -3,6 +3,7 @@ import os
 import json
 import openai
 from .utils import ROOT_REPO_DIR, printlogo
+from .functions import _openai_wrapper
 from pyswip.prolog import Prolog, PrologError
 import logging
 import re

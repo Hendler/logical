@@ -17,5 +17,5 @@ Earlier, Devin was refactoring to push to pypi and it broke invoke (logical/task
 4. make sure all documentation is up to date
 8.  move test_prolog_validation and prolog_syntax_tests.pl to /tests
 9. move heights_logic.pl to tests
-10. make sure it can be installed from a clean environment with pip install
+10. make sure it can be installed from a clean environment with pip install. Our desired behavior is that this installs this as a binary which can be run with "logical [commands]"
 

@@ -4,7 +4,6 @@ from invoke import Collection, task
 load_dotenv(find_dotenv())
 
 from .tasks import parse, run_logic_task, interactive_logic
-from . import _open_ai_wrapper
 
 ns = Collection()
 ns.add_task(parse)
