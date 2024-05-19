@@ -3,15 +3,18 @@ import os
 import json
 import openai
 from .utils import ROOT_REPO_DIR, printlogo
+from .functions import _openai_wrapper
 from pyswip.prolog import Prolog, PrologError
 import logging
 import re
 
 # Configure logging to display info-level messages
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 # Load the OpenAI API key from the environment variable
-openai.api_key = os.getenv('OPENAI_API_KEY')
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @task
 def parse(c, input_text):
@@ -35,8 +38,7 @@ def parse(c, input_text):
 
     # Call the OpenAI API wrapper function to get the Prolog code
     openai_response = _openai_wrapper(
-        system_message=system_message,
-        user_message=input_text
+        system_message=system_message, user_message=input_text
     )
 
     # Extract the Prolog code from the response
@@ -50,13 +52,17 @@ def parse(c, input_text):
         # Capitalize variables (Prolog variables start with an uppercase letter or underscore)
         # Use a regular expression to find all instances of variables and capitalize them
         # Variables in Prolog are capitalized and not part of a quoted string or comment
-        prolog_code = re.sub(r'(?<=\(|,|\s)([a-z_]\w*)(?=\s|\,|\))', lambda match: match.group(0).capitalize(), prolog_code)
+        prolog_code = re.sub(
+            r"(?<=\(|,|\s)([a-z_]\w*)(?=\s|\,|\))",
+            lambda match: match.group(0).capitalize(),
+            prolog_code,
+        )
         print(f"Formatted Prolog code to append: {prolog_code}")
 
         # Implement the validate_prolog_code function
         def validate_prolog_code(prolog_code):
             """
-            Validates the syntax and semantics of the generated Prolog code by running it in a Prolog interpreter.
+            Validates the syntax of the generated Prolog code.
 
             Parameters:
             - prolog_code (str): The generated Prolog code to validate.
@@ -64,15 +70,98 @@ def parse(c, input_text):
             Returns:
             - (bool, str): A tuple containing a boolean indicating if the validation passed and an error message if it failed.
             """
-            prolog = Prolog()  # Instantiate the Prolog interpreter object
-            try:
-                # Assert the Prolog code to the interpreter
-                prolog.assertz(prolog_code)
-                # Run a simple query to check if the code is semantically valid
-                list(prolog.query("true."))
-                return True, 'Prolog code syntax and semantics are correct.'
-            except PrologError as e:
-                return False, f'Error in Prolog code: {str(e)}'
+            # Remove comments and strip whitespace from each line
+            stripped_code = "\n".join(
+                line.split("%")[0].rstrip() for line in prolog_code.splitlines()
+            )
+
+            # Check for balanced parentheses
+            parentheses_stack = []
+            for char in stripped_code:
+                if char == "(":
+                    parentheses_stack.append(char)
+                elif char == ")":
+                    if not parentheses_stack or parentheses_stack[-1] != "(":
+                        return False, "Error: Unbalanced parentheses detected."
+                    parentheses_stack.pop()
+
+            if parentheses_stack:
+                return False, "Error: Unbalanced parentheses detected."
+
+            # Define states for the finite state machine
+            NORMAL, IN_STRING, IN_COMMENT, ESCAPE_IN_STRING = range(4)
+            state = NORMAL
+
+            # Check that each statement ends with a period, handling string literals and comments
+            for line in stripped_code.splitlines():
+                if line:
+                    for i, char in enumerate(line):
+                        if state == NORMAL:
+                            if char == "'":
+                                state = IN_STRING
+                            elif char == "%" and state != IN_STRING:
+                                state = IN_COMMENT
+                        elif state == IN_STRING:
+                            if char == "\\":
+                                state = ESCAPE_IN_STRING
+                            elif char == "'":
+                                state = NORMAL
+                        elif state == ESCAPE_IN_STRING:
+                            # Once an escape sequence is processed, return to IN_STRING state
+                            state = IN_STRING
+                        elif state == IN_COMMENT:
+                            # Ignore everything within a comment
+                            continue
+                    # Check if the period is at the end of the line, ignoring trailing whitespace
+                    if state == NORMAL and not line.rstrip().endswith("."):
+                        return (
+                            False,
+                            "Error: Each Prolog statement must end with a period outside of string literals and comments.",
+                        )
+                    # Reset state for the next line if not within a string or comment
+                    if state == IN_STRING or state == IN_COMMENT:
+                        if char == "\n" and state == IN_COMMENT:
+                            state = NORMAL
+                        continue
+                    else:
+                        state = NORMAL
+
+            # Check for correct usage of operators
+            if re.search(r"(?<!:)(:-|;|,)(?=\s|$)", stripped_code) or re.search(
+                r"(?<=\s)(:-|;|,)(?!\s)", stripped_code
+            ):
+                return False, "Error: Missing or incorrect usage of operators."
+
+            # Check for directives
+            if re.search(r"(?<=:-)\s*[a-z]", stripped_code) or not re.search(
+                r":-\s*[A-Z_]", stripped_code
+            ):
+                return (
+                    False,
+                    "Error: Directives should start with :- followed by an uppercase letter or underscore.",
+                )
+
+            # Check for facts and rules structure
+            if re.search(r"\b[a-z]+\([\w, ]+\)\s*:-", stripped_code) or not re.search(
+                r"\b[a-z]+\([\w, ]+\)\.", stripped_code
+            ):
+                return (
+                    False,
+                    "Error: Facts should not contain variables and rules should have a head and a body.",
+                )
+
+            # Check for quantifiers
+            if re.search(r"\b(forall|exists)\b(?![\s]*\()", stripped_code):
+                return False, "Error: Incorrect use of quantifiers."
+
+            # Check for nested parentheses using a non-recursive pattern
+            nested_parentheses_pattern = r"\((?:[^()]|\([^()]*\))*\)"
+            if re.search(nested_parentheses_pattern, stripped_code) and not all(
+                c in "()" for c in re.findall(nested_parentheses_pattern, stripped_code)
+            ):
+                return False, "Error: Unbalanced nested parentheses."
+
+            return True, "Prolog code syntax is correct."
 
         # Replace the placeholder call with the actual function definition
         validation_passed, error_message = validate_prolog_code(prolog_code)
@@ -83,39 +172,41 @@ def parse(c, input_text):
             return
 
         # Handle different types of logical constructs
-        if input_text.lower().startswith('all '):
-            parts = input_text[4:].split(' are ', 1)
+        if input_text.lower().startswith("all "):
+            parts = input_text[4:].split(" are ", 1)
             if len(parts) == 2:
                 subject = parts[0].strip().lower()
-                predicate = parts[1].strip().rstrip('.').lower()
+                predicate = parts[1].strip().rstrip(".").lower()
                 # Ensure subject and predicate are singular for Prolog code
-                subject_singular = subject[:-1] if subject.endswith('s') else subject
-                predicate_singular = predicate[:-1] if predicate.endswith('s') else predicate
+                subject_singular = subject[:-1] if subject.endswith("s") else subject
+                predicate_singular = (
+                    predicate[:-1] if predicate.endswith("s") else predicate
+                )
                 # Construct the Prolog code for the implication
                 prolog_code = f"{predicate_singular}(X) :- {subject_singular}(X)."
-                prolog_code = prolog_code.replace('x', 'X')  # Capitalize the variable
+                prolog_code = prolog_code.replace("x", "X")  # Capitalize the variable
                 print(f"Prolog code for 'All' statement: {prolog_code}")
-        elif input_text.lower().startswith('some '):
-            parts = input_text[5:].split(' can ', 1)
+        elif input_text.lower().startswith("some "):
+            parts = input_text[5:].split(" can ", 1)
             if len(parts) == 2:
                 subject = parts[0].strip().lower()
-                predicate = parts[1].strip().rstrip('.').lower()
+                predicate = parts[1].strip().rstrip(".").lower()
                 # Construct the Prolog code for the existence of at least one subject that satisfies the predicate
                 prolog_code = f"findall(X, ({subject}(X), {predicate}(X)), List), length(List, Length), Length > 0."
-                prolog_code = prolog_code.replace('x', 'X')  # Capitalize the variable
+                prolog_code = prolog_code.replace("x", "X")  # Capitalize the variable
                 print(f"Prolog code for 'Some' statement: {prolog_code}")
 
     # Log the Prolog code to be appended to the world.pl file for verification
     logging.info(f"Appending to world.pl: {prolog_code}")
 
     # Write the validated and formatted Prolog code to a file for later use
-    prolog_file_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
+    prolog_file_path = os.path.join(ROOT_REPO_DIR, "world.pl")
     print(f"Attempting to append to world.pl at path: {prolog_file_path}")
     print(f"Prolog code to be appended: {prolog_code}")
     try:
-        with open(prolog_file_path, 'a') as prolog_file:
+        with open(prolog_file_path, "a") as prolog_file:
             print(f"Appending the following Prolog code to world.pl:\n{prolog_code}")
-            prolog_file.write(prolog_code + '\n')
+            prolog_file.write(prolog_code + "\n")
         print("Prolog code appended to world.pl successfully.")
     except Exception as e:
         print(f"Failed to append Prolog code to world.pl: {e}")
@@ -144,7 +235,7 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     """
     # Read the Prolog code from the file
     try:
-        with open(prolog_code_path, 'r') as prolog_file:
+        with open(prolog_code_path, "r") as prolog_file:
             prolog_code = prolog_file.read()
     except FileNotFoundError:
         c.run(f"echo 'Error: Prolog code file not found at {prolog_code_path}'")
@@ -159,24 +250,28 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     printlogo()
 
     # Split the Prolog code into individual lines
-    prolog_lines = prolog_code.strip().split('\n')
+    prolog_lines = prolog_code.strip().split("\n")
     # Iterate over each line and handle it appropriately
     for line in prolog_lines:
-        if line and not line.startswith('%'):  # Skip empty lines and comments
+        if line and not line.startswith("%"):  # Skip empty lines and comments
             line = line.strip()
-            if line.startswith(':-'):  # Handle Prolog directives differently
-                with open(prolog_code_path, 'a') as prolog_file:
-                    prolog_file.write(line + '\n')  # Write the directive directly to the file
+            if line.startswith(":-"):  # Handle Prolog directives differently
+                with open(prolog_code_path, "a") as prolog_file:
+                    prolog_file.write(
+                        line + "\n"
+                    )  # Write the directive directly to the file
             else:
                 # Ensure the line is a complete statement with a single period at the end
                 # Only add a period if the line does not already end with one
-                if not line.endswith('.'):
-                    line += '.'
+                if not line.endswith("."):
+                    line += "."
                 try:
                     # Assert the Prolog fact or rule, ensuring no duplicate periods and correct syntax
                     # Do not strip parentheses as they might be part of the Prolog syntax
                     # Check if the line is a rule or fact and handle accordingly
-                    if ':-' in line or (line.count('(') == line.count(')') and line.count('(') > 0):
+                    if ":-" in line or (
+                        line.count("(") == line.count(")") and line.count("(") > 0
+                    ):
                         # It's a rule, assert without changes
                         prolog.assertz(line)
                     else:
@@ -189,13 +284,15 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     # If main_predicate and arity are not provided, attempt to determine them
     if not main_predicate or arity is None:
         for line in prolog_lines:
-            if not line.startswith('%') and ':-' in line:
+            if not line.startswith("%") and ":-" in line:
                 # Extract the predicate name and its arguments
-                predicate_parts = line.split(':-')[0].strip().split('(')
+                predicate_parts = line.split(":-")[0].strip().split("(")
                 main_predicate = predicate_parts[0]
                 if len(predicate_parts) > 1:
                     # Count the number of arguments based on commas and closing parenthesis
-                    arity = predicate_parts[1].count(',') + (1 if predicate_parts[1].endswith(')') else 0)
+                    arity = predicate_parts[1].count(",") + (
+                        1 if predicate_parts[1].endswith(")") else 0
+                    )
                 else:
                     arity = 0
                 break
@@ -208,7 +305,7 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     if arity == 0:
         query = f"{main_predicate}."
     else:
-        args = ','.join(['_' for _ in range(arity)])  # Use underscores for variables
+        args = ",".join(["_" for _ in range(arity)])  # Use underscores for variables
         query = f"{main_predicate}({args})."
 
     # Query the Prolog interpreter to determine the truth value
@@ -227,7 +324,8 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     # Return the truth value
     return truth_value
 
-@task(help={'statement': "An English statement to convert to Prolog."})
+
+@task(help={"statement": "An English statement to convert to Prolog."})
 def interactive_logic(c, statement):
     """
     This task provides an interactive mode for the user to input English statements and receive Prolog queries or truth values in response.
@@ -240,14 +338,14 @@ def interactive_logic(c, statement):
     if not statement:
         # Interactive mode: prompt the user for an English statement
         statement = input("Enter an English statement (or type 'exit' to quit): ")
-        if statement.lower() == 'exit':
+        if statement.lower() == "exit":
             return
 
     # Call the parse task to convert the English statement to Prolog code
     parse(c, statement)
 
     # Run the resulting Prolog code to determine its truth value
-    prolog_code_path = os.path.join(ROOT_REPO_DIR, 'world.pl')
+    prolog_code_path = os.path.join(ROOT_REPO_DIR, "world.pl")
     run_logic_task(c, prolog_code_path)
 
-        # Removed the line that clears the contents of world.pl to allow accumulation of Prolog statements
+    # Removed the line that clears the contents of world.pl to allow accumulation of Prolog statements

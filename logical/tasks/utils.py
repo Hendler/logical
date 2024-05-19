@@ -1,10 +1,6 @@
 import os
 
-
-
 ROOT_REPO_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-
-
 
 
 def double_line(line):
@@ -12,7 +8,7 @@ def double_line(line):
     print(line)
 
 
-def printlogo() :
+def printlogo():
     os.system("clear")
     ENDC = "\033[0m"
 
@@ -32,6 +28,3 @@ def printlogo() :
     print("                  2013-2023 HAI.AI, LLC            ")
     print("")
     print("WELCOME TO LOGICAL - beep \a beep \a")
-
-
-
