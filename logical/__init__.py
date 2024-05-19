@@ -223,7 +223,7 @@ def is_valid_prolog(response: str) -> bool:
                     state = NORMAL
                 i += 1  # Skip the next character as it is part of '*/'
             elif char == '\n':  # Handle end of line within a comment
-    pass
+                pass
                 # No action needed for multi-line comments
                 # Single line comments are handled by the '*' and '/' check
         i += 1  # Increment the loop counter

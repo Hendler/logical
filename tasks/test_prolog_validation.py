@@ -1,4 +1,5 @@
 import re
+import os
 
 # Define the validate_prolog_code function as it appears in tasks.py
 def validate_prolog_code(prolog_code):
@@ -11,34 +12,33 @@ def validate_prolog_code(prolog_code):
     Returns:
     - (bool, str): A tuple containing a boolean indicating if the validation passed and an error message if it failed.
     """
-    # Remove comments and strip whitespace from each line
-    # Handle both single-line (%) and multi-line (/* ... */) comments
-    stripped_code_lines = []
-    in_multiline_comment = False
-    for line in prolog_code.splitlines():
-        while '/*' in line or '*/' in line:
-            if '/*' in line:
-                in_multiline_comment = True
-                comment_start_index = line.find('/*')
-                comment_end_index = line.find('*/', comment_start_index + 2)
-                if comment_end_index != -1:
-                    # A complete comment block is found, remove it
-                    line = line[:comment_start_index] + line[comment_end_index + 2:]
-                    in_multiline_comment = False
-                else:
-                    # Only the start of a comment block is found, remove from start to end of line
-                    line = line[:comment_start_index]
-                    break
-            elif '*/' in line and in_multiline_comment:
-                # End of a comment block is found, remove from start to the end of the comment block
-                comment_end_index = line.find('*/') + 2
-                line = line[comment_end_index:]
-                in_multiline_comment = False
-        if not in_multiline_comment:
-            line = line.split('%')[0]
-        stripped_code_lines.append(line.rstrip())
+    print("Entering validate_prolog_code function")
 
-    stripped_code = "\n".join(stripped_code_lines)
+    # Manually remove all comments from the Prolog code to handle nested comments
+    def strip_comments(code):
+        stripped_code = ""
+        stack = []
+        i = 0
+        while i < len(code):
+            if code[i:i+2] == '/*':
+                stack.append('/*')
+                i += 2
+                continue  # Skip appending characters and move to the next iteration
+            elif code[i:i+2] == '*/' and stack:
+                stack.pop()
+                i += 2
+                continue  # Skip appending characters and move to the next iteration
+            elif not stack and code[i] == '%':
+                # Skip the rest of the line after a single-line comment
+                i = code.find('\n', i)
+                if i == -1:  # If no newline is found, we are at the end of the code
+                    break
+            elif not stack:
+                stripped_code += code[i]
+            i += 1
+        return stripped_code
+
+    stripped_code = strip_comments(prolog_code)
 
     # Check for balanced parentheses
     parentheses_stack = []
@@ -54,65 +54,72 @@ def validate_prolog_code(prolog_code):
         return False, 'Error: Unbalanced parentheses detected.'
 
     # Define states for the finite state machine
-    NORMAL, IN_STRING, IN_COMMENT, ESCAPE_IN_STRING = range(4)
+    NORMAL, IN_STRING, ESCAPE_IN_STRING = range(3)
     state = NORMAL
-    comment_depth = 0  # Track the depth of nested comments
 
-    # Check that each statement ends with a period, handling string literals and comments
+    # Check that each statement ends with a period, handling string literals
     for line in stripped_code.splitlines():
-        if line:
-            i = 0
-            while i < len(line):
-                char = line[i]
-                if state == NORMAL:
-                    if char == "'":
-                        state = IN_STRING
-                    elif char == '%':
-                        break  # Ignore the rest of the line after a single-line comment
-                    elif char == '/' and i < len(line) - 1 and line[i+1] == '*':
-                        state = IN_COMMENT
-                        comment_depth += 1
-                        i += 1  # Skip the next character as it is part of '/*'
-                elif state == IN_STRING:
-                    if char == "\\":
-                        state = ESCAPE_IN_STRING
-                    elif char == "'":
-                        state = NORMAL
-                elif state == ESCAPE_IN_STRING:
-                    state = IN_STRING  # Return to IN_STRING state after an escape sequence
-                elif state == IN_COMMENT:
-                    if char == '*' and i < len(line) - 1 and line[i+1] == '/':
-                        comment_depth -= 1
-                        if comment_depth == 0:
-                            state = NORMAL
-                        i += 1  # Skip the next character as it is part of '*/'
-                i += 1
-            # Check if the period is at the end of the line, ignoring trailing whitespace
-            if state == NORMAL and not line.rstrip().endswith('.'):
-                return False, 'Error: Each Prolog statement must end with a period outside of string literals and comments.'
-            # Reset state for the next line if not within a string or comment
-            if state != IN_COMMENT:
-                state = NORMAL
+        i = 0
+        while i < len(line):
+            char = line[i]
+            if state == NORMAL:
+                if char == "'":
+                    state = IN_STRING
+            elif state == IN_STRING:
+                if char == "\\":
+                    state = ESCAPE_IN_STRING
+                elif char == "'":
+                    state = NORMAL
+            elif state == ESCAPE_IN_STRING:
+                state = IN_STRING  # Return to IN_STRING state after an escape sequence
+
+            i += 1  # Increment i at the end of each loop iteration
+
+        # Check if the period is at the end of the line, ignoring trailing whitespace
+        if state == NORMAL and not line.rstrip().endswith('.'):
+            return False, 'Error: Each Prolog statement must end with a period outside of string literals.'
+        # Reset state for the next line if not within a string
+        if state != IN_STRING:
+            state = NORMAL
 
     # Check for correct usage of operators
+    print(f"Before operator check: {stripped_code}")
     operator_pattern = r'(?<!\S)(:-|;|,|\.)'
-    if re.search(operator_pattern, stripped_code) and not re.search(r'\b[a-z]+\([\w, ]+\)\s*(?::-\s*.+)?\.', stripped_code):
+    # Exclude directives from the operator check
+    if re.search(operator_pattern, stripped_code) and not re.search(r'\b[a-z]+\([\w, ]+\)\s*(?::-\s*.+)?\.', stripped_code) and ':-' not in stripped_code:
         return False, 'Error: Missing or incorrect usage of operators.'
+    print(f"After operator check: {stripped_code}")
 
     # Check for directives
-    directive_pattern = r':-\s*[a-zA-Z_][a-zA-Z0-9_]*\s*(\([\w, ]+\))?\s*(?=\.)'
-    if ':-' in stripped_code and not re.search(directive_pattern, stripped_code):
-        return False, 'Error: Invalid directive syntax.'
+    print(f"Before directive check: {stripped_code}")
+    directive_pattern = r':-\s*(?:[a-zA-Z_][a-zA-Z0-9_]*\s+)?[a-zA-Z_][a-zA-Z0-9_]*\/\d+\s*\.$'
+    directive_match = re.search(directive_pattern, stripped_code)
+    if ':-' in stripped_code:
+        if not directive_match:
+            print(f"Directive regex failed to match: {stripped_code}")
+            return False, 'Error: Invalid directive syntax.'
+        else:
+            print(f"Directive regex matched: {directive_match.group()}")
+            # Remove the matched directive from the code for further checks
+            stripped_code = stripped_code.replace(directive_match.group(), '').strip()
 
-    # Check for facts and rules structure
-    fact_rule_pattern = r'\b[a-z]+\([\w, ]+\)(\s*:-\s*.+)?\.'
-    if not re.search(fact_rule_pattern, stripped_code):
-        return False, 'Error: Invalid facts or rules structure.'
+    # Check for correct facts and rules structure after comments and directives have been stripped
+    if stripped_code:
+        fact_rule_pattern = r'\b[a-z]+\s*\(\s*(?:[^()]*|\((?:[^()]*|\([^()]*\))*\))*\)\s*(?::-\s*(?:[^.]|\.[^.]|\.\.)*\.)?\.'
+        if not re.search(fact_rule_pattern, stripped_code):
+            # Log the stripped code when the pattern does not match to aid in debugging
+            print(f"Stripped code for debugging:\n{stripped_code}")
+            return False, 'Error: Invalid facts or rules structure.'
+    else:
+        # If the stripped code is empty after removing directives, it means the code is syntactically correct
+        return True, 'Prolog code syntax is correct.'
 
     return True, 'Prolog code syntax is correct.'
 
+print("Current working directory:", os.getcwd())
+
 # Read the Prolog code samples from prolog_syntax_tests.pl
-with open('prolog_syntax_tests.pl', 'r') as file:
+with open('tasks/prolog_syntax_tests.pl', 'r') as file:
     prolog_samples = file.read().split('\n\n')  # Assuming each sample is separated by a blank line
 
 # Additional test cases to cover edge cases
