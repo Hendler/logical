@@ -39,6 +39,9 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 testpaths = [
     "tests",
-    "tasks"
+    "logical/tasks"
 ]
 addopts = "-ra -q"
+
+[tool.poetry.scripts]
+logical = "logical.__main__:main"
