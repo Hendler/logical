@@ -119,7 +119,7 @@ def validate_prolog_code(prolog_code):
 print("Current working directory:", os.getcwd())
 
 # Read the Prolog code samples from prolog_syntax_tests.pl
-with open('tasks/prolog_syntax_tests.pl', 'r') as file:
+with open('logical/tasks/prolog_syntax_tests.pl', 'r') as file:
     prolog_samples = file.read().split('\n\n')  # Assuming each sample is separated by a blank line
 
 # Additional test cases to cover edge cases
