@@ -2,8 +2,8 @@ from invoke import task
 import os
 import json
 import openai
-from logical import _openai_wrapper
-from logical import ROOT_REPO_DIR
+from . import _openai_wrapper
+from . import ROOT_REPO_DIR
 from pyswip.prolog import Prolog, PrologError
 import logging
 import re
