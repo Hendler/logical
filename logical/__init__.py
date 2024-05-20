@@ -19,7 +19,7 @@ OPEN_AI_MODEL_TYPE = os.getenv("OPEN_AI_MODEL_TYPE")
 # Define the root directory of the repository
 ROOT_REPO_DIR = os.path.dirname(os.path.abspath(__file__))
 
-from .storage import (
+from logical.tasks.storage import (
     LogicalRow,
     QueryRow,
     write_dataclass_to_csv,
