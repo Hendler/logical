@@ -167,6 +167,15 @@ def validate_prolog_code(prolog_code):
         print("Error from Prolog interpreter:", error_message)
         return False, error_message
 
+    # Additional validation for directives to ensure they have arity where required
+    for line in stripped_code.splitlines():
+        if line.startswith(":-"):
+            directive_parts = line.split()
+            if len(directive_parts) > 1 and directive_parts[1] == "dynamic":
+                predicate_parts = directive_parts[2].partition('/')
+                if not predicate_parts[1]:  # No '/' found, arity is missing
+                    return False, "Error: Directive 'dynamic' requires arity."
+
     return True, "Prolog code syntax is correct."
 
 print("Current working directory:", os.getcwd())

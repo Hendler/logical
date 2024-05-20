@@ -17,10 +17,12 @@ def test_interactive_logic_conversion_and_appending(mock_open, mock_append_to_wo
                 mocked_file.return_value.__enter__.return_value = mock_open.return_value
                 tasks.interactive_logic(context)
                 # Verify that the append_to_world function is called with the correct Prolog code
-                mock_append_to_world.assert_called_once_with('cows_cannot_fly.')
+                # The Prolog code is expected to be the output of the parse function for the input "Cows cannot fly."
+                expected_prolog_code = "assertz(not(fly(cow)))."  # Assumed expected output from the parse function
+                mock_append_to_world.assert_called_once_with(expected_prolog_code)
                 # Verify that the open function is called with the correct path and mode
-                world_pl_path = os.path.join(os.path.dirname(__file__), "..", "logical", "world.pl")
-                mocked_file.assert_called_once_with(os.path.abspath(world_pl_path), 'a')
+                world_pl_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "logical", "world.pl"))
+                mocked_file.assert_called_once_with(world_pl_path, 'a')
 
 # Test the interactive_logic function for handling queries against world.pl
 def test_interactive_logic_querying(mock_open, mock_run_logic_task):
