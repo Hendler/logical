@@ -11,7 +11,7 @@ def test_interactive_logic_conversion_and_appending(mock_open, mock_append_to_wo
     # Mock the input to simulate user input of English statements
     with patch('builtins.input', side_effect=['Cows cannot fly.', 'exit']):
         # Mock the append_to_world function to verify it is called with correct Prolog code
-        with patch('logical.tasks.append_to_world', mock_append_to_world):
+        with patch('logical.tasks.tasks.append_to_world') as mock_append_to_world:
             # Mock the open function to simulate file operations on world.pl with the correct path and mode
             with patch('builtins.open', mock_open) as mocked_file:
                 mocked_file.return_value.__enter__.return_value = mock_open.return_value
