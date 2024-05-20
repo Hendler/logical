@@ -131,6 +131,7 @@ additional_tests = {
 }
 
 # Combine predefined samples with additional tests
+prolog_samples = []
 prolog_samples.extend([test[0] for test in additional_tests.values()])
 
 # Test each Prolog code sample
