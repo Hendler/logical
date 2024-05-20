@@ -5,13 +5,8 @@ import openai
 from .utils import ROOT_REPO_DIR, printlogo
 from .functions import _openai_wrapper
 from pyswip.prolog import Prolog, PrologError
-import logging
+from .logger import logger
 import re
-
-# Configure logging to display info-level messages
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
 
 # Load the OpenAI API key from the environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -27,9 +22,9 @@ def append_to_world(prolog_code):
     try:
         with open(prolog_file_path, "a") as prolog_file:
             prolog_file.write(f"\n{prolog_code}\n")
-        logging.info(f"Appended Prolog code to world.pl: {prolog_code}")
+        logger.info(f"Appended Prolog code to world.pl: {prolog_code}")
     except Exception as e:
-        logging.error(f"Failed to append Prolog code to world.pl: {e}")
+        logger.error(f"Failed to append Prolog code to world.pl: {e}")
 
 @task
 def parse(c, input_text):
@@ -58,7 +53,7 @@ def parse(c, input_text):
 
     # Extract the Prolog code from the response
     prolog_code = openai_response.get("prolog", "")
-    logging.info(f"Generated Prolog code: {prolog_code}")
+    logger.info(f"Generated Prolog code: {prolog_code}")
 
     # Validate and format the Prolog code
     if prolog_code:
@@ -80,7 +75,7 @@ def parse(c, input_text):
                 line += '.'
             formatted_lines.append(line)
         prolog_code = '\n'.join(formatted_lines)
-        logging.info(f"Formatted Prolog code to append: {prolog_code}")
+        logger.info(f"Formatted Prolog code to append: {prolog_code}")
 
         # Implement the validate_prolog_code function
         def validate_prolog_code(prolog_code):
@@ -108,7 +103,7 @@ def parse(c, input_text):
         validation_passed, error_message = validate_prolog_code(prolog_code)
         if not validation_passed:
             error_log_message = f"Validation failed for input: '{input_text}' with error: {error_message}"
-            logging.error(error_log_message)
+            logger.error(error_log_message)
             return
 
         # Replace the redundant code blocks with calls to the new function
@@ -141,10 +136,10 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
         with open(prolog_code_path, "r") as prolog_file:
             prolog_code = prolog_file.read()
     except FileNotFoundError:
-        logging.error(f"Error: Prolog code file not found at {prolog_code_path}")
+        logger.error(f"Error: Prolog code file not found at {prolog_code_path}")
         return
     except Exception as e:
-        logging.error(f"Error reading Prolog code file: {e}")
+        logger.error(f"Error reading Prolog code file: {e}")
         return
 
     # Initialize the Prolog interpreter
@@ -181,7 +176,7 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
                         # It's a fact, ensure it ends with a single period
                         prolog.assertz(line)
                 except PrologError as e:
-                    logging.error(f"Error in Prolog code: {e}")
+                    logger.error(f"Error in Prolog code: {e}")
                     return
 
     # If main_predicate and arity are not provided, attempt to determine them
@@ -201,7 +196,7 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
                 break
 
     if not main_predicate:
-        logging.error(f"Error: No main predicate found in Prolog code")
+        logger.error(f"Error: No main predicate found in Prolog code")
         return
 
     # Construct the query using the main predicate and arity
@@ -215,14 +210,14 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     try:
         query_result = list(prolog.query(query))
     except PrologError as e:
-        logging.error(f"Error executing Prolog query: {e}")
+        logger.error(f"Error executing Prolog query: {e}")
         return
 
     # Determine the truth value based on the query result
     truth_value = bool(query_result)
 
     # Log the result for auditing
-    logging.info(f"The truth value of the Prolog code is: {truth_value}")
+    logger.info(f"The truth value of the Prolog code is: {truth_value}")
 
     # Return the truth value
     return truth_value
