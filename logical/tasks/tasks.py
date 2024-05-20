@@ -79,7 +79,7 @@ def parse(c, input_text):
                 formatted_lines.append(line)
             else:
                 # Add 'assertz' only if it's not already present at the beginning of the line
-                if not line.startswith('assertz('):
+                if 'assertz(' not in line:
                     line = 'assertz(' + line
                 # Ensure the line ends with a period if it's not a directive or a comment
                 if not line.endswith('.'):
