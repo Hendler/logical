@@ -2,6 +2,9 @@ import re
 import os
 from pyswip import Prolog
 from pyswip.prolog import PrologError
+import logging
+
+logger = logging.getLogger(__name__)
 
 def run_prolog_code(prolog_code):
     """
@@ -46,8 +49,11 @@ def run_prolog_code(prolog_code):
                 if statement.endswith('.'):
                     statement = statement[:-1].strip()
                 try:
+                    logger.info(f"Asserting Prolog statement: {statement}")
                     prolog.assertz(statement)
+                    logger.info(f"Successfully asserted: {statement}")
                 except Exception as e:
+                    logger.error(f"Prolog syntax error while asserting: {statement} - {e}")
                     # If an Exception is caught, the code is invalid
                     return False, f"Prolog syntax error: {e}"
     except Exception as e:
@@ -60,8 +66,11 @@ def run_prolog_code(prolog_code):
             # Retract each predicate individually, ensuring it's not a built-in predicate
             if predicate_name not in builtin_predicates:
                 try:
+                    logger.info(f"Retracting Prolog predicate: {predicate_name}")
                     prolog.retractall(f"{predicate_name}(_)")
+                    logger.info(f"Successfully retracted predicate: {predicate_name}")
                 except Exception as e:
+                    logger.error(f"Failed to retract predicate {predicate_name}: {e}")
                     return False, f"Failed to retract predicate {predicate_name}: {e}"
 
     return True, "Prolog code syntax is correct."
