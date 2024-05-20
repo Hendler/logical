@@ -8,38 +8,23 @@ First developed at the [OpenAI emergency hackathon on 3/5/2023](https://twitter.
 
 ## Usage
 
-To set up and use this logic engine, follow these steps:
+To use the logical engine, follow these steps:
 
-1. Install the package using Poetry:
-```
-$ poetry install logical
-```
-2. Set up the environment variables in a `.env` file. Use the provided `.env-example` as a template.
-3. Ensure the `OPENAI_API_KEY` is set to your actual OpenAI API key.
-4. Configure the `OPEN_AI_MODEL_TYPE` environment variable to specify the desired model, such as "gpt-4o".
+1. Install the package and its dependencies.
+2. Set up the required environment variables, including your OpenAI API key.
+3. Use the `interactive_logic` task to input English statements and receive Prolog queries or truth values interactively.
 
-The logic engine can process any English logical statements, using OpenAI to generate the corresponding Prolog code. The generated code is then parsed to ensure both syntactical and semantical correctness before execution.
+Example interactive session:
+```
+$ logical interactive-logic
+Enter an English statement: All humans are mortal. Socrates is a human.
+The truth value of the statement 'All humans are mortal. Socrates is a human.' is: True
+Enter an English statement: (or type 'exit' to quit): exit
+Exiting interactive logic mode.
+```
+This session demonstrates adding Prolog code to `world.pl` and querying its truth value. The `world.pl` file accumulates knowledge without overwriting previous facts and is not tracked in the repository.
 
-Example usage for parsing English to Prolog:
-```
-$ logical parse "All humans are mortal. Socrates is a human."
-```
-This will append Prolog code for the given English statements to `world.pl`, ensuring that the world state is continuously updated without overwriting previous facts. The `world.pl` file is included in `.gitignore` to prevent it from being tracked in the repository.
-
-To execute Prolog code and determine its truth value, use the `logical run-logic` command:
-```
-$ logical run-logic --prolog-code-path='./logical/prolog_output.pl'
-```
-This command reads the specified Prolog code file, dynamically determines the main predicate, and executes the Prolog query to find its truth value.
-
-To run tests and verify the correctness of the Prolog statements generated, use the following command:
-```
-$ poetry run pytest
-```
-
-Logging of OpenAI API requests and responses is done through `openai_requests.log`, which can be found in the project's root directory. This log file is useful for auditing and debugging purposes. It includes detailed information about the requests sent to the OpenAI API and the responses received, including any errors encountered.
-
-The `myprolog.csv` file stores 1000 logical English examples with their truth values and corresponding Prolog statements, which are used for testing and validation purposes.
+The `myprolog.csv` file contains 1000 logical English examples with truth values and corresponding Prolog statements, serving as a test and validation dataset.
 
 ## background
 
@@ -72,13 +57,20 @@ Via ChatGPT:
 
 ## Installation
 
-To install the logical package and all necessary dependencies, use Poetry:
+To install the logical package and all necessary dependencies, use the following command:
 
 ```bash
 $ poetry install
 ```
 
-After installation, copy the `.env-example` to `.env` and configure the necessary environment variables as described in the usage section above.
+After installation, create a `.env` file based on the `.env-example` template and set the necessary environment variables. For detailed setup instructions, refer to the "Quick Start" section below.
+
+## Quick Start
+
+1. Clone the repository and navigate to the project directory.
+2. Run `poetry install` to install dependencies.
+3. Copy `.env-example` to `.env` and configure your OpenAI API key and other settings.
+4. Start an interactive logic session with `logical interactive-logic`.
 
 ## Commands:
 
