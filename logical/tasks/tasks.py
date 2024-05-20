@@ -77,11 +77,12 @@ def parse(c, input_text):
             # Check if the line is a comment, directive, or already contains 'assertz'
             if line.startswith('%') or line.startswith(':-') or line.startswith('assertz('):
                 formatted_lines.append(line)
+            elif line and not line.endswith('.'):
+                # Add 'assertz' and a period to lines that represent facts or rules
+                formatted_lines.append(f'assertz({line}).')
             else:
-                # Add 'assertz' only if it's not already present and the line is not empty
-                if line and not re.match(r'^\s*assertz\(\s*.+\s*\)\s*\.$', line):
-                    line = 'assertz(' + line + ').'
-                formatted_lines.append(line)
+                # For lines that already end with a period, just add 'assertz'
+                formatted_lines.append(f'assertz({line}).')
         prolog_code = '\n'.join(formatted_lines)
         logger.info(f"Formatted Prolog code to append: {prolog_code}")
 
