@@ -57,6 +57,14 @@ def parse(c, input_text):
             lambda match: match.group(0).capitalize(),
             prolog_code,
         )
+        # Append a period at the end of each line if it's missing
+        formatted_lines = []
+        for line in prolog_code.splitlines():
+            line = line.strip()
+            if line and not line.endswith('.'):
+                line += '.'
+            formatted_lines.append(line)
+        prolog_code = '\n'.join(formatted_lines)
         print(f"Formatted Prolog code to append: {prolog_code}")
 
         # Implement the validate_prolog_code function
@@ -171,30 +179,11 @@ def parse(c, input_text):
             print(error_log_message)
             return
 
-        # Handle different types of logical constructs
-        if input_text.lower().startswith("all "):
-            parts = input_text[4:].split(" are ", 1)
-            if len(parts) == 2:
-                subject = parts[0].strip().lower()
-                predicate = parts[1].strip().rstrip(".").lower()
-                # Ensure subject and predicate are singular for Prolog code
-                subject_singular = subject[:-1] if subject.endswith("s") else subject
-                predicate_singular = (
-                    predicate[:-1] if predicate.endswith("s") else predicate
-                )
-                # Construct the Prolog code for the implication
-                prolog_code = f"{predicate_singular}(X) :- {subject_singular}(X)."
-                prolog_code = prolog_code.replace("x", "X")  # Capitalize the variable
-                print(f"Prolog code for 'All' statement: {prolog_code}")
-        elif input_text.lower().startswith("some "):
-            parts = input_text[5:].split(" can ", 1)
-            if len(parts) == 2:
-                subject = parts[0].strip().lower()
-                predicate = parts[1].strip().rstrip(".").lower()
-                # Construct the Prolog code for the existence of at least one subject that satisfies the predicate
-                prolog_code = f"findall(X, ({subject}(X), {predicate}(X)), List), length(List, Length), Length > 0."
-                prolog_code = prolog_code.replace("x", "X")  # Capitalize the variable
-                print(f"Prolog code for 'Some' statement: {prolog_code}")
+        # Append the validated and formatted Prolog code to world.pl
+        prolog_file_path = os.path.join(ROOT_REPO_DIR, "world.pl")
+        with open(prolog_file_path, "a") as prolog_file:
+            prolog_file.write(f"\n{prolog_code}\n")
+        logging.info(f"Appended Prolog code to world.pl: {prolog_code}")
 
     # Log the Prolog code to be appended to the world.pl file for verification
     logging.info(f"Appending to world.pl: {prolog_code}")

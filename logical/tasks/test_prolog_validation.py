@@ -1,5 +1,6 @@
 import re
 import os
+from pyswip import Prolog
 
 # Define the validate_prolog_code function as it appears in tasks.py
 def validate_prolog_code(prolog_code):
@@ -85,54 +86,42 @@ def validate_prolog_code(prolog_code):
         if state != IN_STRING:
             state = NORMAL
 
-    # Check for correct usage of operators
-    print(f"Before operator check: {stripped_code}")
-    operator_pattern = r"(?<!\S)(:-|;|,|\.)"
-    # Exclude directives from the operator check
-    if (
-        re.search(operator_pattern, stripped_code)
-        and not re.search(r"\b[a-z]+\([\w, ]+\)\s*(?::-\s*.+)?\.", stripped_code)
-        and ":-" not in stripped_code
-    ):
-        return False, "Error: Missing or incorrect usage of operators."
-    print(f"After operator check: {stripped_code}")
+    def run_prolog_code(prolog_code):
+        """
+        Runs the given Prolog code using the SWI-Prolog interpreter to validate its syntax and semantics.
 
-    # Check for directives
-    print(f"Before directive check: {stripped_code}")
-    directive_pattern = (
-        r":-\s*(?:[a-zA-Z_][a-zA-Z0-9_]*\s+)?[a-zA-Z_][a-zA-Z0-9_]*\/\d+\s*\.$"
-    )
-    directive_match = re.search(directive_pattern, stripped_code)
-    if ":-" in stripped_code:
-        if not directive_match:
-            print(f"Directive regex failed to match: {stripped_code}")
-            return False, "Error: Invalid directive syntax."
-        else:
-            print(f"Directive regex matched: {directive_match.group()}")
-            # Remove the matched directive from the code for further checks
-            stripped_code = stripped_code.replace(directive_match.group(), "").strip()
+        Parameters:
+        - prolog_code (str): The generated Prolog code to validate.
 
-    # Check for correct facts and rules structure after comments and directives have been stripped
-    if stripped_code:
-        fact_rule_pattern = r"\b[a-z]+\s*\(\s*(?:[^()]*|\((?:[^()]*|\([^()]*\))*\))*\)\s*(?::-\s*(?:[^.]|\.[^.]|\.\.)*\.)?\."
-        if not re.search(fact_rule_pattern, stripped_code):
-            # Log the stripped code when the pattern does not match to aid in debugging
-            print(f"Stripped code for debugging:\n{stripped_code}")
-            return False, "Error: Invalid facts or rules structure."
-    else:
-        # If the stripped code is empty after removing directives, it means the code is syntactically correct
+        Returns:
+        - (bool, str): A tuple containing a boolean indicating if the validation passed and an error message if it failed.
+        """
+        prolog = Prolog()
+        try:
+            prolog.assertz(prolog_code)
+        except Exception as e:
+            return False, f"Prolog interpreter error: {e}"
+        finally:
+            prolog.retractall(prolog_code)  # Clean up the Prolog environment
+
         return True, "Prolog code syntax is correct."
+
+    # Replace the regex-based validation with the Prolog interpreter validation
+    validation_passed, error_message = run_prolog_code(stripped_code)
+    if not validation_passed:
+        return False, error_message
 
     return True, "Prolog code syntax is correct."
 
 
 print("Current working directory:", os.getcwd())
 
-# Read the Prolog code samples from prolog_syntax_tests.pl
-with open("logical/tasks/prolog_syntax_tests.pl", "r") as file:
-    prolog_samples = file.read().split(
-        "\n\n"
-    )  # Assuming each sample is separated by a blank line
+# The following code block has been removed as it is not necessary for the unit tests
+# and the file prolog_syntax_tests.pl does not exist.
+# with open("logical/tasks/prolog_syntax_tests.pl", "r") as file:
+#     prolog_samples = file.read().split(
+#         "\n\n"
+#     )  # Assuming each sample is separated by a blank line
 
 # Additional test cases to cover edge cases
 additional_tests = {
@@ -154,5 +143,22 @@ for sample in prolog_samples:
 
 # Test additional edge cases
 for description, (sample, expected_result) in additional_tests.items():
+    validation_passed, _ = validate_prolog_code(sample)
+    assert(validation_passed == expected_result), f"Test failed for {description}: {sample}"
+
+# Additional complex Prolog syntax tests
+complex_syntax_tests = {
+    "Multiple predicates": ("animal(cow). likes(mary, cow).", True),
+    "Rule with multiple conditions": ("flies(X) :- bird(X), not(penguin(X)).", True),
+    "Rule with conjunction and disjunction": ("likes(X, Y) :- (cat(X), mouse(Y)); (dog(X), bone(Y)).", True),
+    "Fact with negation": ("not(likes(john, rain)).", True),
+    "Invalid rule structure": ("flies(X) :- bird(X) not(penguin(X)).", False),  # Missing comma
+    "Invalid fact structure": ("animal cow.", False),  # Missing parentheses
+    "Valid directive": (":- dynamic animal/1.", True),
+    "Invalid directive": (":- dynamic animal.", False),  # Missing arity
+}
+
+# Test additional complex Prolog syntax cases
+for description, (sample, expected_result) in complex_syntax_tests.items():
     validation_passed, _ = validate_prolog_code(sample)
     assert(validation_passed == expected_result), f"Test failed for {description}: {sample}"
