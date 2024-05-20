@@ -1,6 +1,6 @@
 import pytest
 from logical.tasks import tasks
-from unittest.mock import patch
+from unittest.mock import patch, call
 from invoke.context import Context
 
 # Test the interactive_logic function for proper handling of English to Prolog conversion and appending to world.pl
@@ -54,7 +54,60 @@ def test_interactive_logic_invalid_input(mock_open):
             # Verify that invalid input does not result in appending to world.pl
             mocked_file.assert_not_called()
 
+# Test the parse function for correct Prolog code generation
+def test_parse_prolog_generation(mock_open):
+    # Create a Context object to pass to the task
+    context = Context()
+    # Define a set of English statements and their expected Prolog translations
+    test_cases = [
+        ("Cows cannot fly.", "cows_cannot_fly."),
+        ("Birds can fly.", "birds_can_fly."),
+        ("All humans are mortal. Socrates is a human.", "mortal(socrates)."),
+        # Add more test cases as needed
+    ]
+    # Test each case
+    for english_statement, expected_prolog in test_cases:
+        with patch('logical.tasks._openai_wrapper', return_value={'prolog': expected_prolog}):
+            tasks.parse(context, english_statement)
+            # Verify that the Prolog code is generated correctly
+            mock_open.assert_called_once_with('world.pl', 'a')
+            mock_open().write.assert_called_with(f"\n{expected_prolog}\n")
+            mock_open.reset_mock()
+
+# Integration test for the full workflow from English statement input to Prolog code generation, validation, and execution
+def test_full_workflow_integration(mock_open, mock_run_logic_task):
+    # Create a Context object to pass to the task
+    context = Context()
+    # Define a set of English statements and their expected Prolog translations
+    test_cases = [
+        ("Cows cannot fly.", "cows_cannot_fly.", True),
+        ("Birds can fly.", "birds_can_fly.", True),
+        ("All humans are mortal. Socrates is a human.", "mortal(socrates).", True),
+        ("This is not a logical statement.", None, False),
+        # Add more test cases as needed
+    ]
+    # Test each case
+    for english_statement, expected_prolog, is_valid in test_cases:
+        with patch('logical.tasks._openai_wrapper', return_value={'prolog': expected_prolog}):
+            with patch('logical.tasks.validate_prolog_code', return_value=is_valid):
+                with patch('logical.tasks.run_logic_task', mock_run_logic_task):
+                    tasks.interactive_logic(context, statement=english_statement)
+                    # Verify that the Prolog code is generated, validated, and executed correctly
+                    if is_valid:
+                        mock_open.assert_called_once_with('world.pl', 'a')
+                        mock_open().write.assert_called_with(f"\n{expected_prolog}\n")
+                    else:
+                        mock_open.assert_not_called()
+                    mock_run_logic_task.assert_called_with(context, expected_prolog)
+                    mock_open.reset_mock()
+                    mock_run_logic_task.reset_mock()
+
 @pytest.fixture
 def mock_open(mocker):
     """Fixture for mocking open calls."""
     return mocker.mock_open()
+
+@pytest.fixture
+def mock_run_logic_task(mocker):
+    """Fixture for mocking the run_logic_task function."""
+    return mocker.Mock()
