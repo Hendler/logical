@@ -73,7 +73,7 @@ def _openai_wrapper(
         # Return a mock response
         print("Detected test environment, returning mock response")
         return {
-            "prolog": "Mocked response",
+            "prolog": "assertz(not(fly(cow))).",
             "notes": "This is a mock response for testing purposes.",
         }
 
