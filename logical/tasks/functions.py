@@ -40,6 +40,7 @@ def _openai_wrapper(
     example_user_message: str = None,
     example_assistant_message: str = None,
 ):
+    print("Entering _openai_wrapper function")
     """
     Interacts with the OpenAI API to convert English statements to Prolog code.
 
@@ -70,6 +71,7 @@ def _openai_wrapper(
     # Check if the function is called in a test environment
     if os.getenv("OPENAI_API_KEY") == "fake-api-key":
         # Return a mock response
+        print("Detected test environment, returning mock response")
         return {
             "prolog": "Mocked response",
             "notes": "This is a mock response for testing purposes.",
@@ -83,11 +85,12 @@ def _openai_wrapper(
     try:
         # Instantiate a new OpenAI client
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
+        print(f"Sending request to OpenAI API: {messages}")
         # Use the new method for creating chat completions
         result = client.chat.completions.create(
             model=OPEN_AI_MODEL_TYPE, messages=messages
         )
+        print(f"Received response from OpenAI API: {result}")
 
         # Log the raw response content from OpenAI API
         response_content = result.choices[0].message.content
@@ -99,21 +102,26 @@ def _openai_wrapper(
         )
         notes = ""  # Currently, no additional notes are provided
 
+        print("Exiting _openai_wrapper function with success")
         return {"prolog": prolog_code, "notes": notes}
     except openai.AuthenticationError:
         # Handle invalid API key error
+        print("Caught AuthenticationError")
         return {"prolog": "", "notes": "Error: Invalid OpenAI API key."}
     except openai.RateLimitError:
         # Handle API rate limit exceeded error
+        print("Caught RateLimitError")
         return {"prolog": "", "notes": "Error: OpenAI API rate limit exceeded."}
     except openai.OpenAIError as e:
         # Handle general OpenAI API errors
+        print(f"Caught OpenAIError: {e}")
         return {
             "prolog": "",
             "notes": f"Error: An unexpected OpenAI API error occurred: {str(e)}",
         }
     except Exception as e:
         # Handle non-OpenAI related exceptions
+        print(f"Caught Exception: {e}")
         return {"prolog": "", "notes": f"Error: An unexpected error occurred: {str(e)}"}
 
 
