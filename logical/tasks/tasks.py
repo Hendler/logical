@@ -78,12 +78,9 @@ def parse(c, input_text):
             if line.startswith('%') or line.startswith(':-'):
                 formatted_lines.append(line)
             else:
-                # Add 'assertz' only if it's not already present at the beginning of the line
-                if 'assertz(' not in line:
-                    line = 'assertz(' + line
-                # Ensure the line ends with a period if it's not a directive or a comment
-                if not line.endswith('.'):
-                    line += '.'
+                # Add 'assertz' only if it's not already present and the line is not empty
+                if line and not re.match(r'^\s*assertz\s*\(.+\)\s*\.$', line):
+                    line = 'assertz(' + line + ').'
                 formatted_lines.append(line)
         prolog_code = '\n'.join(formatted_lines)
         logger.info(f"Formatted Prolog code to append: {prolog_code}")
