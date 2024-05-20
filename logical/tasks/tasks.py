@@ -16,6 +16,21 @@ logging.basicConfig(
 # Load the OpenAI API key from the environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+def append_to_world(prolog_code):
+    """
+    Appends the given Prolog code to the world.pl file.
+
+    Parameters:
+    - prolog_code (str): The Prolog code to append.
+    """
+    prolog_file_path = os.path.join(ROOT_REPO_DIR, "world.pl")
+    try:
+        with open(prolog_file_path, "a") as prolog_file:
+            prolog_file.write(f"\n{prolog_code}\n")
+        logging.info(f"Appended Prolog code to world.pl: {prolog_code}")
+    except Exception as e:
+        logging.error(f"Failed to append Prolog code to world.pl: {e}")
+
 @task
 def parse(c, input_text):
     """
@@ -178,26 +193,8 @@ def parse(c, input_text):
             logging.error(error_log_message)
             return
 
-        # Append the validated and formatted Prolog code to world.pl
-        prolog_file_path = os.path.join(ROOT_REPO_DIR, "world.pl")
-        with open(prolog_file_path, "a") as prolog_file:
-            prolog_file.write(f"\n{prolog_code}\n")
-        logging.info(f"Appended Prolog code to world.pl: {prolog_code}")
-
-    # Log the Prolog code to be appended to the world.pl file for verification
-    # This logging statement is redundant since we log this information again in line 189
-
-    # Write the validated and formatted Prolog code to a file for later use
-    prolog_file_path = os.path.join(ROOT_REPO_DIR, "world.pl")
-    logging.info(f"Attempting to append to world.pl at path: {prolog_file_path}")
-    logging.info(f"Prolog code to be appended: {prolog_code}")
-    try:
-        logging.info(f"Appending the following Prolog code to world.pl:\n{prolog_code}")
-        with open(prolog_file_path, "a") as prolog_file:
-            prolog_file.write(prolog_code + "\n")
-        logging.info("Prolog code appended to world.pl successfully.")
-    except Exception as e:
-        logging.error(f"Failed to append Prolog code to world.pl: {e}")
+        # Replace the redundant code blocks with calls to the new function
+        append_to_world(prolog_code)
 
 @task
 def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
