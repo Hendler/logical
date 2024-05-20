@@ -13,7 +13,7 @@ def test_interactive_logic_conversion_and_appending(mock_open):
         with patch('builtins.open', mock_open) as mocked_file:
             tasks.interactive_logic(context)
             # Verify that the Prolog statement is appended to world.pl
-            mocked_file.assert_called_once_with('world.pl', 'a')
+            mocked_file.assert_called_once_with('/home/ubuntu/logical/logical/world.pl', 'a')
             mocked_file().write.assert_called_with('cows_cannot_fly.\n')
 
 # Test the interactive_logic function for handling queries against world.pl
