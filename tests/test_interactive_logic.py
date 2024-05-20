@@ -5,24 +5,43 @@ from unittest.mock import patch, call
 from invoke.context import Context
 
 # Test the interactive_logic function for proper handling of English to Prolog conversion and appending to world.pl
-def test_interactive_logic_conversion_and_appending(mock_open, mock_append_to_world):
+@pytest.mark.parametrize("input_statement, expected_prolog_code", [
+    ("Cows cannot fly.", "assertz(not(fly(cow)))."),
+    ("Birds can fly.", "assertz(fly(bird))."),
+    ("All humans are mortal.", "assertz(mortal(human))."),
+    ("Socrates is a human.", "assertz(human(socrates))."),
+    ("The sky is blue.", "assertz(blue(sky))."),
+    ("Sugar is sweet.", "assertz(sweet(sugar))."),
+    # Add more test cases as needed
+])
+def test_interactive_logic_conversion_and_appending(mock_open, mock_append_to_world, input_statement, expected_prolog_code):
     # Create a Context object to pass to the task
     context = Context()
     # Mock the input to simulate user input of English statements
-    with patch('builtins.input', side_effect=['Cows cannot fly.', 'exit']):
-        # Mock the append_to_world function to verify it is called with correct Prolog code
-        with patch('logical.tasks.tasks.append_to_world') as mock_append_to_world:
-            # Mock the open function to simulate file operations on world.pl with the correct path and mode
-            with patch('builtins.open', mock_open) as mocked_file:
-                mocked_file.return_value.__enter__.return_value = mock_open.return_value
-                tasks.interactive_logic(context)
-                # Verify that the append_to_world function is called with the correct Prolog code
-                # The Prolog code is expected to be the output of the parse function for the input "Cows cannot fly."
-                expected_prolog_code = "assertz(not(fly(cow)))."  # Expected output from the mock response
-                mock_append_to_world.assert_called_once_with(expected_prolog_code)
-                # Verify that the open function is called with the correct path and mode
-                world_pl_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "logical", "world.pl"))
-                mocked_file.assert_called_once_with(world_pl_path, 'a')
+    with patch('builtins.input', side_effect=[input_statement, 'exit']):
+        # Mock the _openai_wrapper function to return the expected Prolog code for the input statement
+        with patch('logical.tasks.tasks._openai_wrapper', return_value={'prolog': expected_prolog_code}) as mock_openai_wrapper:
+            # Mock the append_to_world function to verify it is called with correct Prolog code
+            with patch('logical.tasks.tasks.append_to_world') as mock_append_to_world:
+                # Mock the open function to simulate file operations on world.pl with the correct path and mode
+                with patch('builtins.open', mock_open) as mocked_file:
+                    mocked_file.return_value.__enter__.return_value = mock_open.return_value
+                    tasks.interactive_logic(context)
+                    # Verify that the append_to_world function is called with the correct Prolog code
+                    # The Prolog code is expected to be the output of the parse function for the input "Cows cannot fly."
+                    print(f"Expected Prolog code to append: {expected_prolog_code}")
+                    actual_prolog_code_call = mock_append_to_world.call_args[0][0] if mock_append_to_world.call_args else None
+                    print(f"Actual Prolog code called with append_to_world: {actual_prolog_code_call}")
+                    assert actual_prolog_code_call == expected_prolog_code.strip(), f"Append to world called with wrong Prolog code: {actual_prolog_code_call}"
+
+                    world_pl_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "logical", "world.pl"))
+                    print(f"Expected world.pl path: {world_pl_path}")
+                    actual_path_used_in_open_call = mocked_file.call_args[0][0] if mocked_file.call_args else None
+                    print(f"Actual path used in open call: {actual_path_used_in_open_call}")
+                    assert actual_path_used_in_open_call == world_pl_path, f"Open called with wrong path: {actual_path_used_in_open_call}"
+                    assert mocked_file.call_args[0][1] == 'a', f"Open called with wrong mode: {mocked_file.call_args[0][1]}"
+                    # Verify that the open function is called with the correct path and mode
+                    mocked_file.assert_called_once_with(world_pl_path, 'a')
 
 # Test the interactive_logic function for handling queries against world.pl
 def test_interactive_logic_querying(mock_open, mock_run_logic_task):

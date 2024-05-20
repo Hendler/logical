@@ -69,13 +69,22 @@ def parse(c, input_text):
             lambda match: match.group(0).capitalize(),
             prolog_code,
         )
-        # Append a period at the end of each line if it's missing
+
+        # Format the Prolog code to ensure proper syntax
         formatted_lines = []
         for line in prolog_code.splitlines():
             line = line.strip()
-            if line and not line.endswith('.'):
-                line += '.'
-            formatted_lines.append(line)
+            # Check if the line is a comment or directive and should be left unchanged
+            if line.startswith('%') or line.startswith(':-'):
+                formatted_lines.append(line)
+            else:
+                # Add 'assertz' only if it's not already present at the beginning of the line
+                if not line.startswith('assertz('):
+                    line = 'assertz(' + line
+                # Ensure the line ends with a period if it's not a directive or a comment
+                if not line.endswith('.'):
+                    line += '.'
+                formatted_lines.append(line)
         prolog_code = '\n'.join(formatted_lines)
         logger.info(f"Formatted Prolog code to append: {prolog_code}")
 
