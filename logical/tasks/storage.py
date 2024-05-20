@@ -3,40 +3,46 @@ import pendulum
 from typing import List
 from dataclasses import dataclass
 import os
+from pathlib import Path
 
 
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-PROLOG_STORAGE_NAME = f"{ROOT_DIR}/myprolog.csv"
-QUERY_FILE_NAME = f"{ROOT_DIR}/queries.csv"
-PROLOG_FILE_NAME = f"{ROOT_DIR}/world.pl"
+ROOT_DIR = Path(__file__).resolve().parent.parent
+PROLOG_STORAGE_NAME = ROOT_DIR / "myprolog.csv"
+QUERY_FILE_NAME = ROOT_DIR / "queries.csv"
+PROLOG_FILE_NAME = ROOT_DIR / "world.pl"
+
+
+def get_current_timestamp():
+    """Return the current timestamp as an ISO 8601 formatted string."""
+    return pendulum.now().to_iso8601_string()
 
 
 @dataclass
 class LogicalRow:
     input_text: str
     prolog_text: str
-    created: pendulum.DateTime = pendulum.now().to_iso8601_string()
+    created: pendulum.DateTime = get_current_timestamp()
 
 
 @dataclass
 class QueryRow:
     input_text: str
     result: str
-    created: pendulum.DateTime = pendulum.now().to_iso8601_string()
+    created: pendulum.DateTime = get_current_timestamp()
 
 
 @dataclass
 class RDFQueryRow:
     input_text: str
     result: str
-    created: pendulum.DateTime = pendulum.now().to_iso8601_string()
+    created: pendulum.DateTime = get_current_timestamp()
 
 
 @dataclass
 class RDFLogicalRow:
     input_text: str
     prolog_text: str
-    created: pendulum.DateTime = pendulum.now().to_iso8601_string()
+    created: pendulum.DateTime = get_current_timestamp()
 
 
 def write_dataclass_to_csv(row: LogicalRow, filename=PROLOG_STORAGE_NAME) -> None:
@@ -45,6 +51,7 @@ def write_dataclass_to_csv(row: LogicalRow, filename=PROLOG_STORAGE_NAME) -> Non
             csv_file,
             fieldnames=list(row.__dict__.keys()),
         )
+        # Write header only if the file is empty (at the beginning)
         if csv_file.tell() == 0:
             writer.writeheader()
         writer.writerow(row.__dict__)
@@ -52,19 +59,16 @@ def write_dataclass_to_csv(row: LogicalRow, filename=PROLOG_STORAGE_NAME) -> Non
 
 def write_all_prolog() -> str:
     all_prolog = "\n".join([row.prolog_text for row in load_dataclass_from_csv()])
-    handle = open(PROLOG_FILE_NAME, "w")
-    # seek out the line you want to overwrite
-    handle.seek(0)
-    handle.truncate()
-    handle.write(all_prolog)
-    handle.close()
+    with open(PROLOG_FILE_NAME, "w") as handle:
+        # Overwrite the file with the new Prolog code
+        handle.write(all_prolog)
     return all_prolog
 
 
 def load_dataclass_from_csv(filename=PROLOG_STORAGE_NAME) -> List[LogicalRow]:
     with open(filename, mode="r") as csv_file:
         reader = csv.DictReader(csv_file)
-        people = []
+        rows = []
         for row in reader:
-            people.append(LogicalRow(**row))
-        return people
+            rows.append(LogicalRow(**row))
+        return rows
