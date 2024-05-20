@@ -8,10 +8,10 @@ def test_interactive_logic_conversion_and_appending(mock_open):
     # Create a Context object to pass to the task
     context = Context()
     # Mock the input to simulate user input of English statements
-    with patch('builtins.input', return_value='Cows cannot fly.'):
+    with patch('builtins.input', side_effect=['Cows cannot fly.', 'exit']):
         # Mock the open function to simulate file operations on world.pl
         with patch('builtins.open', mock_open) as mocked_file:
-            tasks.interactive_logic(context, statement='Cows cannot fly.')
+            tasks.interactive_logic(context)
             # Verify that the Prolog statement is appended to world.pl
             mocked_file.assert_called_once_with('world.pl', 'a')
             mocked_file().write.assert_called_with('cows_cannot_fly.\n')
