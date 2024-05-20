@@ -2,6 +2,69 @@ import re
 import os
 from pyswip import Prolog
 
+def run_prolog_code(prolog_code):
+    """
+    Runs the given Prolog code using the SWI-Prolog interpreter to validate its syntax and semantics.
+
+    Parameters:
+    - prolog_code (str): The generated Prolog code to validate.
+
+    Returns:
+    - (bool, str): A tuple containing a boolean indicating if the validation passed and an error message if it failed.
+    """
+    # List of known built-in predicates in Prolog
+    builtin_predicates = {'retractall', 'assertz', 'consult', 'listing'}
+
+    prolog = Prolog()
+    try:
+        # Split the Prolog code into statements, taking care not to split inside string literals
+        statements = []
+        current_statement = ""
+        in_string = False
+        for char in prolog_code:
+            if char == "'" and not in_string:
+                in_string = True
+            elif char == "'" and in_string:
+                in_string = False
+            if char == '.' and not in_string:
+                statements.append(current_statement.strip() + '.')
+                current_statement = ""
+            else:
+                current_statement += char
+
+        # Assert the Prolog statements to validate their syntax
+        for statement in statements:
+            if statement:  # Ensure the statement is not empty
+                # Extract the predicate name to check if it's a built-in predicate
+                predicate_name_match = re.match(r'\b[a-z][a-zA-Z0-9_]*', statement)
+                if predicate_name_match:
+                    predicate_name = predicate_name_match.group(0)
+                    if predicate_name in builtin_predicates:
+                        continue  # Skip assertion for built-in predicates
+                # Ensure the period is outside the parentheses for assertz
+                if statement.endswith('.'):
+                    statement = statement[:-1].strip()
+                try:
+                    prolog.assertz(statement)
+                except Exception as e:
+                    # If an Exception is caught, the code is invalid
+                    return False, f"Prolog syntax error: {e}"
+    except Exception as e:
+        return False, f"Prolog interpreter error: {e}"
+    finally:
+        # Clean up the Prolog environment by retracting the asserted predicates
+        # Find all predicate names using a regular expression
+        predicate_names = set(re.findall(r'\b[a-z][a-zA-Z0-9_]*\b(?=\()', prolog_code))
+        for predicate_name in predicate_names:
+            # Retract each predicate individually, ensuring it's not a built-in predicate
+            if predicate_name not in builtin_predicates:
+                try:
+                    prolog.retractall(f"{predicate_name}(_)")
+                except Exception as e:
+                    return False, f"Failed to retract predicate {predicate_name}: {e}"
+
+    return True, "Prolog code syntax is correct."
+
 # Define the validate_prolog_code function as it appears in tasks.py
 def validate_prolog_code(prolog_code):
     """
@@ -39,7 +102,9 @@ def validate_prolog_code(prolog_code):
             i += 1
         return stripped_code
 
+    print("Original Prolog code:", prolog_code)
     stripped_code = strip_comments(prolog_code)
+    print("Stripped Prolog code:", stripped_code)
 
     # Check for balanced parentheses
     parentheses_stack = []
@@ -86,33 +151,13 @@ def validate_prolog_code(prolog_code):
         if state != IN_STRING:
             state = NORMAL
 
-    def run_prolog_code(prolog_code):
-        """
-        Runs the given Prolog code using the SWI-Prolog interpreter to validate its syntax and semantics.
-
-        Parameters:
-        - prolog_code (str): The generated Prolog code to validate.
-
-        Returns:
-        - (bool, str): A tuple containing a boolean indicating if the validation passed and an error message if it failed.
-        """
-        prolog = Prolog()
-        try:
-            prolog.assertz(prolog_code)
-        except Exception as e:
-            return False, f"Prolog interpreter error: {e}"
-        finally:
-            prolog.retractall(prolog_code)  # Clean up the Prolog environment
-
-        return True, "Prolog code syntax is correct."
-
-    # Replace the regex-based validation with the Prolog interpreter validation
+    print("Prolog code before running interpreter:", stripped_code)
     validation_passed, error_message = run_prolog_code(stripped_code)
     if not validation_passed:
+        print("Error from Prolog interpreter:", error_message)
         return False, error_message
 
     return True, "Prolog code syntax is correct."
-
 
 print("Current working directory:", os.getcwd())
 
@@ -125,7 +170,7 @@ print("Current working directory:", os.getcwd())
 
 # Additional test cases to cover edge cases
 additional_tests = {
-    "Nested comments": ("/* Comment /* nested comment */ end comment */", True),
+    "Nested comments": ("/* Comment /* nested comment */ end comment */ retractall(dummy_predicate).", True),
     "String with escaped single quote": ("likes(john, 'Soccer\\'s fun').", True),
     "Complex directive": (":- dynamic cow/1.", True),
 }
@@ -163,3 +208,22 @@ complex_syntax_tests = {
 for description, (sample, expected_result) in complex_syntax_tests.items():
     validation_passed, _ = validate_prolog_code(sample)
     assert(validation_passed == expected_result), f"Test failed for {description}: {sample}"
+
+def test_strip_comments():
+    """
+    Test the strip_comments function with various Prolog code snippets to ensure it correctly handles nested comments.
+    """
+    test_cases = [
+        ("/* Simple comment */", ""),
+        ("/* Comment with % symbol */", ""),
+        ("/* Nested /* comment */ still inside */", ""),
+        ("% Single line comment\nvalid_predicate.", "valid_predicate."),
+        ("valid_predicate. % Trailing comment", "valid_predicate."),
+        ("/* Comment with 'string' inside */", ""),
+        ("/* Multiple /* nested /* comments */ */ */", ""),
+        ("/* Unbalanced /* nested comment */", ""),
+        ("Unbalanced nested comment */", ""),
+    ]
+
+    for prolog_code, expected in test_cases:
+        assert strip_comments(prolog_code) == expected, f"Failed to strip comments from: {prolog_code}"
