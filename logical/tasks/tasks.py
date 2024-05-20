@@ -43,7 +43,7 @@ def parse(c, input_text):
 
     # Extract the Prolog code from the response
     prolog_code = openai_response.get("prolog", "")
-    print(f"Generated Prolog code: {prolog_code}")
+    logging.info(f"Generated Prolog code: {prolog_code}")
 
     # Validate and format the Prolog code
     if prolog_code:
@@ -65,7 +65,7 @@ def parse(c, input_text):
                 line += '.'
             formatted_lines.append(line)
         prolog_code = '\n'.join(formatted_lines)
-        print(f"Formatted Prolog code to append: {prolog_code}")
+        logging.info(f"Formatted Prolog code to append: {prolog_code}")
 
         # Implement the validate_prolog_code function
         def validate_prolog_code(prolog_code):
@@ -176,7 +176,6 @@ def parse(c, input_text):
         if not validation_passed:
             error_log_message = f"Validation failed for input: '{input_text}' with error: {error_message}"
             logging.error(error_log_message)
-            print(error_log_message)
             return
 
         # Append the validated and formatted Prolog code to world.pl
@@ -186,19 +185,19 @@ def parse(c, input_text):
         logging.info(f"Appended Prolog code to world.pl: {prolog_code}")
 
     # Log the Prolog code to be appended to the world.pl file for verification
-    logging.info(f"Appending to world.pl: {prolog_code}")
+    # This logging statement is redundant since we log this information again in line 189
 
     # Write the validated and formatted Prolog code to a file for later use
     prolog_file_path = os.path.join(ROOT_REPO_DIR, "world.pl")
-    print(f"Attempting to append to world.pl at path: {prolog_file_path}")
-    print(f"Prolog code to be appended: {prolog_code}")
+    logging.info(f"Attempting to append to world.pl at path: {prolog_file_path}")
+    logging.info(f"Prolog code to be appended: {prolog_code}")
     try:
+        logging.info(f"Appending the following Prolog code to world.pl:\n{prolog_code}")
         with open(prolog_file_path, "a") as prolog_file:
-            print(f"Appending the following Prolog code to world.pl:\n{prolog_code}")
             prolog_file.write(prolog_code + "\n")
-        print("Prolog code appended to world.pl successfully.")
+        logging.info("Prolog code appended to world.pl successfully.")
     except Exception as e:
-        print(f"Failed to append Prolog code to world.pl: {e}")
+        logging.error(f"Failed to append Prolog code to world.pl: {e}")
 
 @task
 def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
@@ -227,10 +226,10 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
         with open(prolog_code_path, "r") as prolog_file:
             prolog_code = prolog_file.read()
     except FileNotFoundError:
-        c.run(f"echo 'Error: Prolog code file not found at {prolog_code_path}'")
+        logging.error(f"Error: Prolog code file not found at {prolog_code_path}")
         return
     except Exception as e:
-        c.run(f"echo 'Error reading Prolog code file: {e}'")
+        logging.error(f"Error reading Prolog code file: {e}")
         return
 
     # Initialize the Prolog interpreter
@@ -267,7 +266,7 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
                         # It's a fact, ensure it ends with a single period
                         prolog.assertz(line)
                 except PrologError as e:
-                    c.run(f"echo 'Error in Prolog code: {e}'")
+                    logging.error(f"Error in Prolog code: {e}")
                     return
 
     # If main_predicate and arity are not provided, attempt to determine them
@@ -287,7 +286,7 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
                 break
 
     if not main_predicate:
-        c.run(f"echo 'Error: No main predicate found in Prolog code'")
+        logging.error(f"Error: No main predicate found in Prolog code")
         return
 
     # Construct the query using the main predicate and arity
@@ -301,14 +300,14 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     try:
         query_result = list(prolog.query(query))
     except PrologError as e:
-        c.run(f"echo 'Error executing Prolog query: {e}'")
+        logging.error(f"Error executing Prolog query: {e}")
         return
 
     # Determine the truth value based on the query result
     truth_value = bool(query_result)
 
     # Log the result for auditing
-    c.run(f"echo 'The truth value of the Prolog code is: {truth_value}'")
+    logging.info(f"The truth value of the Prolog code is: {truth_value}")
 
     # Return the truth value
     return truth_value
