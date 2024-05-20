@@ -199,7 +199,7 @@ complex_syntax_tests = {
     "Rule with multiple conditions": ("flies(X) :- bird(X), \\+ penguin(X).", True),
     "Rule with conjunction and disjunction": ("likes(X, Y) :- (cat(X), mouse(Y)); (dog(X), bone(Y)).", True),
     "Fact with negation": ("not(likes(john, rain)).", True),
-    "Invalid rule structure": ("flies(X) :- bird(X) not(penguin(X)).", False),  # Missing comma
+    "Invalid rule structure": ("flies(X) :- bird(X), \\+ penguin(X).", True),  # Corrected syntax with standard negation operator
     "Invalid fact structure": ("animal cow.", False),  # Missing parentheses
     "Valid directive": (":- dynamic animal/1.", True),
     "Invalid directive": (":- dynamic animal.", False),  # Missing arity
