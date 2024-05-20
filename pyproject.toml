@@ -41,7 +41,7 @@ testpaths = [
     "tests",
     "logical/tasks"
 ]
-addopts = "-ra -q"
+addopts = "-ra --junitxml=test_results.xml"
 
 [tool.poetry.scripts]
 logical = "logical.__main__:main"
