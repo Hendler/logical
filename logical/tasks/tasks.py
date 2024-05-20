@@ -315,7 +315,7 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
 
 
 @task(help={"statement": "An English statement to convert to Prolog."})
-def interactive_logic(c, statement):
+def interactive_logic(c, statement=""):
     """
     This task provides an interactive mode for the user to input English statements and receive Prolog queries or truth values in response.
     It utilizes the existing `parse` and `run_logic_task` functionalities to process user input and interact with the Prolog interpreter.
@@ -324,17 +324,21 @@ def interactive_logic(c, statement):
     - c: The context from the invoke task.
     - statement: An English statement to be processed.
     """
-    if not statement:
-        # Interactive mode: prompt the user for an English statement
-        statement = input("Enter an English statement (or type 'exit' to quit): ")
-        if statement.lower() == "exit":
-            return
+    while True:
+        if not statement:
+            # Interactive mode: prompt the user for an English statement
+            statement = input("Enter an English statement (or type 'exit' to quit): ").strip()
+            if statement.lower() == "exit":
+                print("Exiting interactive logic mode.")
+                break
 
-    # Call the parse task to convert the English statement to Prolog code
-    parse(c, statement)
+        # Call the parse task to convert the English statement to Prolog code
+        parse(c, statement)
 
-    # Run the resulting Prolog code to determine its truth value
-    prolog_code_path = os.path.join(ROOT_REPO_DIR, "world.pl")
-    run_logic_task(c, prolog_code_path)
+        # Run the resulting Prolog code to determine its truth value
+        prolog_code_path = os.path.join(ROOT_REPO_DIR, "world.pl")
+        truth_value = run_logic_task(c, prolog_code_path)
+        print(f"The truth value of the statement '{statement}' is: {truth_value}")
 
-    # Removed the line that clears the contents of world.pl to allow accumulation of Prolog statements
+        # Clear the statement to allow for new input in the next iteration
+        statement = ""
