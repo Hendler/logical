@@ -1,6 +1,7 @@
 import re
 import os
 from pyswip import Prolog
+from pyswip.prolog import PrologError
 
 def run_prolog_code(prolog_code):
     """
@@ -195,7 +196,7 @@ for description, (sample, expected_result) in additional_tests.items():
 # Additional complex Prolog syntax tests
 complex_syntax_tests = {
     "Multiple predicates": ("animal(cow). likes(mary, cow).", True),
-    "Rule with multiple conditions": ("flies(X) :- bird(X), not(penguin(X)).", True),
+    "Rule with multiple conditions": ("flies(X) :- bird(X), \\+ penguin(X).", True),
     "Rule with conjunction and disjunction": ("likes(X, Y) :- (cat(X), mouse(Y)); (dog(X), bone(Y)).", True),
     "Fact with negation": ("not(likes(john, rain)).", True),
     "Invalid rule structure": ("flies(X) :- bird(X) not(penguin(X)).", False),  # Missing comma

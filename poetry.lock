@@ -642,14 +642,18 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pyswip"
-version = "0.2.10"
+version = "0.2.11"
 description = "PySwip enables querying SWI-Prolog in your Python programs."
 optional = false
 python-versions = "*"
-files = [
-    {file = "pyswip-0.2.10-py2.py3-none-any.whl", hash = "sha256:7abc3009f8badc7d0c23d72422960e9f229059a731430c9acd7e9a718cbd2832"},
-    {file = "pyswip-0.2.10.tar.gz", hash = "sha256:7698584ddf73d051d22d5fed728b9e89bb444a9d384d48c9f5e6fd7060bbdb9f"},
-]
+files = []
+develop = false
+
+[package.source]
+type = "git"
+url = "https://github.com/yuce/pyswip.git"
+reference = "master"
+resolved_reference = "8eec0917c79f9414749252f0e57212c09ecdeaf9"
 
 [[package]]
 name = "python-dateutil"
@@ -802,4 +806,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "e4d12637e8f28f4602f7e3675c4e3f647f81084543021fc284585c1e455a729f"
+content-hash = "bb6434354d887f47ad77952c3db9aa2b9198c6d7f16c221572a7fc86638ab4dd"

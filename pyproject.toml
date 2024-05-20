@@ -18,7 +18,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.9"
 openai = "1.30.1"
-pyswip = "0.2.10"
+pyswip = {git = "https://github.com/yuce/pyswip.git", rev = "master"}
 pendulum = "2.1.2"
 folpy = "0.1.0"
 
