@@ -53,11 +53,13 @@ def parse(c, input_text):
 
     # Extract the Prolog code from the response
     prolog_code = openai_response.get("prolog", "")
+    # Remove markdown code block syntax (triple backticks) from the Prolog code
+    prolog_code = prolog_code.replace("```", "").strip()
     logger.info(f"Generated Prolog code: {prolog_code}")
 
     # Validate and format the Prolog code
     if prolog_code:
-        # Ensure the code starts with a lowercase character for predicates
+        prolog_code = "\n".join([line[0].lower() + line[1:] if line else "" for line in prolog_code.splitlines()])
         prolog_code = prolog_code.strip().lower()
         # Capitalize variables (Prolog variables start with an uppercase letter or underscore)
         # Use a regular expression to find all instances of variables and capitalize them
