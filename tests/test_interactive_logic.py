@@ -1,20 +1,26 @@
+import os
 import pytest
 from logical.tasks import tasks
 from unittest.mock import patch, call
 from invoke.context import Context
 
 # Test the interactive_logic function for proper handling of English to Prolog conversion and appending to world.pl
-def test_interactive_logic_conversion_and_appending(mock_open):
+def test_interactive_logic_conversion_and_appending(mock_open, mock_append_to_world):
     # Create a Context object to pass to the task
     context = Context()
     # Mock the input to simulate user input of English statements
     with patch('builtins.input', side_effect=['Cows cannot fly.', 'exit']):
-        # Mock the open function to simulate file operations on world.pl
-        with patch('builtins.open', mock_open) as mocked_file:
-            tasks.interactive_logic(context)
-            # Verify that the Prolog statement is appended to world.pl
-            mocked_file.assert_called_once_with('/home/ubuntu/logical/logical/world.pl', 'a')
-            mocked_file().write.assert_called_with('cows_cannot_fly.\n')
+        # Mock the append_to_world function to verify it is called with correct Prolog code
+        with patch('logical.tasks.append_to_world', mock_append_to_world):
+            # Mock the open function to simulate file operations on world.pl with the correct path and mode
+            with patch('builtins.open', mock_open) as mocked_file:
+                mocked_file.return_value.__enter__.return_value = mock_open.return_value
+                tasks.interactive_logic(context)
+                # Verify that the append_to_world function is called with the correct Prolog code
+                mock_append_to_world.assert_called_once_with('cows_cannot_fly.')
+                # Verify that the open function is called with the correct path and mode
+                world_pl_path = os.path.join(os.path.dirname(__file__), "..", "logical", "world.pl")
+                mocked_file.assert_called_once_with(os.path.abspath(world_pl_path), 'a')
 
 # Test the interactive_logic function for handling queries against world.pl
 def test_interactive_logic_querying(mock_open, mock_run_logic_task):
@@ -157,6 +163,11 @@ def test_interactive_logic_invalid_prolog_generation(mock_open, mock_run_logic_t
 def mock_open(mocker):
     """Fixture for mocking open calls."""
     return mocker.mock_open()
+
+@pytest.fixture
+def mock_append_to_world(mocker):
+    """Fixture for mocking the append_to_world function."""
+    return mocker.Mock()
 
 @pytest.fixture
 def mock_run_logic_task(mocker):
