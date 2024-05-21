@@ -121,6 +121,7 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     # ... (rest of the run_logic_task function remains unchanged)
 
 @task(help={"statement": "An English statement to convert to Prolog."})
+@task(help={"statement": "An English statement to convert to Prolog."})
 def interactive_logic(c, statement=""):
     logger.debug("Starting interactive_logic function")
     if not statement:
@@ -147,19 +148,18 @@ def interactive_logic(c, statement=""):
         formatted_lines = []
         for line in prolog_code.splitlines():
             line = line.strip()
+            logger.debug(f"Line before formatting: {line}")
             # Check if the line is a comment, directive, or ends with a period
             if line.startswith('%') or line.startswith(':-') or line.endswith('.'):
                 formatted_lines.append(line)
             else:
-                # Check if 'assertz' is already present anywhere in the line
+                # Add 'assertz' only if it's not already present at the beginning of the line
                 if 'assertz(' not in line:
-                    # Add 'assertz' only if it's not already present
-                    formatted_lines.append(f"assertz({line}).")
-                else:
-                    # If 'assertz' is present, do not modify the line
-                    formatted_lines.append(line)
+                    line = f"assertz({line})."
+                formatted_lines.append(line)
+            logger.debug(f"Line after formatting: {line}")
         formatted_prolog_code = '\n'.join(formatted_lines)
-        logger.debug(f"Prolog code before validation: {formatted_prolog_code}")
+        logger.debug(f"Prolog code after formatting and before validation: {formatted_prolog_code}")
         # Validate the Prolog code
         validation_passed, error_message = validate_prolog_code(formatted_prolog_code)
         logger.debug(f"Validation result: {validation_passed}, Error message: {error_message}")
