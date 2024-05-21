@@ -107,12 +107,12 @@ def parse(c, input_text):
         for line in prolog_code.splitlines():
             line = line.strip()
             logger.debug(f"Line before formatting: {line}")
-            # Ensure 'assertz' is not duplicated by checking if it is already present in the line, ignoring case
-            if not "assertz(" in line.lower():
+            # Ensure 'assertz(' is only added if it is not already present in the statement
+            if not line.startswith('assertz(') and not line.startswith('assertz ('):
                 line = f"assertz({line})"
             # Ensure the line ends with a single period, only add it if it's not already there at the end
-            if not line.strip().endswith('.'):
-                line = f"{line.strip()}."
+            if not line.endswith('.'):
+                line = f"{line}."
             logger.debug(f"Line after formatting: {line}")
             formatted_lines.append(line)
         prolog_code = '\n'.join(formatted_lines)
@@ -128,12 +128,6 @@ def parse(c, input_text):
             # Append the validated and formatted Prolog code to world.pl
             append_to_world(prolog_code)
 
-@task
-def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
-    pass
-    # ... (rest of the run_logic_task function remains unchanged)
-
-@task(help={"statement": "An English statement to convert to Prolog."})
 @task(help={"statement": "An English statement to convert to Prolog."})
 def interactive_logic(c, statement=""):
     logger.debug("Starting interactive_logic function")
@@ -147,31 +141,14 @@ def interactive_logic(c, statement=""):
     # Extract the Prolog code from the response
     prolog_code = openai_response.get("prolog", "")
     logger.debug(f"Prolog code received from _openai_wrapper: {prolog_code}")
-    formatted_prolog_code = ""
+
     if prolog_code:
-        # Remove markdown code block syntax (triple backticks) from the Prolog code
-        prolog_code = prolog_code.replace("```", "").strip()
-        # Capitalize variables (Prolog variables start with an uppercase letter or underscore)
-        prolog_code = re.sub(
-            r"(?<=\(|,|\s)([a-z_]\w*)(?=\s|\,|\))",
-            lambda match: match.group(0).capitalize(),
-            prolog_code,
-        )
-        # Format the Prolog code to ensure proper syntax
-        formatted_lines = []
-        for line in prolog_code.splitlines():
-            line = line.strip()
-            logger.debug(f"Line before formatting: {line}")
-            # Ensure 'assertz' is not duplicated by checking if it is already present at the beginning of the line, ignoring case
-            if not line.lower().startswith("assertz("):
-                line = f"assertz({line})"
-            # Ensure the line ends with a single period, only add it if it's not already there at the end
-            line = line.rstrip()  # Remove any trailing whitespace
-            if not line.endswith('.'):
-                line += '.'
-            logger.debug(f"Line after formatting: {line}")
-            formatted_lines.append(line)
-        formatted_prolog_code = '\n'.join(formatted_lines)
+        # Check if 'assertz' is already present at the beginning of the Prolog code
+        if not prolog_code.lstrip().startswith('assertz(') and not prolog_code.lstrip().startswith('assertz ('):
+            formatted_prolog_code = f"assertz({prolog_code})."
+        else:
+            formatted_prolog_code = prolog_code
+
         # Validate the Prolog code
         validation_passed, error_message = validate_prolog_code(formatted_prolog_code)
         logger.debug(f"Validation result: {validation_passed}, Error message: {error_message}")
@@ -186,4 +163,8 @@ def interactive_logic(c, statement=""):
         return None
     logger.debug("interactive_logic function completed")
     return formatted_prolog_code
-    # ... (rest of the interactive_logic function remains unchanged)
+
+@task
+def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
+    pass
+    # ... (rest of the run_logic_task function remains unchanged)
