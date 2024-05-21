@@ -122,6 +122,7 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
 
 @task(help={"statement": "An English statement to convert to Prolog."})
 @task(help={"statement": "An English statement to convert to Prolog."})
+@task(help={"statement": "An English statement to convert to Prolog."})
 def interactive_logic(c, statement=""):
     logger.debug("Starting interactive_logic function")
     if not statement:
@@ -154,7 +155,7 @@ def interactive_logic(c, statement=""):
                 formatted_lines.append(line)
             else:
                 # Add 'assertz' only if it's not already present at the beginning of the line
-                if 'assertz(' not in line:
+                if not line.lstrip().startswith('assertz('):
                     line = f"assertz({line})."
                 formatted_lines.append(line)
             logger.debug(f"Line after formatting: {line}")
