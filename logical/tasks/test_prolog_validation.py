@@ -75,6 +75,29 @@ def run_prolog_code(prolog_code):
 
     return True, "Prolog code syntax is correct."
 
+def strip_comments(code):
+    stripped_code = ""
+    stack = []
+    i = 0
+    while i < len(code):
+        if code[i : i + 2] == "/*":
+            stack.append("/*")
+            i += 2
+            continue  # Skip appending characters and move to the next iteration
+        elif code[i : i + 2] == "*/" and stack:
+            stack.pop()
+            i += 2
+            continue  # Skip appending characters and move to the next iteration
+        elif not stack and code[i] == "%":
+            # Skip the rest of the line after a single-line comment
+            i = code.find("\n", i)
+            if i == -1:  # If no newline is found, we are at the end of the code
+                break
+        elif not stack:
+            stripped_code += code[i]
+        i += 1
+    return stripped_code
+
 # Define the validate_prolog_code function as it appears in tasks.py
 def validate_prolog_code(prolog_code):
     """
@@ -87,30 +110,6 @@ def validate_prolog_code(prolog_code):
     - (bool, str): A tuple containing a boolean indicating if the validation passed and an error message if it failed.
     """
     print("Entering validate_prolog_code function")
-
-    # Manually remove all comments from the Prolog code to handle nested comments
-    def strip_comments(code):
-        stripped_code = ""
-        stack = []
-        i = 0
-        while i < len(code):
-            if code[i : i + 2] == "/*":
-                stack.append("/*")
-                i += 2
-                continue  # Skip appending characters and move to the next iteration
-            elif code[i : i + 2] == "*/" and stack:
-                stack.pop()
-                i += 2
-                continue  # Skip appending characters and move to the next iteration
-            elif not stack and code[i] == "%":
-                # Skip the rest of the line after a single-line comment
-                i = code.find("\n", i)
-                if i == -1:  # If no newline is found, we are at the end of the code
-                    break
-            elif not stack:
-                stripped_code += code[i]
-            i += 1
-        return stripped_code
 
     print("Original Prolog code:", prolog_code)
     stripped_code = strip_comments(prolog_code)

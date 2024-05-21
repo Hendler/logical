@@ -55,7 +55,7 @@ def test_interactive_logic_querying(mock_open, mock_run_logic_task):
             with patch('logical.tasks.run_logic_task', mock_run_logic_task):
                 tasks.interactive_logic(context, statement='')
                 # Verify that the queries are run against the contents of world.pl
-                mocked_file.assert_called_once_with('world.pl', 'r')
+                mocked_file.assert_called_once_with('/home/ubuntu/logical/logical/world.pl', 'r')
                 # Verify that the run_logic_task is called for each query
                 expected_calls = [call(context, 'sky_is_blue.'), call(context, 'cows_cannot_fly.')]
                 mock_run_logic_task.assert_has_calls(expected_calls, any_order=True)
@@ -72,7 +72,7 @@ def test_interactive_logic_accumulation(mock_open, mock_run_logic_task):
             with patch('logical.tasks.run_logic_task', mock_run_logic_task):
                 tasks.interactive_logic(context, statement='')
                 # Verify that multiple Prolog statements are appended to world.pl without clearing previous content
-                calls = [call('world.pl', 'a'), call().write('cows_cannot_fly.\n'), call().write('birds_can_fly.\n')]
+                calls = [call('/home/ubuntu/logical/logical/world.pl', 'a'), call().write('cows_cannot_fly.\n'), call().write('birds_can_fly.\n')]
                 mocked_file.assert_has_calls(calls, any_order=False)
                 # Verify that the run_logic_task is called for each valid Prolog statement
                 expected_calls = [call(context, 'cows_cannot_fly.'), call(context, 'birds_can_fly.')]
@@ -106,7 +106,7 @@ def test_parse_prolog_generation(mock_open):
         with patch('logical.tasks.functions._openai_wrapper', return_value={'prolog': expected_prolog}):
             tasks.parse(context, english_statement)
             # Verify that the Prolog code is generated correctly
-            mock_open.assert_called_once_with('world.pl', 'a')
+            mock_open.assert_called_once_with('/home/ubuntu/logical/logical/world.pl', 'a')
             mock_open().write.assert_called_with(f"\n{expected_prolog}\n")
             mock_open.reset_mock()
 
@@ -130,7 +130,7 @@ def test_full_workflow_integration(mock_open, mock_run_logic_task):
                     tasks.interactive_logic(context, statement=english_statement)
                     # Verify that the Prolog code is generated, validated, and executed correctly
                     if is_valid:
-                        mock_open.assert_called_once_with('world.pl', 'a')
+                        mock_open.assert_called_once_with('/home/ubuntu/logical/logical/world.pl', 'a')
                         mock_open().write.assert_called_with(f"\n{expected_prolog}\n")
                     else:
                         mock_open.assert_not_called()

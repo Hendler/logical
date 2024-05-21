@@ -1,0 +1,12 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-8.2.0, pluggy-1.5.0 -- /home/ubuntu/.pyenv/versions/3.11.2/envs/logical/bin/python
+cachedir: .pytest_cache
+rootdir: /home/ubuntu/logical
+configfile: pyproject.toml
+testpaths: tests, logical/tasks
+plugins: mock-3.14.0, anyio-4.3.0
+collecting ... collected 25 items
+
+tests/test_integration.py::test_openai_wrapper PASSED                    [  4%]
+tests/test_interactive_logic.py::test_interactive_logic_conversion_and_appending[Cows cannot fly.-assertz(not(fly(cow))).] FAILED [  8%]
+tests/test_interactive_logic.py::test_interactive_logic_conversion_and_appending[Birds can fly.-assertz(fly(bird)).] 

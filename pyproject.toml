@@ -42,6 +42,8 @@ testpaths = [
     "logical/tasks"
 ]
 addopts = "-ra --junitxml=test_results.xml"
+log_cli = true
+log_cli_level = "DEBUG"
 
 [tool.poetry.scripts]
 logical = "logical.__main__:main"
