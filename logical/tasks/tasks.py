@@ -51,14 +51,46 @@ def validate_prolog_code(prolog_code):
     for statement in statements:
         if not statement.strip():  # Skip empty lines
             continue
+        # Normalize the statement to ensure consistent handling
+        normalized_statement = statement.strip()
+        # Check if 'assertz' is present at the start of the normalized statement
+        if normalized_statement.startswith('assertz(') and normalized_statement.endswith(').'):
+            # Remove 'assertz(' from the start and the closing ')' from the end
+            normalized_statement = normalized_statement[8:-2]
+        # Check for balanced parentheses
+        if not is_balanced_parentheses(normalized_statement):
+            return False, f"Unbalanced parentheses in statement '{normalized_statement}'."
+        # Ensure the statement ends with a single period if it doesn't already
+        if not normalized_statement.endswith('.'):
+            normalized_statement += '.'
         try:
             # Attempt to assert each Prolog statement into the knowledge base
-            prolog.assertz(statement)
+            prolog.assertz(normalized_statement)
         except PrologError as e:
             # If a PrologError is caught for any statement, the code is invalid
-            return False, f"Prolog syntax error in statement '{statement}': {e}"
+            return False, f"Prolog syntax error in statement '{normalized_statement}': {e}"
     # If no error is caught for any statement, the code is valid
     return True, "Prolog code syntax is correct."
+
+def is_balanced_parentheses(statement):
+    """
+    Checks if parentheses in a statement are balanced.
+
+    Parameters:
+    - statement (str): The statement to check.
+
+    Returns:
+    - bool: True if parentheses are balanced, False otherwise.
+    """
+    stack = []
+    for char in statement:
+        if char == '(':
+            stack.append(char)
+        elif char == ')':
+            if not stack or stack[-1] != '(':
+                return False
+            stack.pop()
+    return not stack
 
 @task
 def parse(c, input_text):
@@ -93,6 +125,7 @@ def parse(c, input_text):
 
     # Validate and format the Prolog code
     if prolog_code:
+        # Normalize the case of the Prolog code
         prolog_code = "\n".join([line[0].lower() + line[1:] if line else "" for line in prolog_code.splitlines()])
         prolog_code = prolog_code.strip().lower()
         # Capitalize variables (Prolog variables start with an uppercase letter or underscore)
@@ -107,12 +140,12 @@ def parse(c, input_text):
         for line in prolog_code.splitlines():
             line = line.strip()
             logger.debug(f"Line before formatting: {line}")
-            # Ensure 'assertz(' is only added if it is not already present in the statement
-            if not line.startswith('assertz(') and not line.startswith('assertz ('):
+            # Ensure 'assertz(' is only added if it is not already present at the start of the statement
+            if 'assertz(' not in line:
+                # Ensure the line ends with a single period, only add it if it's not already there at the end
+                if not line.endswith('.'):
+                    line += '.'
                 line = f"assertz({line})"
-            # Ensure the line ends with a single period, only add it if it's not already there at the end
-            if not line.endswith('.'):
-                line = f"{line}."
             logger.debug(f"Line after formatting: {line}")
             formatted_lines.append(line)
         prolog_code = '\n'.join(formatted_lines)
@@ -143,18 +176,12 @@ def interactive_logic(c, statement=""):
     logger.debug(f"Prolog code received from _openai_wrapper: {prolog_code}")
 
     if prolog_code:
-        # Check if 'assertz' is already present at the beginning of the Prolog code
-        if not prolog_code.lstrip().startswith('assertz(') and not prolog_code.lstrip().startswith('assertz ('):
-            formatted_prolog_code = f"assertz({prolog_code})."
-        else:
-            formatted_prolog_code = prolog_code
-
         # Validate the Prolog code
-        validation_passed, error_message = validate_prolog_code(formatted_prolog_code)
+        validation_passed, error_message = validate_prolog_code(prolog_code)
         logger.debug(f"Validation result: {validation_passed}, Error message: {error_message}")
         if validation_passed:
             # Append the validated Prolog code to world.pl
-            append_to_world(formatted_prolog_code)
+            append_to_world(prolog_code)
         else:
             logger.error(f"Failed to validate Prolog code: {error_message}")
             return None
@@ -162,7 +189,6 @@ def interactive_logic(c, statement=""):
         logger.error("No Prolog code was generated.")
         return None
     logger.debug("interactive_logic function completed")
-    return formatted_prolog_code
 
 @task
 def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
