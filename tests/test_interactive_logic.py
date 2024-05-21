@@ -17,6 +17,8 @@ from invoke.context import Context
 def test_interactive_logic_conversion_and_appending(mock_open, mock_append_to_world, input_statement, expected_prolog_code):
     # Create a Context object to pass to the task
     context = Context()
+    print(f"Testing with input: '{input_statement}' and expected Prolog: '{expected_prolog_code}'")
+    print(f"Prolog code before processing: {expected_prolog_code}")
     # Mock the input to simulate user input of English statements
     with patch('builtins.input', side_effect=[input_statement, 'exit']):
         # Mock the _openai_wrapper function to return the expected Prolog code for the input statement
@@ -26,10 +28,20 @@ def test_interactive_logic_conversion_and_appending(mock_open, mock_append_to_wo
                 # Mock the open function to simulate file operations on world.pl with the correct path and mode
                 with patch('builtins.open', mock_open) as mocked_file:
                     mocked_file.return_value.__enter__.return_value = mock_open.return_value
-                    # Call the interactive_logic function and capture the formatted Prolog code
-                    tasks.interactive_logic(context, input_statement)
-                    # Verify that the append_to_world function is called with the correct Prolog code
-                    mock_append_to_world.assert_called_once_with(expected_prolog_code)
+                    try:
+                        print(f"Before interactive_logic: Mock _openai_wrapper will return: {mock_openai_wrapper.return_value['prolog']}")
+                        # Call the interactive_logic function and capture the formatted Prolog code
+                        formatted_prolog_code = tasks.interactive_logic(context, input_statement)
+                        print(f"Formatted Prolog code before append_to_world: {formatted_prolog_code}")
+                        # Verify that the append_to_world function is called with the correct Prolog code
+                        mock_append_to_world.assert_called_once_with(expected_prolog_code)
+                        print(f"Prolog code passed to append_to_world: {formatted_prolog_code}")
+                        print(f"Expected Prolog code after processing: {expected_prolog_code}")
+                        # The assertion now checks if the formatted Prolog code exactly matches the expected Prolog code
+                        assert formatted_prolog_code == expected_prolog_code, f"Prolog code formatting error: {formatted_prolog_code}"
+                    except Exception as e:
+                        print(f"Exception occurred during interactive_logic: {e}")
+                        raise
 
 # Test the interactive_logic function for handling queries against world.pl
 def test_interactive_logic_querying(mock_open, mock_run_logic_task):
