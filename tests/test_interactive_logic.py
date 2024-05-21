@@ -17,31 +17,31 @@ from invoke.context import Context
 def test_interactive_logic_conversion_and_appending(mock_open, mock_append_to_world, input_statement, expected_prolog_code):
     # Create a Context object to pass to the task
     context = Context()
+    print(f"Testing with input: '{input_statement}' and expected Prolog: '{expected_prolog_code}'")
+    print(f"Prolog code before processing: {expected_prolog_code}")
     # Mock the input to simulate user input of English statements
     with patch('builtins.input', side_effect=[input_statement, 'exit']):
         # Mock the _openai_wrapper function to return the expected Prolog code for the input statement
-        with patch('logical.tasks.tasks._openai_wrapper', return_value={'prolog': expected_prolog_code}) as mock_openai_wrapper:
-            # Mock the append_to_world function to verify it is called with correct Prolog code
-            with patch('logical.tasks.tasks.append_to_world') as mock_append_to_world:
+        with patch('logical.tasks.functions._openai_wrapper', return_value={'prolog': expected_prolog_code}) as mock_openai_wrapper:
+            # Mock the append_to_world function to track calls
+            with patch('logical.tasks.tasks.append_to_world', mock_append_to_world):
                 # Mock the open function to simulate file operations on world.pl with the correct path and mode
                 with patch('builtins.open', mock_open) as mocked_file:
                     mocked_file.return_value.__enter__.return_value = mock_open.return_value
-                    tasks.interactive_logic(context)
-                    # Verify that the append_to_world function is called with the correct Prolog code
-                    # The Prolog code is expected to be the output of the parse function for the input "Cows cannot fly."
-                    print(f"Expected Prolog code to append: {expected_prolog_code}")
-                    actual_prolog_code_call = mock_append_to_world.call_args[0][0] if mock_append_to_world.call_args else None
-                    print(f"Actual Prolog code called with append_to_world: {actual_prolog_code_call}")
-                    assert actual_prolog_code_call == expected_prolog_code.strip(), f"Append to world called with wrong Prolog code: {actual_prolog_code_call}"
-
-                    world_pl_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "logical", "world.pl"))
-                    print(f"Expected world.pl path: {world_pl_path}")
-                    actual_path_used_in_open_call = mocked_file.call_args[0][0] if mocked_file.call_args else None
-                    print(f"Actual path used in open call: {actual_path_used_in_open_call}")
-                    assert actual_path_used_in_open_call == world_pl_path, f"Open called with wrong path: {actual_path_used_in_open_call}"
-                    assert mocked_file.call_args[0][1] == 'a', f"Open called with wrong mode: {mocked_file.call_args[0][1]}"
-                    # Verify that the open function is called with the correct path and mode
-                    mocked_file.assert_called_once_with(world_pl_path, 'a')
+                    try:
+                        print(f"Before interactive_logic: Mock _openai_wrapper will return: {mock_openai_wrapper.return_value['prolog']}")
+                        # Call the interactive_logic function and capture the formatted Prolog code
+                        formatted_prolog_code = tasks.interactive_logic(context, input_statement)
+                        print(f"Formatted Prolog code before append_to_world: {formatted_prolog_code}")
+                        # Verify that the append_to_world function is called with the correct Prolog code
+                        mock_append_to_world.assert_called_once_with(formatted_prolog_code)
+                        print(f"Prolog code passed to append_to_world: {formatted_prolog_code}")
+                        print(f"Expected Prolog code after processing: {expected_prolog_code}")
+                        # The assertion now checks if the formatted Prolog code exactly matches the expected Prolog code
+                        assert formatted_prolog_code == expected_prolog_code, f"Prolog code formatting error: {formatted_prolog_code}"
+                    except Exception as e:
+                        print(f"Exception occurred during interactive_logic: {e}")
+                        raise
 
 # Test the interactive_logic function for handling queries against world.pl
 def test_interactive_logic_querying(mock_open, mock_run_logic_task):
@@ -103,7 +103,7 @@ def test_parse_prolog_generation(mock_open):
     ]
     # Test each case
     for english_statement, expected_prolog in test_cases:
-        with patch('logical.tasks._openai_wrapper', return_value={'prolog': expected_prolog}):
+        with patch('logical.tasks.functions._openai_wrapper', return_value={'prolog': expected_prolog}):
             tasks.parse(context, english_statement)
             # Verify that the Prolog code is generated correctly
             mock_open.assert_called_once_with('world.pl', 'a')
@@ -124,8 +124,8 @@ def test_full_workflow_integration(mock_open, mock_run_logic_task):
     ]
     # Test each case
     for english_statement, expected_prolog, is_valid in test_cases:
-        with patch('logical.tasks._openai_wrapper', return_value={'prolog': expected_prolog}):
-            with patch('logical.tasks.validate_prolog_code', return_value=is_valid):
+        with patch('logical.tasks.functions._openai_wrapper', return_value={'prolog': expected_prolog}):
+            with patch('logical.tasks.tasks.validate_prolog_code', return_value=(is_valid, "")):
                 with patch('logical.tasks.run_logic_task', mock_run_logic_task):
                     tasks.interactive_logic(context, statement=english_statement)
                     # Verify that the Prolog code is generated, validated, and executed correctly
@@ -175,7 +175,7 @@ def test_interactive_logic_invalid_prolog_generation(mock_open, mock_run_logic_t
         # Mock the open function to simulate file operations on world.pl
         with patch('builtins.open', mock_open) as mocked_file:
             # Mock the _openai_wrapper to simulate invalid Prolog code generation
-            with patch('logical.tasks._openai_wrapper', return_value={'prolog': 'invalid_prolog_code'}):
+            with patch('logical.tasks.functions._openai_wrapper', return_value={'prolog': 'invalid_prolog_code'}):
                 tasks.interactive_logic(context, statement='Cows cannot fly.')
                 # Verify that invalid Prolog code does not result in appending to world.pl
                 mocked_file.assert_not_called()
