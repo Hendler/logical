@@ -34,7 +34,7 @@ def test_interactive_logic_conversion_and_appending(mock_open, mock_append_to_wo
                         formatted_prolog_code = tasks.interactive_logic(context, input_statement)
                         print(f"Formatted Prolog code before append_to_world: {formatted_prolog_code}")
                         # Verify that the append_to_world function is called with the correct Prolog code
-                        mock_append_to_world.assert_called_once_with(formatted_prolog_code)
+                        mock_append_to_world.assert_called_once_with(expected_prolog_code)
                         print(f"Prolog code passed to append_to_world: {formatted_prolog_code}")
                         print(f"Expected Prolog code after processing: {expected_prolog_code}")
                         # The assertion now checks if the formatted Prolog code exactly matches the expected Prolog code
