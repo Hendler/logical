@@ -83,20 +83,20 @@ def strip_comments(code):
         if code[i : i + 2] == "/*":
             stack.append("/*")
             i += 2
-            continue  # Skip appending characters and move to the next iteration
-        elif code[i : i + 2] == "*/" and stack:
-            stack.pop()
+        elif code[i : i + 2] == "*/":
+            if stack:
+                stack.pop()
             i += 2
-            continue  # Skip appending characters and move to the next iteration
         elif not stack and code[i] == "%":
-            # Skip the rest of the line after a single-line comment
-            i = code.find("\n", i)
-            if i == -1:  # If no newline is found, we are at the end of the code
+            end_of_line = code.find("\n", i)
+            if end_of_line == -1:
                 break
-        elif not stack:
+            i = end_of_line + 1
+        elif not stack or (stack and code[i] != "\n"):
             stripped_code += code[i]
         i += 1
-    return stripped_code
+    stripped_lines = [line.rstrip() for line in stripped_code.splitlines()]
+    return "\n".join(stripped_lines)
 
 # Define the validate_prolog_code function as it appears in tasks.py
 def validate_prolog_code(prolog_code):
