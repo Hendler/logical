@@ -54,23 +54,43 @@ def validate_prolog_code(prolog_code):
         # Normalize the statement to ensure consistent handling
         normalized_statement = statement.strip()
         # Check if 'assertz' is present at the start of the normalized statement
-        if normalized_statement.startswith('assertz(') and normalized_statement.endswith(').'):
-            # Remove 'assertz(' from the start and the closing ')' from the end
+        if normalized_statement.startswith('assertz(') and normalized_statement.endswith(').') and normalized_statement.count('assertz(') == 1:
+            # Strip 'assertz(' from the start and the trailing '.' to prepare for syntax checking
             normalized_statement = normalized_statement[8:-2]
-        # Check for balanced parentheses
+        # Check for balanced parentheses after potential modifications
         if not is_balanced_parentheses(normalized_statement):
             return False, f"Unbalanced parentheses in statement '{normalized_statement}'."
-        # Ensure the statement ends with a single period if it doesn't already
-        if not normalized_statement.endswith('.'):
-            normalized_statement += '.'
+        # Attempt to assert the normalized Prolog statement into the knowledge base
         try:
-            # Attempt to assert each Prolog statement into the knowledge base
             prolog.assertz(normalized_statement)
         except PrologError as e:
-            # If a PrologError is caught for any statement, the code is invalid
+            # If a PrologError is caught, the code is invalid
             return False, f"Prolog syntax error in statement '{normalized_statement}': {e}"
     # If no error is caught for any statement, the code is valid
     return True, "Prolog code syntax is correct."
+
+def find_matching_paren(statement, open_paren_index):
+    """
+    Finds the index of the matching closing parenthesis for the first opening parenthesis in the statement.
+
+    Parameters:
+    - statement (str): The Prolog statement to search.
+    - open_paren_index (int): The index of the opening parenthesis.
+
+    Returns:
+    - int: The index of the matching closing parenthesis, or -1 if no match is found.
+    """
+    stack = []
+    for i in range(open_paren_index, len(statement)):
+        if statement[i] == '(':
+            stack.append(i)
+        elif statement[i] == ')':
+            if not stack:
+                return -1  # No matching opening parenthesis
+            stack.pop()
+            if not stack:
+                return i  # Found the matching closing parenthesis
+    return -1  # No matching closing parenthesis found
 
 def is_balanced_parentheses(statement):
     """
@@ -141,7 +161,8 @@ def parse(c, input_text):
             line = line.strip()
             logger.debug(f"Line before formatting: {line}")
             # Ensure 'assertz(' is only added if it is not already present at the start of the statement
-            if 'assertz(' not in line:
+            # and the statement is not a well-formed Prolog fact or rule
+            if not line.startswith('assertz(') and not is_balanced_parentheses(line):
                 # Ensure the line ends with a single period, only add it if it's not already there at the end
                 if not line.endswith('.'):
                     line += '.'
@@ -162,6 +183,7 @@ def parse(c, input_text):
             append_to_world(prolog_code)
 
 @task(help={"statement": "An English statement to convert to Prolog."})
+@task(help={"statement": "An English statement to convert to Prolog."})
 def interactive_logic(c, statement=""):
     logger.debug("Starting interactive_logic function")
     if not statement:
@@ -176,10 +198,17 @@ def interactive_logic(c, statement=""):
     logger.debug(f"Prolog code received from _openai_wrapper: {prolog_code}")
 
     if prolog_code:
+        # Strip comments and ensure no trailing whitespace
+        prolog_code = re.sub(r'\s*%.*', '', prolog_code, flags=re.MULTILINE).strip()
         # Validate the Prolog code
         validation_passed, error_message = validate_prolog_code(prolog_code)
         logger.debug(f"Validation result: {validation_passed}, Error message: {error_message}")
         if validation_passed:
+            # Ensure the Prolog code ends with a single period and is wrapped with 'assertz' if not already present
+            if not prolog_code.endswith('.'):
+                prolog_code += '.'
+            if not prolog_code.startswith('assertz('):
+                prolog_code = f"assertz({prolog_code})"
             # Append the validated Prolog code to world.pl
             append_to_world(prolog_code)
         else:
@@ -189,6 +218,7 @@ def interactive_logic(c, statement=""):
         logger.error("No Prolog code was generated.")
         return None
     logger.debug("interactive_logic function completed")
+    return prolog_code
 
 @task
 def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
