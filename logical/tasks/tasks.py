@@ -7,6 +7,16 @@ from .functions import _openai_wrapper
 from pyswip.prolog import Prolog, PrologError
 from .logger import logger
 import re
+import sys
+import logging
+
+# Configure logger to output debug logs to console
+logger.setLevel(logging.DEBUG)
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 # Load the OpenAI API key from the environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -96,12 +106,15 @@ def parse(c, input_text):
         formatted_lines = []
         for line in prolog_code.splitlines():
             line = line.strip()
-            # Check if the line is a comment, directive, contains 'assertz', or ends with a period
-            if line.startswith('%') or line.startswith(':-') or 'assertz(' in line or line.endswith('.'):
-                formatted_lines.append(line)
-            else:
-                # Add 'assertz' only if it's not already present
-                formatted_lines.append(f"assertz({line}).")
+            logger.debug(f"Line before formatting: {line}")
+            # Ensure 'assertz' is not duplicated by checking if it is already present in the line, ignoring case
+            if not "assertz(" in line.lower():
+                line = f"assertz({line})"
+            # Ensure the line ends with a single period, only add it if it's not already there at the end
+            if not line.strip().endswith('.'):
+                line = f"{line.strip()}."
+            logger.debug(f"Line after formatting: {line}")
+            formatted_lines.append(line)
         prolog_code = '\n'.join(formatted_lines)
         logger.info(f"Formatted Prolog code to append: {prolog_code}")
 
@@ -120,7 +133,6 @@ def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
     pass
     # ... (rest of the run_logic_task function remains unchanged)
 
-@task(help={"statement": "An English statement to convert to Prolog."})
 @task(help={"statement": "An English statement to convert to Prolog."})
 @task(help={"statement": "An English statement to convert to Prolog."})
 def interactive_logic(c, statement=""):
@@ -150,17 +162,16 @@ def interactive_logic(c, statement=""):
         for line in prolog_code.splitlines():
             line = line.strip()
             logger.debug(f"Line before formatting: {line}")
-            # Check if the line is a comment, directive, or ends with a period
-            if line.startswith('%') or line.startswith(':-') or line.endswith('.'):
-                formatted_lines.append(line)
-            else:
-                # Add 'assertz' only if it's not already present at the beginning of the line
-                if not line.lstrip().startswith('assertz('):
-                    line = f"assertz({line})."
-                formatted_lines.append(line)
+            # Ensure 'assertz' is not duplicated by checking if it is already present at the beginning of the line, ignoring case
+            if not line.lower().startswith("assertz("):
+                line = f"assertz({line})"
+            # Ensure the line ends with a single period, only add it if it's not already there at the end
+            line = line.rstrip()  # Remove any trailing whitespace
+            if not line.endswith('.'):
+                line += '.'
             logger.debug(f"Line after formatting: {line}")
+            formatted_lines.append(line)
         formatted_prolog_code = '\n'.join(formatted_lines)
-        logger.debug(f"Prolog code after formatting and before validation: {formatted_prolog_code}")
         # Validate the Prolog code
         validation_passed, error_message = validate_prolog_code(formatted_prolog_code)
         logger.debug(f"Validation result: {validation_passed}, Error message: {error_message}")
