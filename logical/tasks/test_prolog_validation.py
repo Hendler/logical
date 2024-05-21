@@ -45,17 +45,24 @@ def run_prolog_code(prolog_code):
                     predicate_name = predicate_name_match.group(0)
                     if predicate_name in builtin_predicates:
                         continue  # Skip assertion for built-in predicates
-                # Ensure the period is outside the parentheses for assertz
-                if statement.endswith('.'):
-                    statement = statement[:-1].strip()
+
+                # Handle 'assertz' statements correctly
+                normalized_statement = statement.strip()
+                if normalized_statement.startswith('assertz(') and normalized_statement.endswith(').'):
+                    assertz_count = normalized_statement.count('assertz(')
+                    index = normalized_statement.find('assertz(')
+                    closing_paren_index = find_matching_paren(normalized_statement, index + 7)
+                    if closing_paren_index != -1 and assertz_count == 1:
+                        normalized_statement = normalized_statement[8:closing_paren_index] + normalized_statement[closing_paren_index+1:-1]
+                    elif assertz_count > 1:
+                        # Logic to handle nested 'assertz' or 'assertz' in larger expressions needs to be implemented here
+                        pass
+                if not normalized_statement.endswith('.'):
+                    normalized_statement += '.'
                 try:
-                    logger.info(f"Asserting Prolog statement: {statement}")
-                    prolog.assertz(statement)
-                    logger.info(f"Successfully asserted: {statement}")
-                except Exception as e:
-                    logger.error(f"Prolog syntax error while asserting: {statement} - {e}")
-                    # If an Exception is caught, the code is invalid
-                    return False, f"Prolog syntax error: {e}"
+                    prolog.assertz(normalized_statement)
+                except PrologError as e:
+                    return False, f"Prolog syntax error in statement '{normalized_statement}': {e}"
     except Exception as e:
         return False, f"Prolog interpreter error: {e}"
     finally:
