@@ -112,11 +112,7 @@ def validate_prolog_code(prolog_code):
     Returns:
     - (bool, str): A tuple containing a boolean indicating if the validation passed and an error message if it failed.
     """
-    print("Entering validate_prolog_code function")
-
-    print("Original Prolog code:", prolog_code)
     stripped_code = strip_comments(prolog_code)
-    print("Stripped Prolog code:", stripped_code)
 
     # Check for balanced parentheses
     parentheses_stack = []
@@ -163,10 +159,8 @@ def validate_prolog_code(prolog_code):
         if state != IN_STRING:
             state = NORMAL
 
-    print("Prolog code before running interpreter:", stripped_code)
     validation_passed, error_message = run_prolog_code(stripped_code)
     if not validation_passed:
-        print("Error from Prolog interpreter:", error_message)
         return False, error_message
 
     # Additional validation for directives to ensure they have arity where required
@@ -180,48 +174,47 @@ def validate_prolog_code(prolog_code):
 
     return True, "Prolog code syntax is correct."
 
-print("Current working directory:", os.getcwd())
+def test_prolog_samples():
+    """
+    Test various Prolog code samples to ensure they are validated correctly.
+    """
+    # Additional test cases to cover edge cases
+    additional_tests = {
+        "Nested comments": ("/* Comment /* nested comment */ end comment */ retractall(dummy_predicate).", True),
+        "String with escaped single quote": ("likes(john, 'Soccer\\'s fun').", True),
+        "Complex directive": (":- dynamic cow/1.", True),
+    }
 
-# Additional test cases to cover edge cases
-additional_tests = {
-    "Nested comments": ("/* Comment /* nested comment */ end comment */ retractall(dummy_predicate).", True),
-    "String with escaped single quote": ("likes(john, 'Soccer\\'s fun').", True),
-    "Complex directive": (":- dynamic cow/1.", True),
-}
+    # Combine predefined samples with additional tests
+    prolog_samples = []
+    prolog_samples.extend([test[0] for test in additional_tests.values()])
 
-# Combine predefined samples with additional tests
-prolog_samples = []
-prolog_samples.extend([test[0] for test in additional_tests.values()])
+    # Test each Prolog code sample
+    for sample in prolog_samples:
+        validation_passed, error_message = validate_prolog_code(sample)
+        assert validation_passed, f"Validation failed for sample:\n{sample}\nError: {error_message}"
 
-# Test each Prolog code sample
-for sample in prolog_samples:
-    validation_passed, error_message = validate_prolog_code(sample)
-    if validation_passed:
-        print(f"Validation passed for sample:\n{sample}")
-    else:
-        print(f"Validation failed for sample:\n{sample}\nError: {error_message}")
+    # Test additional edge cases
+    for description, (sample, expected_result) in additional_tests.items():
+        validation_passed, _ = validate_prolog_code(sample)
+        assert(validation_passed == expected_result), f"Test failed for {description}: {sample}"
 
-# Test additional edge cases
-for description, (sample, expected_result) in additional_tests.items():
-    validation_passed, _ = validate_prolog_code(sample)
-    assert(validation_passed == expected_result), f"Test failed for {description}: {sample}"
+    # Additional complex Prolog syntax tests
+    complex_syntax_tests = {
+        "Multiple predicates": ("animal(cow). likes(mary, cow).", True),
+        "Rule with multiple conditions": ("flies(X) :- bird(X), \\+ penguin(X).", True),
+        "Rule with conjunction and disjunction": ("likes(X, Y) :- (cat(X), mouse(Y)); (dog(X), bone(Y)).", True),
+        "Fact with negation": ("not(likes(john, rain)).", True),
+        "Invalid rule structure": ("flies(X) :- bird(X), \\+ penguin(X).", True),  # Corrected syntax with standard negation operator
+        "Invalid fact structure": ("animal(cow).", True),  # Corrected syntax with parentheses
+        "Valid directive": (":- dynamic animal/1.", True),
+        "Invalid directive": (":- dynamic animal.", False),  # Missing arity
+    }
 
-# Additional complex Prolog syntax tests
-complex_syntax_tests = {
-    "Multiple predicates": ("animal(cow). likes(mary, cow).", True),
-    "Rule with multiple conditions": ("flies(X) :- bird(X), \\+ penguin(X).", True),
-    "Rule with conjunction and disjunction": ("likes(X, Y) :- (cat(X), mouse(Y)); (dog(X), bone(Y)).", True),
-    "Fact with negation": ("not(likes(john, rain)).", True),
-    "Invalid rule structure": ("flies(X) :- bird(X), \\+ penguin(X).", True),  # Corrected syntax with standard negation operator
-    "Invalid fact structure": ("animal(cow).", True),  # Corrected syntax with parentheses
-    "Valid directive": (":- dynamic animal/1.", True),
-    "Invalid directive": (":- dynamic animal.", False),  # Missing arity
-}
-
-# Test additional complex Prolog syntax cases
-for description, (sample, expected_result) in complex_syntax_tests.items():
-    validation_passed, _ = validate_prolog_code(sample)
-    assert(validation_passed == expected_result), f"Test failed for {description}: {sample}"
+    # Test additional complex Prolog syntax cases
+    for description, (sample, expected_result) in complex_syntax_tests.items():
+        validation_passed, _ = validate_prolog_code(sample)
+        assert(validation_passed == expected_result), f"Test failed for {description}: {sample}"
 
 def test_strip_comments():
     """
