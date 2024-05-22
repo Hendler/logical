@@ -29,7 +29,8 @@ def mock_openai_wrapper_response(input_statement, **kwargs):
     This function takes an input statement, normalizes it, and searches for a matching
     statement in the test_cases list. If a match is found, it returns the expected Prolog
     code in the same format as the _openai_wrapper function would. If no match is found,
-    it returns a default Prolog statement that indicates no match was found, rather than None. This allows us to test the interactive_logic function's response
+    it returns None to simulate the behavior of the _openai_wrapper function when it does
+    not find a match. This allows us to test the interactive_logic function's response
     handling without making actual API calls.
 
     Args:
@@ -37,7 +38,7 @@ def mock_openai_wrapper_response(input_statement, **kwargs):
         **kwargs: Additional keyword arguments, not used but included for compatibility.
 
     Returns:
-        str: The expected Prolog code or a default Prolog statement if no match is found.
+        str: The expected Prolog code or None if no match is found.
     """
     # Normalize input_statement by stripping whitespace and converting to lowercase
     normalized_input = input_statement.strip().lower()
@@ -48,8 +49,8 @@ def mock_openai_wrapper_response(input_statement, **kwargs):
         if normalized_stmt == normalized_input:
             # Return the expected Prolog code directly
             return code
-    # Return a default Prolog statement indicating no match found
-    return "assertz(no_match_found)."
+    # Return None to indicate no match found
+    return None
 
 def mock_openai_wrapper_side_effect(**kwargs):
     """
@@ -96,14 +97,18 @@ def test_interactive_logic_conversion_and_appending(input_statement, expected_pr
          patch('builtins.open', mock_open):
         # Call the interactive_logic function with test_mode set to False
         tasks.interactive_logic(context, input_statement, test_mode=False)
-        # Verify that the append_to_world function is called with the correct Prolog code when test_mode is False
-        mock_append_to_world.assert_called_once_with(expected_prolog_code)
-        # Verify that the open function is called with the correct file path and mode
-        world_pl_path = os.path.join(tasks.ROOT_REPO_DIR, "world.pl")
-        mock_open.assert_called_once_with(world_pl_path, 'a')
-        mock_open().write.assert_called_with(f"{expected_prolog_code}\n")
         # Ensure the mock_wrapper is called with the correct statement
         mock_wrapper.assert_called_once_with(stmt=input_statement)
+        # If the Prolog code is not None, verify that the append_to_world function is called with the correct Prolog code when test_mode is False
+        if expected_prolog_code is not None:
+            mock_append_to_world.assert_called_once_with(expected_prolog_code)
+            # Verify that the open function is called with the correct file path and mode
+            world_pl_path = os.path.join(tasks.ROOT_REPO_DIR, "world.pl")
+            mock_open.assert_called_once_with(world_pl_path, 'a')
+            mock_open().write.assert_called_with(f"{expected_prolog_code}\n")
+        else:
+            mock_append_to_world.assert_not_called()
+            mock_open.assert_not_called()
 
 # Test the interactive_logic function for handling queries against world.pl
 def test_interactive_logic_querying(mock_open, mock_run_logic_task):
