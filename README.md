@@ -68,28 +68,34 @@ After installation, create a `.env` file based on the `.env-example` template an
 ## Quick Start
 
 1. Clone the repository and navigate to the project directory.
-2. Run `poetry install` to install dependencies.
-3. Copy `.env-example` to `.env` and configure your OpenAI API key and other settings.
-4. Start an interactive logic session with `logical interactive-logic`.
+2. Run `poetry install` to install dependencies, including `folpy`.
+3. Copy `.env-example` to `.env` and configure your environment variables:
+   - `OPENAI_API_KEY`: Your OpenAI API key.
+   - `OPEN_AI_MODEL_TYPE`: Set to "gpt-4o" or another model type as required.
+4. Start an interactive logic session with `logical interactive-logic` to input English statements and receive Prolog queries or truth values interactively.
 
-## Commands:
+## Commands
 
-    - help
-    - exit
-    - parse: input text to extract logic from
-    - ask: ask a logical question
+- `help`: Display help information.
+- `exit`: Exit the interactive logic session.
+- `parse`: Input text to extract logic from.
+- `ask`: Ask a logical question.
+- `validate`: Validate Prolog code using the Prolog interpreter.
 
+## Debugging
 
-## debug
+To debug the logic engine and test the generated Prolog code, follow these steps:
 
-To debug the logic engine and test the generated Prolog code, you can load the Prolog file in the SWI-Prolog interpreter:
-
-```
-$ swipl
-?- ['myprolog.pl'].
-```
-
-This will allow you to interact with the Prolog code and verify its correctness.
+1. Load the Prolog file in the SWI-Prolog interpreter using the command:
+   ```
+   $ swipl
+   ?- ['world.pl'].
+   ```
+2. Run tests to validate the Prolog code by executing:
+   ```
+   $ poetry run pytest
+   ```
+3. If you encounter any issues, refer to the error messages and consult the `analyze_invalid_prolog.py` script to identify common error patterns.
 
 ## updates
 
