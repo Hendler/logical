@@ -4,7 +4,8 @@ from logical.tasks import tasks
 from unittest.mock import patch, call
 from invoke.context import Context
 
-# Define a set of English statements and their expected Prolog translations at the module level
+# test_cases is a list of tuples where each tuple contains an English statement and its expected Prolog translation.
+# This list is used throughout the tests to simulate the OpenAI API responses for converting English to Prolog.
 test_cases = [
     ("Cows cannot fly.", "assertz(not(fly(cow)))."),
     ("Birds can fly.", "assertz(fly(bird))."),
@@ -12,10 +13,26 @@ test_cases = [
     ("Socrates is a human.", "assertz(human(socrates))."),
     ("The sky is blue.", "assertz(blue(sky))."),
     ("Sugar is sweet.", "assertz(sweet(sugar))."),
-    # Add more test cases as needed
+    # Additional test cases can be added here as needed.
 ]
 
 def mock_openai_wrapper_response(input_statement, **kwargs):
+    """
+    Simulate the OpenAI API response for converting English statements to Prolog code.
+
+    This function takes an input statement, normalizes it, and searches for a matching
+    statement in the test_cases list. If a match is found, it returns the expected Prolog
+    code in the same format as the _openai_wrapper function would. If no match is found,
+    it returns a default response indicating that no match was found. This allows us to
+    test the interactive_logic function's response handling without making actual API calls.
+
+    Args:
+        input_statement (str): The English statement to be converted to Prolog code.
+        **kwargs: Additional keyword arguments, not used but included for compatibility.
+
+    Returns:
+        dict: A simulated OpenAI API response with the expected Prolog code or a default message.
+    """
     # Normalize input_statement by stripping whitespace and converting to lowercase
     normalized_input = input_statement.strip().lower()
     # Iterate over the test_cases to find the expected Prolog code for the given input statement
@@ -23,16 +40,44 @@ def mock_openai_wrapper_response(input_statement, **kwargs):
         # Normalize stmt for comparison
         normalized_stmt = stmt.strip().lower()
         if normalized_stmt == normalized_input:
-            return {'choices': [{'text': code}]}  # Return the expected Prolog code
+            # Return the expected Prolog code in the format that _openai_wrapper would return
+            return {'choices': [{'text': code}]}
     # Return a response indicating no match found if input_statement does not match any test cases
     return {'choices': [{'text': 'No match found'}]}
 
 def mock_openai_wrapper_side_effect(stmt, **kwargs):
-    # Call the mock response function with the provided statement
+    """
+    Side effect function for the _openai_wrapper mock.
+
+    This function is used to simulate the behavior of the _openai_wrapper function
+    during testing. It delegates to the mock_openai_wrapper_response function,
+    passing the provided statement and any additional keyword arguments.
+
+    Args:
+        stmt (str): The English statement to be converted to Prolog code.
+        **kwargs: Additional keyword arguments for the _openai_wrapper function.
+
+    Returns:
+        dict: A simulated OpenAI API response with the expected Prolog code.
+    """
     return mock_openai_wrapper_response(stmt, **kwargs)
 
 @pytest.mark.parametrize("input_statement, expected_prolog_code", test_cases)
 def test_interactive_logic_conversion_and_appending(input_statement, expected_prolog_code, mock_open, mock_append_to_world):
+    """
+    Test the interactive_logic function's ability to convert English statements to Prolog code and append them to world.pl.
+
+    This test verifies that the interactive_logic function calls the append_to_world function
+    with the correct Prolog code when test_mode is False. It also checks that the open function
+    is called with the correct file path and mode, and that the _openai_wrapper mock is called
+    with the correct statement.
+
+    Args:
+        input_statement (str): The English statement to be converted to Prolog code.
+        expected_prolog_code (str): The expected Prolog code to be appended to world.pl.
+        mock_open (Mock): A mock of the open function.
+        mock_append_to_world (Mock): A mock of the append_to_world function.
+    """
     # Create a Context object to pass to the task
     context = Context()
     # Mock the _openai_wrapper function to return the expected Prolog code for the input statement
