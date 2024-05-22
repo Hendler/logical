@@ -31,7 +31,9 @@ def mock_openai_wrapper_response(input_statement, **kwargs):
     code in the same format as the _openai_wrapper function would. If no match is found,
     it returns None to simulate the behavior of the _openai_wrapper function when it does
     not find a match. This allows us to test the interactive_logic function's response
-    handling without making actual API calls.
+    handling without making actual API calls. The None return value is used to test the
+    interactive_logic function's ability to handle cases where the OpenAI API does not
+    provide a Prolog translation for a given English statement.
 
     Args:
         input_statement (str): The English statement to be converted to Prolog code.
@@ -81,11 +83,13 @@ def test_interactive_logic_conversion_and_appending(input_statement, expected_pr
     This test verifies that the interactive_logic function calls the append_to_world function
     with the correct Prolog code when test_mode is False. It also checks that the open function
     is called with the correct file path and mode, and that the _openai_wrapper mock is called
-    with the correct statement.
+    with the correct statement. When the expected_prolog_code is None, it tests that the
+    interactive_logic function does not attempt to append invalid Prolog code to world.pl and
+    does not make unnecessary file operations.
 
     Args:
         input_statement (str): The English statement to be converted to Prolog code.
-        expected_prolog_code (str): The expected Prolog code to be appended to world.pl.
+        expected_prolog_code (str): The expected Prolog code to be appended to world.pl or None if no Prolog code is expected.
         mock_open (Mock): A mock of the open function.
         mock_append_to_world (Mock): A mock of the append_to_world function.
     """
@@ -107,6 +111,7 @@ def test_interactive_logic_conversion_and_appending(input_statement, expected_pr
             mock_open.assert_called_once_with(world_pl_path, 'a')
             mock_open().write.assert_called_with(f"{expected_prolog_code}\n")
         else:
+            # Ensure that no file operations are performed when no Prolog code is expected
             mock_append_to_world.assert_not_called()
             mock_open.assert_not_called()
 
