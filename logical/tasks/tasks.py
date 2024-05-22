@@ -208,27 +208,27 @@ def interactive_logic(c, statement="", test_mode=False):
     prolog_code = openai_response.get("prolog", "")
     logger.debug(f"Extracted Prolog code: {prolog_code}")
 
-    if prolog_code:
-        # Strip comments and ensure no trailing whitespace
-        prolog_code = re.sub(r'\s*%.*|/\*.*?\*/', '', prolog_code, flags=re.DOTALL).strip()
-        logger.debug(f"Prolog code after stripping comments: {prolog_code}")
-        # Validate the Prolog code
-        logger.debug(f"Validating Prolog code: {prolog_code}")
-        validation_passed, error_message = validate_prolog_code(prolog_code)
-        logger.debug(f"Validation result: {validation_passed}, Error message: {error_message}")
-        if validation_passed:
-            logger.debug(f"Validation passed for Prolog code: {prolog_code}")
-            if not test_mode:  # Check for test_mode before appending
-                logger.debug(f"Attempting to append Prolog code to world.pl with test_mode={test_mode}")
-                # Append the validated Prolog code to world.pl only if not in test mode
-                append_to_world(prolog_code)
-                logger.debug(f"Prolog code appended to world.pl: {prolog_code}")
-        else:
-            logger.error(f"Failed to validate Prolog code: {error_message}")
-            prolog_code = None
+    if not prolog_code:
+        logger.info("No Prolog code was generated or Prolog code was empty.")
+        return None  # Return None immediately if no Prolog code is generated
+
+    # Strip comments and ensure no trailing whitespace
+    prolog_code = re.sub(r'\s*%.*|/\*.*?\*/', '', prolog_code, flags=re.DOTALL).strip()
+    logger.debug(f"Prolog code after stripping comments: {prolog_code}")
+    # Validate the Prolog code
+    logger.debug(f"Validating Prolog code: {prolog_code}")
+    validation_passed, error_message = validate_prolog_code(prolog_code)
+    logger.debug(f"Validation result: {validation_passed}, Error message: {error_message}")
+    if validation_passed:
+        logger.debug(f"Validation passed for Prolog code: {prolog_code}")
+        if not test_mode:  # Check for test_mode before appending
+            logger.debug(f"Attempting to append Prolog code to world.pl with test_mode={test_mode}")
+            # Append the validated Prolog code to world.pl only if not in test mode
+            append_to_world(prolog_code)
+            logger.debug(f"Prolog code appended to world.pl: {prolog_code}")
     else:
-        logger.error("No Prolog code was generated or Prolog code was empty.")
-        prolog_code = None
+        logger.error(f"Failed to validate Prolog code: {error_message}")
+        return None  # Return None if the Prolog code validation fails
 
     logger.debug(f"interactive_logic function completed with test_mode={test_mode}, final Prolog code: {prolog_code}")
     return prolog_code  # Always return the Prolog code, even in test mode

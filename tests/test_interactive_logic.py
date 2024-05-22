@@ -104,7 +104,7 @@ def test_interactive_logic_conversion_and_appending(input_statement, expected_pr
          patch('builtins.open', mock_open):
         # Call the interactive_logic function with test_mode set to False
         tasks.interactive_logic(context, input_statement, test_mode=False)
-        # Ensure the mock_wrapper is called with the correct statement
+        # Ensure the mock_wrapper is called with the correct keyword arguments
         mock_wrapper.assert_called_once_with(stmt=input_statement)
         # If the Prolog code is not None, verify that the append_to_world function is called with the correct Prolog code when test_mode is False
         if expected_prolog_code is not None:
@@ -112,6 +112,7 @@ def test_interactive_logic_conversion_and_appending(input_statement, expected_pr
             # Verify that the open function is called with the correct file path and mode
             world_pl_path = os.path.join(tasks.ROOT_REPO_DIR, "world.pl")
             mock_open.assert_called_once_with(world_pl_path, 'a')
+            # The write method should be called with the expected Prolog code followed by a newline character
             mock_open().write.assert_called_with(f"{expected_prolog_code}\n")
         else:
             # Ensure that no file operations are performed when no Prolog code is expected
