@@ -19,7 +19,6 @@ test_cases = [
     ("Grass is green.", "assertz(green(grass))."),
     # Additional test cases can be added here as needed.
     # Ensure no duplicate English statements and that each has a valid Prolog translation.
-    # Ensure no duplicate English statements and that each has a valid Prolog translation.
 ]
 
 def mock_openai_wrapper_response(input_statement, **kwargs):
@@ -63,18 +62,23 @@ def mock_openai_wrapper_side_effect(**kwargs):
 
     This function is used to simulate the behavior of the _openai_wrapper function
     during testing. It delegates to the mock_openai_wrapper_response function,
-    passing the provided statement and any additional keyword arguments.
+    passing the provided system_message and user_message and any additional keyword arguments.
+
+    The function has been updated to use 'system_message' and 'user_message' to match the
+    updated _openai_wrapper function signature. This change ensures that the mock function
+    correctly simulates the behavior of the _openai_wrapper function during testing.
 
     Args:
-        **kwargs: Keyword arguments for the _openai_wrapper function, including 'stmt'.
+        **kwargs: Keyword arguments for the _openai_wrapper function, including 'system_message' and 'user_message'.
 
     Returns:
         dict: A simulated OpenAI API response with the expected Prolog code.
     """
-    # Extract the 'stmt' keyword argument
-    stmt = kwargs.get('stmt')
-    # Call the mock_openai_wrapper_response function with the extracted statement
-    prolog_code = mock_openai_wrapper_response(stmt, **kwargs)
+    # Extract the 'system_message' and 'user_message' keyword arguments
+    system_message = kwargs.get('system_message')
+    user_message = kwargs.get('user_message')
+    # Call the mock_openai_wrapper_response function with the extracted messages
+    prolog_code = mock_openai_wrapper_response(user_message, **kwargs)
     # Return the response in the expected format, ensuring that a string is returned even when prolog_code is None
     return {'choices': [{'text': prolog_code if prolog_code is not None else ""}]}
 
@@ -89,6 +93,9 @@ def test_interactive_logic_conversion_and_appending(input_statement, expected_pr
     with the correct statement. When the expected_prolog_code is None, it tests that the
     interactive_logic function does not attempt to append invalid Prolog code to world.pl and
     does not make unnecessary file operations.
+
+    The test has been updated to assert the correct arguments for the _openai_wrapper mock,
+    reflecting the changes made to the _openai_wrapper function signature.
 
     Args:
         input_statement (str): The English statement to be converted to Prolog code.
@@ -105,7 +112,7 @@ def test_interactive_logic_conversion_and_appending(input_statement, expected_pr
         # Call the interactive_logic function with test_mode set to False
         tasks.interactive_logic(context, input_statement, test_mode=False)
         # Ensure the mock_wrapper is called with the correct keyword arguments
-        mock_wrapper.assert_called_once_with(stmt=input_statement)
+        mock_wrapper.assert_called_once_with(system_message='', user_message=input_statement)
         # If the Prolog code is not None, verify that the append_to_world function is called with the correct Prolog code when test_mode is False
         if expected_prolog_code is not None:
             mock_append_to_world.assert_called_once_with(expected_prolog_code)
