@@ -55,8 +55,16 @@ def run_prolog_code(prolog_code):
                     if closing_paren_index != -1 and assertz_count == 1:
                         normalized_statement = normalized_statement[8:closing_paren_index] + normalized_statement[closing_paren_index+1:-1]
                     elif assertz_count > 1:
-                        # Logic to handle nested 'assertz' or 'assertz' in larger expressions needs to be implemented here
-                        pass
+                        # Find the outermost 'assertz' and strip it
+                        outermost_assertz_index = normalized_statement.rfind('assertz(')
+                        if outermost_assertz_index != -1:
+                            # Find the matching closing parenthesis for the outermost 'assertz'
+                            closing_paren_index = find_matching_paren(normalized_statement, outermost_assertz_index + 7)
+                            if closing_paren_index != -1:
+                                # Strip the outermost 'assertz' and the trailing period
+                                normalized_statement = normalized_statement[outermost_assertz_index + 8:closing_paren_index] + normalized_statement[closing_paren_index+1:-1]
+                            else:
+                                return False, "Error: Unbalanced parentheses in 'assertz' statement."
                 if not normalized_statement.endswith('.'):
                     normalized_statement += '.'
                 try:
