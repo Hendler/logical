@@ -47,7 +47,7 @@ def test_interactive_logic_conversion_and_appending(input_statement, expected_pr
     # Create a Context object to pass to the task
     context = Context()
     # Mock the _openai_wrapper function to return the expected Prolog code for the input statement
-    with patch('logical.tasks.tasks._openai_wrapper', side_effect=mock_openai_wrapper_side_effect) as mock_wrapper:
+    with patch('logical.tasks.tasks._openai_wrapper', side_effect=lambda **kwargs: mock_openai_wrapper_side_effect(kwargs.get('user_message'), **kwargs)) as mock_wrapper:
         # Call the interactive_logic function with test_mode set to True
         formatted_prolog_code = tasks.interactive_logic(context, input_statement, test_mode=True)
         # The assertion now checks if the formatted Prolog code exactly matches the expected Prolog code
