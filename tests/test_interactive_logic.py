@@ -62,12 +62,9 @@ def mock_openai_wrapper_side_effect(**kwargs):
     # Extract the 'stmt' keyword argument
     stmt = kwargs.get('stmt')
     # Call the mock_openai_wrapper_response function with the extracted statement
-    response = mock_openai_wrapper_response(stmt, **kwargs)
+    prolog_code = mock_openai_wrapper_response(stmt, **kwargs)
     # Return the response in the expected format
-    if response is not None:
-        return {'choices': [{'text': response}]}
-    else:
-        return {'choices': [{'text': 'No match found'}]}
+    return {'choices': [{'text': prolog_code}]}
 
 @pytest.mark.parametrize("input_statement, expected_prolog_code", test_cases)
 def test_interactive_logic_conversion_and_appending(input_statement, expected_prolog_code, mock_open, mock_append_to_world):
