@@ -13,7 +13,13 @@ test_cases = [
     ("Socrates is a human.", "assertz(human(socrates))."),
     ("The sky is blue.", "assertz(blue(sky))."),
     ("Sugar is sweet.", "assertz(sweet(sugar))."),
+    ("Water is wet.", "assertz(wet(water))."),
+    ("Fire is hot.", "assertz(hot(fire))."),
+    ("Snow is cold.", "assertz(cold(snow))."),
+    ("Grass is green.", "assertz(green(grass))."),
     # Additional test cases can be added here as needed.
+    # Ensure no duplicate English statements and that each has a valid Prolog translation.
+    # Ensure no duplicate English statements and that each has a valid Prolog translation.
 ]
 
 def mock_openai_wrapper_response(input_statement, **kwargs):
