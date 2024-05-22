@@ -35,6 +35,7 @@ def append_to_world(prolog_code):
         logger.info(f"Appended Prolog code to world.pl: {prolog_code}")
     except Exception as e:
         logger.error(f"Failed to append Prolog code to world.pl: {e}")
+        raise e  # Reraise the exception to ensure it's not silently ignored
 
 def validate_prolog_code(prolog_code):
     """
@@ -160,12 +161,11 @@ def parse(c, input_text):
         for line in prolog_code.splitlines():
             line = line.strip()
             logger.debug(f"Line before formatting: {line}")
+            # Ensure the line ends with a single period, only add it if it's not already there at the end
+            if not line.endswith('.'):
+                line += '.'
             # Ensure 'assertz(' is only added if it is not already present at the start of the statement
-            # and the statement is not a well-formed Prolog fact or rule
-            if not line.startswith('assertz(') and not is_balanced_parentheses(line):
-                # Ensure the line ends with a single period, only add it if it's not already there at the end
-                if not line.endswith('.'):
-                    line += '.'
+            if not line.startswith('assertz('):
                 line = f"assertz({line})"
             logger.debug(f"Line after formatting: {line}")
             formatted_lines.append(line)
@@ -210,11 +210,6 @@ def interactive_logic(c, statement="", test_mode=False):
             logger.debug(f"Validation passed for Prolog code: {prolog_code}")
             if not test_mode:  # Check for test_mode before appending
                 logger.debug(f"Attempting to append Prolog code to world.pl with test_mode={test_mode}")
-                # Ensure the Prolog code ends with a single period and is wrapped with 'assertz' if not already present
-                if not prolog_code.endswith('.'):
-                    prolog_code += '.'
-                if 'assertz(' not in prolog_code:
-                    prolog_code = f"assertz({prolog_code})"
                 # Append the validated Prolog code to world.pl only if not in test mode
                 append_to_world(prolog_code)
                 logger.debug(f"Prolog code appended to world.pl: {prolog_code}")
