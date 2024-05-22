@@ -23,15 +23,15 @@ def mock_openai_wrapper_response(input_statement, **kwargs):
     This function takes an input statement, normalizes it, and searches for a matching
     statement in the test_cases list. If a match is found, it returns the expected Prolog
     code in the same format as the _openai_wrapper function would. If no match is found,
-    it returns a default response indicating that no match was found. This allows us to
-    test the interactive_logic function's response handling without making actual API calls.
+    it returns None. This allows us to test the interactive_logic function's response
+    handling without making actual API calls.
 
     Args:
         input_statement (str): The English statement to be converted to Prolog code.
         **kwargs: Additional keyword arguments, not used but included for compatibility.
 
     Returns:
-        dict: A simulated OpenAI API response with the expected Prolog code or a default message.
+        str: The expected Prolog code or None if no match is found.
     """
     # Normalize input_statement by stripping whitespace and converting to lowercase
     normalized_input = input_statement.strip().lower()
@@ -40,12 +40,12 @@ def mock_openai_wrapper_response(input_statement, **kwargs):
         # Normalize stmt for comparison
         normalized_stmt = stmt.strip().lower()
         if normalized_stmt == normalized_input:
-            # Return the expected Prolog code in the format that _openai_wrapper would return
-            return {'choices': [{'text': code}]}
-    # Return a response indicating no match found if input_statement does not match any test cases
-    return {'choices': [{'text': 'No match found'}]}
+            # Return the expected Prolog code directly
+            return code
+    # Return None if input_statement does not match any test cases
+    return None
 
-def mock_openai_wrapper_side_effect(stmt, **kwargs):
+def mock_openai_wrapper_side_effect(**kwargs):
     """
     Side effect function for the _openai_wrapper mock.
 
@@ -54,13 +54,20 @@ def mock_openai_wrapper_side_effect(stmt, **kwargs):
     passing the provided statement and any additional keyword arguments.
 
     Args:
-        stmt (str): The English statement to be converted to Prolog code.
-        **kwargs: Additional keyword arguments for the _openai_wrapper function.
+        **kwargs: Keyword arguments for the _openai_wrapper function, including 'stmt'.
 
     Returns:
         dict: A simulated OpenAI API response with the expected Prolog code.
     """
-    return mock_openai_wrapper_response(stmt, **kwargs)
+    # Extract the 'stmt' keyword argument
+    stmt = kwargs.get('stmt')
+    # Call the mock_openai_wrapper_response function with the extracted statement
+    response = mock_openai_wrapper_response(stmt, **kwargs)
+    # Return the response in the expected format
+    if response is not None:
+        return {'choices': [{'text': response}]}
+    else:
+        return {'choices': [{'text': 'No match found'}]}
 
 @pytest.mark.parametrize("input_statement, expected_prolog_code", test_cases)
 def test_interactive_logic_conversion_and_appending(input_statement, expected_prolog_code, mock_open, mock_append_to_world):
