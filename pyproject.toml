@@ -41,7 +41,7 @@ testpaths = [
     "tests",
     "logical/tasks"
 ]
-addopts = "-ra --junitxml=test_results.xml -vv"
+addopts = "-ra --junitxml=test_results.xml -vv -s"
 log_cli = true
 log_cli_level = "DEBUG"
 

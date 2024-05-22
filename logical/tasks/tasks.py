@@ -193,9 +193,10 @@ def interactive_logic(c, statement="", test_mode=False):
     openai_response = _openai_wrapper(
         system_message="", user_message=statement
     )
-    logger.debug(f"Prolog code received from _openai_wrapper: {openai_response.get('prolog', '')}")
+    # Log the raw response from _openai_wrapper for debugging
+    logger.debug(f"Raw response from _openai_wrapper: {openai_response}")
     # Extract the Prolog code from the response
-    prolog_code = openai_response.get("prolog", "")
+    prolog_code = openai_response.get("choices", [{}])[0].get("text", "")
     logger.debug(f"Extracted Prolog code: {prolog_code}")
 
     if prolog_code:

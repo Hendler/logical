@@ -80,24 +80,26 @@ def run_prolog_code(prolog_code):
 
 def strip_comments(code):
     stripped_code = ""
-    stack = []
+    comment_depth = 0
     i = 0
     while i < len(code):
         if code[i : i + 2] == "/*":
-            stack.append("/*")
+            comment_depth += 1
             i += 2
         elif code[i : i + 2] == "*/":
-            if stack:
-                stack.pop()
+            if comment_depth > 0:
+                comment_depth -= 1
             i += 2
-        elif not stack and code[i] == "%":
+        elif comment_depth == 0 and code[i] == "%":
             end_of_line = code.find("\n", i)
             if end_of_line == -1:
                 break
             i = end_of_line + 1
-        elif not stack or (stack and code[i] != "\n"):
+        elif comment_depth == 0:
             stripped_code += code[i]
         i += 1
+    if comment_depth != 0:
+        raise ValueError("Unbalanced comment block detected")
     stripped_lines = [line.rstrip() for line in stripped_code.splitlines()]
     return "\n".join(stripped_lines)
 
