@@ -47,7 +47,9 @@ def test_interactive_logic_conversion_and_appending(input_statement, expected_pr
     # Create a Context object to pass to the task
     context = Context()
     # Mock the _openai_wrapper function to return the expected Prolog code for the input statement
-    with patch('logical.tasks.tasks._openai_wrapper', side_effect=lambda **kwargs: mock_openai_wrapper_side_effect(kwargs.get('user_message'), **kwargs)) as mock_wrapper:
+    with patch('logical.tasks.tasks._openai_wrapper', side_effect=lambda **kwargs: mock_openai_wrapper_side_effect(kwargs.get('user_message'), **kwargs)) as mock_wrapper, \
+         patch('logical.tasks.tasks.append_to_world', mock_append_to_world), \
+         patch('builtins.open', mock_open):
         # Call the interactive_logic function with test_mode set to True
         formatted_prolog_code = tasks.interactive_logic(context, input_statement, test_mode=True)
         # The assertion now checks if the formatted Prolog code exactly matches the expected Prolog code
@@ -61,9 +63,11 @@ def test_interactive_logic_conversion_and_appending(input_statement, expected_pr
         # Verify that the open function is called with the correct file path and mode
         mock_open.assert_called_once_with(os.path.join(tasks.ROOT_REPO_DIR, "world.pl"), 'a')
         mock_open().write.assert_called_with(f"{expected_prolog_code}\n")
-
         # Ensure the mock_wrapper is called with the correct statement
         mock_wrapper.assert_called_once_with(input_statement)
+        # Additional logging to diagnose the issue with append_to_world not being called
+        print(f"DEBUG: append_to_world called with: {mock_append_to_world.call_args}")
+        print(f"DEBUG: append_to_world call count: {mock_append_to_world.call_count}")
 
 # Test the interactive_logic function for handling queries against world.pl
 def test_interactive_logic_querying(mock_open, mock_run_logic_task):
