@@ -63,11 +63,11 @@ To install the logical package and all necessary dependencies, use the following
 $ poetry install
 ```
 
-After installation, create a `.env` file based on the `.env-example` template and set the necessary environment variables. For detailed setup instructions, refer to the "Quick Start" section below.
+After installation, create a `.env` file based on the `.env-example` template and set the necessary environment variables, including your `OPENAI_API_KEY`.
 
 ## Quick Start
 
-1. Clone the repository and navigate to the project directory.
+1. Clone the repository using `git clone https://github.com/your-username/logical.git` and navigate to the project directory.
 2. Run `poetry install` to install dependencies, including `folpy`.
 3. Copy `.env-example` to `.env` and configure your environment variables:
    - `OPENAI_API_KEY`: Your OpenAI API key.
@@ -76,17 +76,17 @@ After installation, create a `.env` file based on the `.env-example` template an
 
 ## Commands
 
-- `help`: Display help information.
-- `exit`: Exit the interactive logic session.
-- `parse`: Input text to extract logic from.
-- `ask`: Ask a logical question.
-- `validate`: Validate Prolog code using the Prolog interpreter.
+- `help`: Display help information about the available commands.
+- `exit`: Exit the interactive logic session safely.
+- `parse`: Input text to extract logical statements and convert them into Prolog syntax.
+- `ask`: Pose a question to the logic engine and receive a logical answer.
+- `validate`: Check the syntax and validity of Prolog code using the Prolog interpreter.
 
 ## Debugging
 
 To debug the logic engine and test the generated Prolog code, follow these steps:
 
-1. Load the Prolog file in the SWI-Prolog interpreter using the command:
+1. Load the Prolog file in the SWI-Prolog interpreter to test the logic engine's output:
    ```
    $ swipl
    ?- ['world.pl'].
@@ -99,15 +99,15 @@ To debug the logic engine and test the generated Prolog code, follow these steps
 
 ## updates
 
-The `parse_logic` function prompts have been refined to guide the OpenAI model more explicitly in avoiding common error patterns in Prolog code generation, such as incorrect implications, conditionals without proper predicates, and ensuring proper use of quantifiers.
+The `parse_logic` function prompts have been refined to guide the OpenAI model more explicitly in avoiding common error patterns in Prolog code generation.
 
-The `run_parser` function has been enhanced to handle a wider range of logical constructs, including conjunctions, disjunctions, implications, biconditionals, and quantifications. This allows for more complex English statements to be accurately translated into Prolog syntax.
+The `run_parser` function has been enhanced to handle a wider range of logical constructs, allowing for more complex English statements to be accurately translated into Prolog syntax.
 
-The `analyze_invalid_prolog.py` script now includes a feature to summarize common error patterns found in invalid Prolog statements, such as implication errors, conditional errors, predicate errors, quantifier errors, and chained predicate errors. This helps in identifying and addressing the types of errors that are occurring during the Prolog generation process.
+The `analyze_invalid_prolog.py` script now includes a feature to summarize common error patterns found in invalid Prolog statements.
 
-Additionally, new error handling mechanisms have been implemented to provide informative messages for common issues such as authentication failures and rate limits when interfacing with the OpenAI API. This ensures a smoother experience during both testing and production use.
+New error handling mechanisms have been implemented to provide informative messages for common issues such as authentication failures and rate limits when interfacing with the OpenAI API.
 
-The `parse_logic` function now includes additional validation steps to ensure the semantic validity of the Prolog code generated from the OpenAI API responses. This helps in maintaining the integrity of the logic engine's output and ensures that the generated Prolog code is not only syntactically correct but also semantically meaningful.
+The `parse_logic` function now includes additional validation steps to ensure the semantic validity of the Prolog code generated from the OpenAI API responses.
 
 ## myprolog.csv
 
