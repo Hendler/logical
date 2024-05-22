@@ -188,10 +188,19 @@ def interactive_logic(c, statement="", test_mode=False):
     if not statement:
         statement = input("Enter an English statement to convert to Prolog: ")
     logger.debug(f"Received statement for conversion: {statement}")
+    # Define the system message for context to the OpenAI model, same as used in the parse task
+    system_message = """
+    Hello. You are a Prolog API which converts English statements to Prolog.
+    Output correct and complete Prolog code that can be compiled in swi-prolog.
+    Your Prolog output should be thorough, including necessary assumptions about the world.
+    Ensure the output is in a simple conditional format for parsing by a boolean logic parser.
+    Avoid common errors such as incorrect implications, conditionals without proper predicates, and ensure proper use of quantifiers.
+    Thank you!
+    """
     # Call the OpenAI API wrapper function to get the Prolog code
     logger.debug(f"Calling _openai_wrapper with statement: {statement}")
     openai_response = _openai_wrapper(
-        system_message="", user_message=statement
+        system_message=system_message, user_message=statement
     )
     # Log the raw response from _openai_wrapper for debugging
     logger.debug(f"Raw response from _openai_wrapper: {openai_response}")
