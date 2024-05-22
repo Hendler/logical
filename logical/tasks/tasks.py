@@ -218,7 +218,7 @@ def interactive_logic(c, statement="", test_mode=False):
             logger.error(f"Failed to validate Prolog code: {error_message}")
             prolog_code = None
     else:
-        logger.error("No Prolog code was generated.")
+        logger.error("No Prolog code was generated or Prolog code was empty.")
         prolog_code = None
 
     logger.debug(f"interactive_logic function completed with test_mode={test_mode}, final Prolog code: {prolog_code}")
