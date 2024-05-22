@@ -4,8 +4,8 @@ from logical.tasks import tasks
 from unittest.mock import patch, call
 from invoke.context import Context
 
-# Test the interactive_logic function for proper handling of English to Prolog conversion and appending to world.pl
-@pytest.mark.parametrize("input_statement, expected_prolog_code", [
+# Define a set of English statements and their expected Prolog translations at the module level
+test_cases = [
     ("Cows cannot fly.", "assertz(not(fly(cow)))."),
     ("Birds can fly.", "assertz(fly(bird))."),
     ("All humans are mortal.", "assertz(mortal(human))."),
@@ -13,16 +13,31 @@ from invoke.context import Context
     ("The sky is blue.", "assertz(blue(sky))."),
     ("Sugar is sweet.", "assertz(sweet(sugar))."),
     # Add more test cases as needed
-])
+]
+
+def mock_openai_wrapper_response(input_statement, **kwargs):
+    # This print statement is to confirm that the mock function is being called
+    print(f"DEBUG: mock_openai_wrapper_response is called with input: '{input_statement}'")
+    # Iterate over the test_cases to find the expected Prolog code for the given input statement
+    for stmt, code in test_cases:
+        if stmt == input_statement:
+            return {'prolog': code}
+    return {'prolog': 'No match found'}
+
+# Test the interactive_logic function for proper handling of English to Prolog conversion and appending to world.pl
+@pytest.mark.parametrize("input_statement, expected_prolog_code", test_cases)
 def test_interactive_logic_conversion_and_appending(mock_open, mock_append_to_world, input_statement, expected_prolog_code):
     # Create a Context object to pass to the task
     context = Context()
+    print(f"DEBUG: Starting test case with input: '{input_statement}' and expected Prolog: '{expected_prolog_code}'")  # Debug statement to confirm the start of the test case
     # Mock the input to simulate user input of English statements
     with patch('builtins.input', side_effect=[input_statement, 'exit']):
         # Mock the _openai_wrapper function to return the expected Prolog code for the input statement
-        with patch('logical.tasks.functions._openai_wrapper', return_value={'prolog': expected_prolog_code}):
+        with patch('logical.tasks.tasks._openai_wrapper', side_effect=lambda statement, **kwargs: mock_openai_wrapper_response(statement, **kwargs)) as mock_wrapper:
+            print("DEBUG: _openai_wrapper side_effect set to mock_openai_wrapper_response")  # Debug statement to confirm side_effect has been set
             # Call the interactive_logic function with test_mode set to True
             formatted_prolog_code = tasks.interactive_logic(context, input_statement, test_mode=True)
+            print(f"DEBUG: interactive_logic called with test_mode=True, returned Prolog code: '{formatted_prolog_code}'")  # Debug statement to display the returned Prolog code
             # The assertion now checks if the formatted Prolog code exactly matches the expected Prolog code
             assert formatted_prolog_code == expected_prolog_code, f"Prolog code formatting error: Expected {expected_prolog_code}, got {formatted_prolog_code}"
             # Verify that the append_to_world function is not called when test_mode is True
@@ -85,13 +100,6 @@ def test_interactive_logic_invalid_input(mock_open):
 def test_parse_prolog_generation(mock_open):
     # Create a Context object to pass to the task
     context = Context()
-    # Define a set of English statements and their expected Prolog translations
-    test_cases = [
-        ("Cows cannot fly.", "cows_cannot_fly."),
-        ("Birds can fly.", "birds_can_fly."),
-        ("All humans are mortal. Socrates is a human.", "mortal(socrates)."),
-        # Add more test cases as needed
-    ]
     # Test each case
     for english_statement, expected_prolog in test_cases:
         with patch('logical.tasks.functions._openai_wrapper', return_value={'prolog': expected_prolog}):
