@@ -16,25 +16,13 @@ def run_prolog_code(prolog_code):
     Returns:
     - (bool, str): A tuple containing a boolean indicating if the validation passed and an error message if it failed.
     """
-    # List of known built-in predicates in Prolog
-    builtin_predicates = {'retractall', 'assertz', 'consult', 'listing'}
-
     prolog = Prolog()
     try:
         # Split the Prolog code into statements, taking care not to split inside string literals
-        statements = []
-        current_statement = ""
-        in_string = False
-        for char in prolog_code:
-            if char == "'" and not in_string:
-                in_string = True
-            elif char == "'" and in_string:
-                in_string = False
-            if char == '.' and not in_string:
-                statements.append(current_statement.strip() + '.')
-                current_statement = ""
-            else:
-                current_statement += char
+        statements = re.split(r'(?<!\'.)(?<=\.)\s', prolog_code)
+
+        # List of known built-in predicates in Prolog
+        builtin_predicates = {'retractall', 'assertz', 'consult', 'listing'}
 
         # Assert the Prolog statements to validate their syntax
         for statement in statements:
@@ -193,13 +181,6 @@ def validate_prolog_code(prolog_code):
     return True, "Prolog code syntax is correct."
 
 print("Current working directory:", os.getcwd())
-
-# The following code block has been removed as it is not necessary for the unit tests
-# and the file prolog_syntax_tests.pl does not exist.
-# with open("logical/tasks/prolog_syntax_tests.pl", "r") as file:
-#     prolog_samples = file.read().split(
-#         "\n\n"
-#     )  # Assuming each sample is separated by a blank line
 
 # Additional test cases to cover edge cases
 additional_tests = {

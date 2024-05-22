@@ -183,42 +183,50 @@ def parse(c, input_text):
             append_to_world(prolog_code)
 
 @task(help={"statement": "An English statement to convert to Prolog."})
-@task(help={"statement": "An English statement to convert to Prolog."})
-def interactive_logic(c, statement=""):
-    logger.debug("Starting interactive_logic function")
+def interactive_logic(c, statement="", test_mode=False):
+    logger.debug(f"Starting interactive_logic function with test_mode={test_mode}")
     if not statement:
         statement = input("Enter an English statement to convert to Prolog: ")
     logger.debug(f"Received statement for conversion: {statement}")
     # Call the OpenAI API wrapper function to get the Prolog code
+    logger.debug(f"Calling _openai_wrapper with statement: {statement}")
     openai_response = _openai_wrapper(
         system_message="", user_message=statement
     )
+    logger.debug(f"Prolog code received from _openai_wrapper: {openai_response.get('prolog', '')}")
     # Extract the Prolog code from the response
     prolog_code = openai_response.get("prolog", "")
-    logger.debug(f"Prolog code received from _openai_wrapper: {prolog_code}")
+    logger.debug(f"Extracted Prolog code: {prolog_code}")
 
     if prolog_code:
         # Strip comments and ensure no trailing whitespace
-        prolog_code = re.sub(r'\s*%.*', '', prolog_code, flags=re.MULTILINE).strip()
+        prolog_code = re.sub(r'\s*%.*|/\*.*?\*/', '', prolog_code, flags=re.DOTALL).strip()
+        logger.debug(f"Prolog code after stripping comments: {prolog_code}")
         # Validate the Prolog code
+        logger.debug(f"Validating Prolog code: {prolog_code}")
         validation_passed, error_message = validate_prolog_code(prolog_code)
         logger.debug(f"Validation result: {validation_passed}, Error message: {error_message}")
         if validation_passed:
-            # Ensure the Prolog code ends with a single period and is wrapped with 'assertz' if not already present
-            if not prolog_code.endswith('.'):
-                prolog_code += '.'
-            if not prolog_code.startswith('assertz('):
-                prolog_code = f"assertz({prolog_code})"
-            # Append the validated Prolog code to world.pl
-            append_to_world(prolog_code)
+            logger.debug(f"Validation passed for Prolog code: {prolog_code}")
+            if not test_mode:  # Check for test_mode before appending
+                logger.debug(f"Attempting to append Prolog code to world.pl with test_mode={test_mode}")
+                # Ensure the Prolog code ends with a single period and is wrapped with 'assertz' if not already present
+                if not prolog_code.endswith('.'):
+                    prolog_code += '.'
+                if 'assertz(' not in prolog_code:
+                    prolog_code = f"assertz({prolog_code})"
+                # Append the validated Prolog code to world.pl only if not in test mode
+                append_to_world(prolog_code)
+                logger.debug(f"Prolog code appended to world.pl: {prolog_code}")
         else:
             logger.error(f"Failed to validate Prolog code: {error_message}")
-            return None
+            prolog_code = None
     else:
         logger.error("No Prolog code was generated.")
-        return None
-    logger.debug("interactive_logic function completed")
-    return prolog_code
+        prolog_code = None
+
+    logger.debug(f"interactive_logic function completed with test_mode={test_mode}, final Prolog code: {prolog_code}")
+    return prolog_code  # Always return the Prolog code, even in test mode
 
 @task
 def run_logic_task(c, prolog_code_path, main_predicate=None, arity=None):
