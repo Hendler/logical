@@ -42,6 +42,9 @@ def mock_openai_wrapper_response(input_statement, **kwargs):
     Returns:
         str: The expected Prolog code or None if no match is found.
     """
+    # Check if input_statement is None and return None immediately if it is
+    if input_statement is None:
+        return None
     # Normalize input_statement by stripping whitespace and converting to lowercase
     normalized_input = input_statement.strip().lower()
     # Iterate over the test_cases to find the expected Prolog code for the given input statement
