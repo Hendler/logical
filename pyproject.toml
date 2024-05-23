@@ -32,6 +32,9 @@ invoke = "*"
 from = "logical"
 include = "*.py"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.1"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
@@ -43,7 +46,7 @@ testpaths = [
 ]
 addopts = "-ra --junitxml=test_results.xml -vv"
 log_cli = true
-log_cli_level = "INFO"
+log_cli_level = "DEBUG"
 
 [tool.poetry.scripts]
 logical = "logical.__main__:main"
