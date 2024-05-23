@@ -115,12 +115,15 @@ def test_interactive_logic_conversion_and_appending(input_statement, expected_pr
         assert actual_prolog_code_normalized == expected_prolog_code_normalized, f"Expected Prolog code {expected_prolog_code_normalized}, but got {actual_prolog_code_normalized}"
         if expected_prolog_code is not None:
             # Ensure the mock_append_to_world is called with the normalized Prolog code
+            logger.debug(f"mock_append_to_world called with args: {mock_append_to_world.call_args}")
             mock_append_to_world.assert_called_once_with(expected_prolog_code_normalized)
             world_pl_path = os.path.join(tasks.ROOT_REPO_DIR, "world.pl")
             # Ensure the mock_open is called with the correct file path and mode
+            logger.debug(f"mock_open called with args: {mock_open.call_args}")
             mock_open.assert_called_once_with(world_pl_path, 'a')
             # Ensure the mock_open().write is called with the normalized Prolog code
-            mock_open().write.assert_called_with(expected_prolog_code_normalized)
+            logger.debug(f"mock_open().write called with args: {mock_open().write.call_args}")
+            mock_open().write.assert_called_with(expected_prolog_code_normalized + '\n')
         else:
             mock_append_to_world.assert_not_called()
             mock_open.assert_not_called()
