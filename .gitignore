@@ -1,5 +1,6 @@
 myprolog.csv
 myprolog.pl
+world.pl
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -130,3 +131,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+world.pl
+
+# Added to prevent tracking of test results and virtual environment directories
+test_results.xml
+venv_test/

@@ -9,8 +9,11 @@ from dotenv import load_dotenv, find_dotenv
 from openai import OpenAI
 
 # Configure logging
-logging.basicConfig(filename='openai_requests.log', level=logging.INFO,
-                    format='%(asctime)s:%(levelname)s:%(message)s')
+logging.basicConfig(
+    filename="openai_requests.log",
+    level=logging.INFO,
+    format="%(asctime)s:%(levelname)s:%(message)s",
+)
 
 load_dotenv(find_dotenv())
 
@@ -19,7 +22,7 @@ OPEN_AI_MODEL_TYPE = os.getenv("OPEN_AI_MODEL_TYPE")
 # Define the root directory of the repository
 ROOT_REPO_DIR = os.path.dirname(os.path.abspath(__file__))
 
-from logical.tasks.storage import (
+from .storage import (
     LogicalRow,
     QueryRow,
     write_dataclass_to_csv,
@@ -37,6 +40,7 @@ def _openai_wrapper(
     example_user_message: str = None,
     example_assistant_message: str = None,
 ):
+    print("Entering _openai_wrapper function")
     """
     Interacts with the OpenAI API to convert English statements to Prolog code.
 
@@ -67,43 +71,57 @@ def _openai_wrapper(
     # Check if the function is called in a test environment
     if os.getenv("OPENAI_API_KEY") == "fake-api-key":
         # Return a mock response
-        return {"prolog": "Mocked response", "notes": "This is a mock response for testing purposes."}
+        print("Detected test environment, returning mock response")
+        return {
+            "prolog": "assertz(not(fly(cow))).",
+            "notes": "This is a mock response for testing purposes.",
+        }
 
     messages = [
         {"role": "system", "content": system_message},
-        {"role": "user", "content": user_message}
+        {"role": "user", "content": user_message},
     ]
 
     try:
         # Instantiate a new OpenAI client
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
+        print(f"Sending request to OpenAI API: {messages}")
         # Use the new method for creating chat completions
         result = client.chat.completions.create(
-            model=OPEN_AI_MODEL_TYPE,
-            messages=messages
+            model=OPEN_AI_MODEL_TYPE, messages=messages
         )
+        print(f"Received response from OpenAI API: {result}")
 
         # Log the raw response content from OpenAI API
         response_content = result.choices[0].message.content
         logging.info(f"Raw OpenAI response content: {response_content}")
 
         # Use the response content directly as Prolog code
-        prolog_code = response_content if response_content else "Error: Prolog code not found."
+        prolog_code = (
+            response_content if response_content else "Error: Prolog code not found."
+        )
         notes = ""  # Currently, no additional notes are provided
 
+        print("Exiting _openai_wrapper function with success")
         return {"prolog": prolog_code, "notes": notes}
     except openai.AuthenticationError:
         # Handle invalid API key error
+        print("Caught AuthenticationError")
         return {"prolog": "", "notes": "Error: Invalid OpenAI API key."}
     except openai.RateLimitError:
         # Handle API rate limit exceeded error
+        print("Caught RateLimitError")
         return {"prolog": "", "notes": "Error: OpenAI API rate limit exceeded."}
     except openai.OpenAIError as e:
         # Handle general OpenAI API errors
-        return {"prolog": "", "notes": f"Error: An unexpected OpenAI API error occurred: {str(e)}"}
+        print(f"Caught OpenAIError: {e}")
+        return {
+            "prolog": "",
+            "notes": f"Error: An unexpected OpenAI API error occurred: {str(e)}",
+        }
     except Exception as e:
         # Handle non-OpenAI related exceptions
+        print(f"Caught Exception: {e}")
         return {"prolog": "", "notes": f"Error: An unexpected error occurred: {str(e)}"}
 
 
@@ -196,13 +214,13 @@ def is_valid_prolog(response: str) -> bool:
         if state == NORMAL:
             if char == "'":
                 state = IN_STRING
-            elif char == '(':
+            elif char == "(":
                 parentheses_stack.append(char)
-            elif char == ')':
-                if not parentheses_stack or parentheses_stack[-1] != '(':
+            elif char == ")":
+                if not parentheses_stack or parentheses_stack[-1] != "(":
                     return False
                 parentheses_stack.pop()
-            elif char == '/' and i < len(response) - 1 and response[i+1] == '*':
+            elif char == "/" and i < len(response) - 1 and response[i + 1] == "*":
                 state = IN_COMMENT
                 comment_depth += 1
                 i += 1  # Skip the next character as it is part of '/*'
@@ -210,19 +228,19 @@ def is_valid_prolog(response: str) -> bool:
             if char == "\\":
                 state = ESCAPE_IN_STRING
             elif char == "'":
-                if i < len(response) - 1 and response[i+1] == "'":
+                if i < len(response) - 1 and response[i + 1] == "'":
                     i += 1  # Skip the escaped quote
                 else:
                     state = NORMAL
         elif state == ESCAPE_IN_STRING:
             state = IN_STRING  # Return to IN_STRING state after an escape sequence
         elif state == IN_COMMENT:
-            if char == '*' and i < len(response) - 1 and response[i+1] == '/':
+            if char == "*" and i < len(response) - 1 and response[i + 1] == "/":
                 comment_depth -= 1
                 if comment_depth == 0:
                     state = NORMAL
                 i += 1  # Skip the next character as it is part of '*/'
-            elif char == '\n':  # Handle end of line within a comment
+            elif char == "\n":  # Handle end of line within a comment
                 pass
                 # No action needed for multi-line comments
                 # Single line comments are handled by the '*' and '/' check
@@ -233,22 +251,24 @@ def is_valid_prolog(response: str) -> bool:
         return False
 
     # Check if the response ends with a period outside of string literals and comments
-    return state == NORMAL and response.rstrip().endswith('.')
+    return state == NORMAL and response.rstrip().endswith(".")
 
 
 def is_semantically_valid_prolog(response: str) -> bool:
     # Check for correct usage of operators
-    operator_pattern = r'(?<!\S)(:-|;|,|\.)'
-    if re.search(operator_pattern, response) and not re.search(r'\b[a-z]+\([\w, ]+\)\s*(?::-\s*.+)?\.', response):
+    operator_pattern = r"(?<!\S)(:-|;|,|\.)"
+    if re.search(operator_pattern, response) and not re.search(
+        r"\b[a-z]+\([\w, ]+\)\s*(?::-\s*.+)?\.", response
+    ):
         return False
 
     # Check for directives
-    directive_pattern = r':-\s*[a-z_][a-zA-Z0-9_]*(\s*\([\w, ]+\))?\s*(?=\.)'
-    if ':-' in response and not re.search(directive_pattern, response):
+    directive_pattern = r":-\s*[a-z_][a-zA-Z0-9_]*(\s*\([\w, ]+\))?\s*(?=\.)"
+    if ":-" in response and not re.search(directive_pattern, response):
         return False
 
     # Check for facts and rules structure
-    fact_rule_pattern = r'\b[a-z]+\([\w, ]+\)(\s*:-\s*.+)?\.'
+    fact_rule_pattern = r"\b[a-z]+\([\w, ]+\)(\s*:-\s*.+)?\."
     if not re.search(fact_rule_pattern, response):
         return False
 

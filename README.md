@@ -4,26 +4,32 @@ ChatGPT logic engine using [Prolog](https://en.wikipedia.org/wiki/Prolog).
 
 First developed at the [OpenAI emergency hackathon on 3/5/2023](https://twitter.com/nonmayorpete/status/1632456433102098434).
 
- <img alt="Bertrand Russell"   src="./russell.png" />
+<img alt="Bertrand Russell" src="./russell.png" />
 
-## status 3/16/2023
+## Usage
 
-GPT-3.5 outputs prolog along with additional text sometimes breaking the automated push to the . It may refuse to generate prolog if there are no obvious logical statements. 
+To use the logical engine, follow these steps:
 
-## usage
+1. Install the package and its dependencies.
+2. Set up the required environment variables, including your OpenAI API key.
+3. Use the `interactive_logic` task to input English statements and receive Prolog queries or truth values interactively.
 
+Example interactive session:
 ```
-$ inv logic.run
-$ parse 
-$ Men are mortal. Men are human. I am human. 
-$ ask
-$ Am I mortal?
-
+$ logical interactive-logic
+Enter an English statement: All humans are mortal. Socrates is a human.
+The truth value of the statement 'All humans are mortal. Socrates is a human.' is: True
+Enter an English statement: (or type 'exit' to quit): exit
+Exiting interactive logic mode.
 ```
+This session demonstrates adding Prolog code to `world.pl` and querying its truth value. The `world.pl` file accumulates knowledge without overwriting previous facts and is not tracked in the repository.
+
+The `myprolog.csv` file contains 1000 logical English examples with truth values and corresponding Prolog statements, serving as a test and validation dataset.
+
 ## background
 
 One of the promises of logic is that it can give formal grounding for truth.
-As LLMs develop more sophisicated responses, we will be more challenged to detect truth.  
+As LLMs develop more sophisticated responses, we will be more challenged to detect truth.
 
 Via ChatGPT:
 
@@ -49,32 +55,63 @@ Via ChatGPT:
 
 
 
-## install
+## Installation
 
-    brew install pyenv pyenv-virtualenv git
-    brew install swi-prolog --HEAD
-    pyenv install 3.11.2
-    pyenv virtualenv 3.11.2 logical
-    pip install --upgrade pip
-    chmod +x main.pl
+To install the logical package and all necessary dependencies, use the following command:
 
-Then copy the `.env-example` to `.env`
- 
+```bash
+$ poetry install
+```
 
-# Commands:
+After installation, create a `.env` file based on the `.env-example` template and set the necessary environment variables, including your `OPENAI_API_KEY`.
 
-    - help
-    - exit
-    - parse: input text to extract logic from
-    - ask: : ask a logical question
+## Quick Start
 
+1. Clone the repository using `git clone https://github.com/your-username/logical.git` and navigate to the project directory.
+2. Run `poetry install` to install dependencies, including `folpy`.
+3. Copy `.env-example` to `.env` and configure your environment variables:
+   - `OPENAI_API_KEY`: Your OpenAI API key.
+   - `OPEN_AI_MODEL_TYPE`: Set to "gpt-4o" or another model type as required.
+4. Start an interactive logic session with `logical interactive-logic` to input English statements and receive Prolog queries or truth values interactively.
 
-## debug
+## Commands
 
-You can load the generated file in swipl to test also
+- `help`: Display help information about the available commands.
+- `exit`: Exit the interactive logic session safely.
+- `parse`: Input text to extract logical statements and convert them into Prolog syntax.
+- `ask`: Pose a question to the logic engine and receive a logical answer.
+- `validate`: Check the syntax and validity of Prolog code using the Prolog interpreter.
 
-    $ swipl
-    ?- ['myprolog.pl'].
+## Debugging
+
+To debug the logic engine and test the generated Prolog code, follow these steps:
+
+1. Load the Prolog file in the SWI-Prolog interpreter to test the logic engine's output:
+   ```
+   $ swipl
+   ?- ['world.pl'].
+   ```
+2. Run tests to validate the Prolog code by executing:
+   ```
+   $ poetry run pytest
+   ```
+3. If you encounter any issues, refer to the error messages and consult the `analyze_invalid_prolog.py` script to identify common error patterns.
+
+## updates
+
+The `parse_logic` function prompts have been refined to guide the OpenAI model more explicitly in avoiding common error patterns in Prolog code generation.
+
+The `run_parser` function has been enhanced to handle a wider range of logical constructs, allowing for more complex English statements to be accurately translated into Prolog syntax.
+
+The `analyze_invalid_prolog.py` script now includes a feature to summarize common error patterns found in invalid Prolog statements.
+
+New error handling mechanisms have been implemented to provide informative messages for common issues such as authentication failures and rate limits when interfacing with the OpenAI API.
+
+The `parse_logic` function now includes additional validation steps to ensure the semantic validity of the Prolog code generated from the OpenAI API responses.
+
+## myprolog.csv
+
+The `myprolog.csv` file is used to store logical English examples with their truth values and corresponding Prolog statements. This file is generated by the `parse` task and is utilized for testing and validation purposes. To generate this file, use the `logical parse` command with your English statements.
 
 ## see also
 

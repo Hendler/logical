@@ -1,0 +1,901 @@
+English Statement,Prolog Statement,Truth Value
+All vehicles have fur or vehicles have six legs,"forall(vehicles, have fur or vehicles have six legs)",True
+If vehicles have fur,vehicles have fur :- vehicles have fur,True
+All mammals have wheels or mammals have six legs,"forall(mammals, have wheels or mammals have six legs)",False
+All birds have fur and birds have wheels,"forall(birds, have fur and birds have wheels)",True
+All vehicles can fly and vehicles have wheels,"forall(vehicles, can fly and vehicles have wheels)",True
+No insects can fly and insects have six legs,"not(insects, can fly and insects have six legs)",False
+If men have wheels,men have wheels :- men have wheels,True
+All mammals are bipedal or mammals have fur,"forall(mammals, are bipedal or mammals have fur)",False
+No insects are mortal and insects can fly,"not(insects, are mortal and insects can fly)",True
+No vehicles are bipedal or vehicles can fly,"not(vehicles, are bipedal or vehicles can fly)",True
+No students can fly and students are mortal,"not(students, can fly and students are mortal)",False
+Some insects can fly or insects are mortal,"exists(insects, can fly or insects are mortal)",True
+All vehicles have fur or vehicles are bipedal,"forall(vehicles, have fur or vehicles are bipedal)",False
+No students are mortal or students have fur,"not(students, are mortal or students have fur)",True
+If birds are bipedal,birds are bipedal :- birds are bipedal,True
+If birds have six legs,birds have six legs :- birds have six legs,True
+If mammals have wheels,mammals have wheels :- mammals have wheels,True
+If insects have fur,insects have fur :- insects have fur,True
+All vehicles are bipedal or vehicles have fur,"forall(vehicles, are bipedal or vehicles have fur)",False
+No vehicles have six legs or vehicles can fly,"not(vehicles, have six legs or vehicles can fly)",True
+Some mammals can fly or mammals are bipedal,"exists(mammals, can fly or mammals are bipedal)",False
+All vehicles can fly and vehicles have six legs,"forall(vehicles, can fly and vehicles have six legs)",True
+No insects can fly or insects have wheels,"not(insects, can fly or insects have wheels)",False
+Some insects have fur and insects can fly,"exists(insects, have fur and insects can fly)",True
+All mammals are mortal and mammals can fly,"forall(mammals, are mortal and mammals can fly)",True
+Some students are bipedal or students have wheels,"exists(students, are bipedal or students have wheels)",False
+No birds can fly and birds are mortal,"not(birds, can fly and birds are mortal)",True
+If birds are mortal,birds are mortal :- birds are mortal,True
+No mammals are mortal or mammals are bipedal,"not(mammals, are mortal or mammals are bipedal)",True
+Some men have fur and men are mortal,"exists(men, have fur and men are mortal)",True
+If mammals have wheels,mammals have wheels :- mammals have wheels,True
+Some mammals are mortal and mammals have wheels,"exists(mammals, are mortal and mammals have wheels)",False
+No birds have wheels and birds are bipedal,"not(birds, have wheels and birds are bipedal)",False
+If insects are bipedal,insects are bipedal :- insects are bipedal,True
+All birds are mortal and birds are bipedal,"forall(birds, are mortal and birds are bipedal)",False
+If mammals can fly,mammals can fly :- mammals can fly,True
+No mammals have fur and mammals can fly,"not(mammals, have fur and mammals can fly)",False
+If birds are bipedal,birds are bipedal :- birds are bipedal,True
+If men are mortal,men are mortal :- men are mortal,True
+If birds have six legs,birds have six legs :- birds have six legs,True
+All mammals can fly and mammals are bipedal,"forall(mammals, can fly and mammals are bipedal)",True
+Some vehicles have wheels or vehicles have six legs,"exists(vehicles, have wheels or vehicles have six legs)",False
+If men are mortal,men are mortal :- men are mortal,True
+If students are mortal,students are mortal :- students are mortal,True
+All birds have wheels and birds have six legs,"forall(birds, have wheels and birds have six legs)",False
+No men have six legs or men have wheels,"not(men, have six legs or men have wheels)",True
+No mammals have fur or mammals are mortal,"not(mammals, have fur or mammals are mortal)",True
+All insects are mortal and insects are bipedal,"forall(insects, are mortal and insects are bipedal)",False
+If insects are mortal,insects are mortal :- insects are mortal,True
+All birds have wheels or birds have fur,"forall(birds, have wheels or birds have fur)",False
+If mammals are bipedal,mammals are bipedal :- mammals are bipedal,True
+If men are bipedal,men are bipedal :- men are bipedal,True
+Some men have fur or men have wheels,"exists(men, have fur or men have wheels)",True
+No vehicles can fly or vehicles have wheels,"not(vehicles, can fly or vehicles have wheels)",True
+No men have six legs and men can fly,"not(men, have six legs and men can fly)",True
+Some students are mortal and students have fur,"exists(students, are mortal and students have fur)",False
+No men are mortal and men have wheels,"not(men, are mortal and men have wheels)",False
+No vehicles have fur and vehicles are bipedal,"not(vehicles, have fur and vehicles are bipedal)",True
+No insects have six legs or insects have wheels,"not(insects, have six legs or insects have wheels)",False
+All men have six legs or men are bipedal,"forall(men, have six legs or men are bipedal)",False
+Some mammals are bipedal and mammals are mortal,"exists(mammals, are bipedal and mammals are mortal)",True
+No vehicles are mortal or vehicles are bipedal,"not(vehicles, are mortal or vehicles are bipedal)",True
+All vehicles have six legs and vehicles have wheels,"forall(vehicles, have six legs and vehicles have wheels)",True
+All mammals have six legs or mammals are mortal,"forall(mammals, have six legs or mammals are mortal)",True
+No students can fly and students are mortal,"not(students, can fly and students are mortal)",False
+All vehicles have fur or vehicles can fly,"forall(vehicles, have fur or vehicles can fly)",True
+Some birds have fur or birds have six legs,"exists(birds, have fur or birds have six legs)",False
+Some men have wheels and men have fur,"exists(men, have wheels and men have fur)",False
+Some students have wheels and students are mortal,"exists(students, have wheels and students are mortal)",True
+No birds are bipedal or birds are mortal,"not(birds, are bipedal or birds are mortal)",True
+If students have six legs,students have six legs :- students have six legs,True
+If vehicles are bipedal,vehicles are bipedal :- vehicles are bipedal,True
+Some insects have wheels and insects can fly,"exists(insects, have wheels and insects can fly)",True
+All men have fur or men are bipedal,"forall(men, have fur or men are bipedal)",False
+All mammals have wheels and mammals can fly,"forall(mammals, have wheels and mammals can fly)",False
+If insects have wheels,insects have wheels :- insects have wheels,True
+No vehicles can fly and vehicles are bipedal,"not(vehicles, can fly and vehicles are bipedal)",True
+All mammals have wheels and mammals are bipedal,"forall(mammals, have wheels and mammals are bipedal)",True
+All vehicles have fur and vehicles are bipedal,"forall(vehicles, have fur and vehicles are bipedal)",False
+All men are bipedal and men have six legs,"forall(men, are bipedal and men have six legs)",False
+Some mammals have fur or mammals are mortal,"exists(mammals, have fur or mammals are mortal)",True
+If insects have wheels,insects have wheels :- insects have wheels,True
+All vehicles are mortal or vehicles can fly,"forall(vehicles, are mortal or vehicles can fly)",False
+No birds are mortal and birds have six legs,"not(birds, are mortal and birds have six legs)",True
+If men have fur,men have fur :- men have fur,True
+If vehicles can fly,vehicles can fly :- vehicles can fly,True
+No birds are mortal or birds have fur,"not(birds, are mortal or birds have fur)",False
+No men can fly and men are bipedal,"not(men, can fly and men are bipedal)",False
+All mammals have fur or mammals have six legs,"forall(mammals, have fur or mammals have six legs)",False
+Some students have wheels and students have six legs,"exists(students, have wheels and students have six legs)",False
+If vehicles have wheels,vehicles have wheels :- vehicles have wheels,True
+If vehicles have fur,vehicles have fur :- vehicles have fur,True
+All vehicles have fur and vehicles are mortal,"forall(vehicles, have fur and vehicles are mortal)",False
+If insects are bipedal,insects are bipedal :- insects are bipedal,True
+Some birds are mortal and birds have fur,"exists(birds, are mortal and birds have fur)",True
+Some vehicles are bipedal and vehicles have wheels,"exists(vehicles, are bipedal and vehicles have wheels)",False
+No insects are bipedal or insects can fly,"not(insects, are bipedal or insects can fly)",False
+Some students have fur and students are mortal,"exists(students, have fur and students are mortal)",False
+All vehicles can fly or vehicles are mortal,"forall(vehicles, can fly or vehicles are mortal)",True
+If men are bipedal,men are bipedal :- men are bipedal,True
+No vehicles have wheels or vehicles have six legs,"not(vehicles, have wheels or vehicles have six legs)",False
+If vehicles are bipedal,vehicles are bipedal :- vehicles are bipedal,True
+All students have six legs or students can fly,"forall(students, have six legs or students can fly)",True
+All birds are mortal and birds have six legs,"forall(birds, are mortal and birds have six legs)",False
+Some students have six legs or students are mortal,"exists(students, have six legs or students are mortal)",True
+If men have wheels,men have wheels :- men have wheels,True
+No students are mortal and students have fur,"not(students, are mortal and students have fur)",True
+If birds are bipedal,birds are bipedal :- birds are bipedal,True
+If men can fly,men can fly :- men can fly,True
+If mammals have six legs,mammals have six legs :- mammals have six legs,True
+No insects can fly or insects are mortal,"not(insects, can fly or insects are mortal)",True
+No vehicles are bipedal or vehicles have wheels,"not(vehicles, are bipedal or vehicles have wheels)",True
+No mammals have fur or mammals can fly,"not(mammals, have fur or mammals can fly)",False
+All birds have fur or birds can fly,"forall(birds, have fur or birds can fly)",False
+If insects have wheels,insects have wheels :- insects have wheels,True
+If vehicles are mortal,vehicles are mortal :- vehicles are mortal,True
+All men can fly and men have fur,"forall(men, can fly and men have fur)",False
+If vehicles are mortal,vehicles are mortal :- vehicles are mortal,True
+Some insects have six legs or insects have wheels,"exists(insects, have six legs or insects have wheels)",False
+If vehicles are bipedal,vehicles are bipedal :- vehicles are bipedal,True
+Some men are bipedal or men have six legs,"exists(men, are bipedal or men have six legs)",True
+If mammals have wheels,mammals have wheels :- mammals have wheels,True
+All vehicles have fur or vehicles can fly,"forall(vehicles, have fur or vehicles can fly)",False
+If insects are bipedal,insects are bipedal :- insects are bipedal,True
+All vehicles have wheels or vehicles are mortal,"forall(vehicles, have wheels or vehicles are mortal)",True
+If insects can fly,insects can fly :- insects can fly,True
+All insects are bipedal and insects can fly,"forall(insects, are bipedal and insects can fly)",False
+All insects can fly or insects have wheels,"forall(insects, can fly or insects have wheels)",False
+All mammals have six legs and mammals have wheels,"forall(mammals, have six legs and mammals have wheels)",True
+If men are mortal,men are mortal :- men are mortal,True
+Some mammals are bipedal and mammals have wheels,"exists(mammals, are bipedal and mammals have wheels)",False
+If men are bipedal,men are bipedal :- men are bipedal,True
+If men have six legs,men have six legs :- men have six legs,True
+If insects are bipedal,insects are bipedal :- insects are bipedal,True
+Some men have six legs and men have wheels,"exists(men, have six legs and men have wheels)",False
+No birds have six legs and birds have fur,"not(birds, have six legs and birds have fur)",False
+If men have fur,men have fur :- men have fur,True
+All vehicles have fur and vehicles are bipedal,"forall(vehicles, have fur and vehicles are bipedal)",True
+If mammals can fly,mammals can fly :- mammals can fly,True
+All vehicles have six legs or vehicles have wheels,"forall(vehicles, have six legs or vehicles have wheels)",False
+All students are bipedal or students have fur,"forall(students, are bipedal or students have fur)",True
+If men have wheels,men have wheels :- men have wheels,True
+Some students have fur or students have six legs,"exists(students, have fur or students have six legs)",False
+No vehicles can fly and vehicles have fur,"not(vehicles, can fly and vehicles have fur)",True
+All vehicles have fur or vehicles can fly,"forall(vehicles, have fur or vehicles can fly)",True
+If insects are bipedal,insects are bipedal :- insects are bipedal,True
+Some students are bipedal and students have six legs,"exists(students, are bipedal and students have six legs)",True
+Some vehicles can fly and vehicles are bipedal,"exists(vehicles, can fly and vehicles are bipedal)",True
+All vehicles have fur or vehicles can fly,"forall(vehicles, have fur or vehicles can fly)",True
+If men can fly,men can fly :- men can fly,True
+If insects have wheels,insects have wheels :- insects have wheels,True
+Some vehicles are bipedal and vehicles can fly,"exists(vehicles, are bipedal and vehicles can fly)",True
+Some vehicles have wheels or vehicles are mortal,"exists(vehicles, have wheels or vehicles are mortal)",True
+All vehicles are mortal and vehicles have fur,"forall(vehicles, are mortal and vehicles have fur)",False
+All insects can fly or insects have wheels,"forall(insects, can fly or insects have wheels)",True
+Some men are bipedal and men have six legs,"exists(men, are bipedal and men have six legs)",False
+If insects have wheels,insects have wheels :- insects have wheels,True
+No vehicles can fly and vehicles have six legs,"not(vehicles, can fly and vehicles have six legs)",False
+No mammals are mortal and mammals have fur,"not(mammals, are mortal and mammals have fur)",False
+All birds are bipedal or birds can fly,"forall(birds, are bipedal or birds can fly)",True
+Some men are bipedal or men have wheels,"exists(men, are bipedal or men have wheels)",False
+If birds have wheels,birds have wheels :- birds have wheels,True
+No students have six legs or students have fur,"not(students, have six legs or students have fur)",False
+Some mammals have fur and mammals have wheels,"exists(mammals, have fur and mammals have wheels)",False
+No vehicles are bipedal and vehicles are mortal,"not(vehicles, are bipedal and vehicles are mortal)",True
+If vehicles are bipedal,vehicles are bipedal :- vehicles are bipedal,True
+All vehicles can fly or vehicles are bipedal,"forall(vehicles, can fly or vehicles are bipedal)",True
+Some students have fur and students are mortal,"exists(students, have fur and students are mortal)",True
+No men can fly and men are mortal,"not(men, can fly and men are mortal)",True
+If birds have fur,birds have fur :- birds have fur,True
+Some students have fur or students have wheels,"exists(students, have fur or students have wheels)",True
+All vehicles have six legs or vehicles can fly,"forall(vehicles, have six legs or vehicles can fly)",False
+If birds have fur,birds have fur :- birds have fur,True
+All insects have wheels or insects are bipedal,"forall(insects, have wheels or insects are bipedal)",False
+No birds are mortal and birds have six legs,"not(birds, are mortal and birds have six legs)",False
+Some birds have six legs or birds have fur,"exists(birds, have six legs or birds have fur)",False
+Some vehicles are mortal and vehicles have fur,"exists(vehicles, are mortal and vehicles have fur)",True
+If mammals are mortal,mammals are mortal :- mammals are mortal,True
+If insects have six legs,insects have six legs :- insects have six legs,True
+No insects have wheels or insects are bipedal,"not(insects, have wheels or insects are bipedal)",False
+All insects have wheels and insects are bipedal,"forall(insects, have wheels and insects are bipedal)",True
+No insects are bipedal and insects are mortal,"not(insects, are bipedal and insects are mortal)",False
+If birds are bipedal,birds are bipedal :- birds are bipedal,True
+If vehicles are bipedal,vehicles are bipedal :- vehicles are bipedal,True
+If mammals have wheels,mammals have wheels :- mammals have wheels,True
+If insects have fur,insects have fur :- insects have fur,True
+If mammals can fly,mammals can fly :- mammals can fly,True
+All men have six legs and men are bipedal,"forall(men, have six legs and men are bipedal)",True
+No students can fly and students have six legs,"not(students, can fly and students have six legs)",True
+Some mammals have fur or mammals have six legs,"exists(mammals, have fur or mammals have six legs)",False
+No insects have wheels and insects have fur,"not(insects, have wheels and insects have fur)",False
+If students have wheels,students have wheels :- students have wheels,True
+If men are mortal,men are mortal :- men are mortal,True
+No birds are mortal or birds can fly,"not(birds, are mortal or birds can fly)",False
+All men have fur and men have wheels,"forall(men, have fur and men have wheels)",True
+If mammals have wheels,mammals have wheels :- mammals have wheels,True
+No students are bipedal and students are mortal,"not(students, are bipedal and students are mortal)",False
+If mammals have fur,mammals have fur :- mammals have fur,True
+If vehicles can fly,vehicles can fly :- vehicles can fly,True
+If men are mortal,men are mortal :- men are mortal,True
+All birds can fly and birds are mortal,"forall(birds, can fly and birds are mortal)",False
+Some mammals are bipedal or mammals have wheels,"exists(mammals, are bipedal or mammals have wheels)",False
+No birds are mortal or birds are bipedal,"not(birds, are mortal or birds are bipedal)",False
+If students can fly,students can fly :- students can fly,True
+If men have six legs,men have six legs :- men have six legs,True
+If vehicles are mortal,vehicles are mortal :- vehicles are mortal,True
+If birds are bipedal,birds are bipedal :- birds are bipedal,True
+No vehicles can fly or vehicles have six legs,"not(vehicles, can fly or vehicles have six legs)",True
+No vehicles have fur and vehicles have wheels,"not(vehicles, have fur and vehicles have wheels)",True
+Some birds can fly and birds have fur,"exists(birds, can fly and birds have fur)",True
+If insects are mortal,insects are mortal :- insects are mortal,True
+No students have six legs and students are bipedal,"not(students, have six legs and students are bipedal)",True
+No men have six legs or men are mortal,"not(men, have six legs or men are mortal)",False
+If vehicles have fur,vehicles have fur :- vehicles have fur,True
+Some students can fly and students have wheels,"exists(students, can fly and students have wheels)",False
+No birds are bipedal or birds have fur,"not(birds, are bipedal or birds have fur)",True
+If birds have six legs,birds have six legs :- birds have six legs,True
+All students are mortal or students can fly,"forall(students, are mortal or students can fly)",False
+If birds have wheels,birds have wheels :- birds have wheels,True
+Some insects have six legs or insects are mortal,"exists(insects, have six legs or insects are mortal)",False
+All insects can fly and insects are mortal,"forall(insects, can fly and insects are mortal)",False
+All mammals have six legs or mammals have fur,"forall(mammals, have six legs or mammals have fur)",False
+Some mammals have fur or mammals are mortal,"exists(mammals, have fur or mammals are mortal)",False
+Some vehicles have fur and vehicles have six legs,"exists(vehicles, have fur and vehicles have six legs)",False
+All insects have fur and insects are mortal,"forall(insects, have fur and insects are mortal)",True
+If insects have wheels,insects have wheels :- insects have wheels,True
+Some vehicles have wheels and vehicles have six legs,"exists(vehicles, have wheels and vehicles have six legs)",True
+No birds can fly or birds are bipedal,"not(birds, can fly or birds are bipedal)",False
+No men have fur or men are bipedal,"not(men, have fur or men are bipedal)",True
+Some mammals can fly and mammals are mortal,"exists(mammals, can fly and mammals are mortal)",True
+If birds have six legs,birds have six legs :- birds have six legs,True
+No students can fly or students are mortal,"not(students, can fly or students are mortal)",False
+All birds have fur and birds have six legs,"forall(birds, have fur and birds have six legs)",False
+No vehicles have wheels and vehicles have six legs,"not(vehicles, have wheels and vehicles have six legs)",True
+No birds are bipedal and birds can fly,"not(birds, are bipedal and birds can fly)",False
+If men are bipedal,men are bipedal :- men are bipedal,True
+No students have fur or students have six legs,"not(students, have fur or students have six legs)",False
+No mammals are bipedal or mammals have fur,"not(mammals, are bipedal or mammals have fur)",True
+All students are bipedal and students have six legs,"forall(students, are bipedal and students have six legs)",True
+If students have six legs,students have six legs :- students have six legs,True
+If students have fur,students have fur :- students have fur,True
+Some students have fur and students are bipedal,"exists(students, have fur and students are bipedal)",False
+No mammals have six legs and mammals have wheels,"not(mammals, have six legs and mammals have wheels)",True
+No mammals are mortal and mammals have wheels,"not(mammals, are mortal and mammals have wheels)",False
+Some men have six legs and men have wheels,"exists(men, have six legs and men have wheels)",True
+No birds have six legs or birds have fur,"not(birds, have six legs or birds have fur)",True
+All mammals have fur and mammals are mortal,"forall(mammals, have fur and mammals are mortal)",False
+If birds are bipedal,birds are bipedal :- birds are bipedal,True
+No vehicles have six legs or vehicles are bipedal,"not(vehicles, have six legs or vehicles are bipedal)",True
+No men are bipedal and men can fly,"not(men, are bipedal and men can fly)",False
+If students are bipedal,students are bipedal :- students are bipedal,True
+No students can fly or students are bipedal,"not(students, can fly or students are bipedal)",False
+If vehicles are bipedal,vehicles are bipedal :- vehicles are bipedal,True
+No men have fur and men have wheels,"not(men, have fur and men have wheels)",False
+All students have wheels or students are mortal,"forall(students, have wheels or students are mortal)",False
+If vehicles have wheels,vehicles have wheels :- vehicles have wheels,True
+Some students have fur or students can fly,"exists(students, have fur or students can fly)",False
+All birds are mortal or birds have wheels,"forall(birds, are mortal or birds have wheels)",False
+If birds are mortal,birds are mortal :- birds are mortal,True
+All birds have six legs and birds are bipedal,"forall(birds, have six legs and birds are bipedal)",False
+Some mammals can fly and mammals have fur,"exists(mammals, can fly and mammals have fur)",True
+All students have six legs or students have fur,"forall(students, have six legs or students have fur)",True
+If birds have six legs,birds have six legs :- birds have six legs,True
+All vehicles are mortal and vehicles can fly,"forall(vehicles, are mortal and vehicles can fly)",True
+If mammals have fur,mammals have fur :- mammals have fur,True
+Some mammals have wheels and mammals are mortal,"exists(mammals, have wheels and mammals are mortal)",True
+If mammals have wheels,mammals have wheels :- mammals have wheels,True
+All birds are bipedal and birds have wheels,"forall(birds, are bipedal and birds have wheels)",False
+No mammals have wheels and mammals have fur,"not(mammals, have wheels and mammals have fur)",False
+If students can fly,students can fly :- students can fly,True
+If vehicles have wheels,vehicles have wheels :- vehicles have wheels,True
+No men have six legs or men can fly,"not(men, have six legs or men can fly)",True
+If birds are mortal,birds are mortal :- birds are mortal,True
+No insects have wheels or insects are bipedal,"not(insects, have wheels or insects are bipedal)",True
+Some mammals have six legs and mammals are mortal,"exists(mammals, have six legs and mammals are mortal)",False
+Some mammals have six legs or mammals are bipedal,"exists(mammals, have six legs or mammals are bipedal)",True
+No students have six legs and students are mortal,"not(students, have six legs and students are mortal)",True
+If men are bipedal,men are bipedal :- men are bipedal,True
+Some mammals have six legs or mammals can fly,"exists(mammals, have six legs or mammals can fly)",True
+Some men have fur or men have wheels,"exists(men, have fur or men have wheels)",True
+No vehicles have six legs and vehicles can fly,"not(vehicles, have six legs and vehicles can fly)",False
+Some vehicles are mortal or vehicles have six legs,"exists(vehicles, are mortal or vehicles have six legs)",True
+No men have wheels or men have six legs,"not(men, have wheels or men have six legs)",False
+Some vehicles are mortal or vehicles have six legs,"exists(vehicles, are mortal or vehicles have six legs)",True
+If birds can fly,birds can fly :- birds can fly,True
+If students have six legs,students have six legs :- students have six legs,True
+All men can fly or men have wheels,"forall(men, can fly or men have wheels)",True
+No insects are bipedal and insects are mortal,"not(insects, are bipedal and insects are mortal)",False
+Some students have six legs or students are bipedal,"exists(students, have six legs or students are bipedal)",True
+If students are mortal,students are mortal :- students are mortal,True
+Some birds have six legs and birds are bipedal,"exists(birds, have six legs and birds are bipedal)",False
+All mammals can fly and mammals have fur,"forall(mammals, can fly and mammals have fur)",True
+Some mammals are bipedal or mammals have six legs,"exists(mammals, are bipedal or mammals have six legs)",False
+No mammals are bipedal or mammals are mortal,"not(mammals, are bipedal or mammals are mortal)",True
+No men have six legs or men are mortal,"not(men, have six legs or men are mortal)",True
+Some mammals are mortal or mammals can fly,"exists(mammals, are mortal or mammals can fly)",False
+Some students have six legs and students can fly,"exists(students, have six legs and students can fly)",True
+All students are mortal and students have fur,"forall(students, are mortal and students have fur)",True
+If vehicles have fur,vehicles have fur :- vehicles have fur,True
+Some birds have fur or birds are bipedal,"exists(birds, have fur or birds are bipedal)",False
+All men can fly or men are mortal,"forall(men, can fly or men are mortal)",False
+If mammals are mortal,mammals are mortal :- mammals are mortal,True
+If mammals are mortal,mammals are mortal :- mammals are mortal,True
+Some insects have six legs or insects are bipedal,"exists(insects, have six legs or insects are bipedal)",False
+All insects have wheels and insects have six legs,"forall(insects, have wheels and insects have six legs)",True
+No birds are mortal or birds have wheels,"not(birds, are mortal or birds have wheels)",True
+Some vehicles have six legs and vehicles are bipedal,"exists(vehicles, have six legs and vehicles are bipedal)",True
+No birds are bipedal and birds have fur,"not(birds, are bipedal and birds have fur)",True
+If students can fly,students can fly :- students can fly,True
+If students have six legs,students have six legs :- students have six legs,True
+All vehicles have six legs and vehicles have wheels,"forall(vehicles, have six legs and vehicles have wheels)",True
+Some students have six legs or students are bipedal,"exists(students, have six legs or students are bipedal)",True
+Some men can fly or men have wheels,"exists(men, can fly or men have wheels)",True
+If students are mortal,students are mortal :- students are mortal,True
+No men have wheels and men can fly,"not(men, have wheels and men can fly)",True
+Some insects have fur or insects can fly,"exists(insects, have fur or insects can fly)",False
+No men are bipedal and men have six legs,"not(men, are bipedal and men have six legs)",False
+If mammals are mortal,mammals are mortal :- mammals are mortal,True
+Some insects have six legs or insects can fly,"exists(insects, have six legs or insects can fly)",True
+If students are bipedal,students are bipedal :- students are bipedal,True
+All mammals have six legs or mammals are bipedal,"forall(mammals, have six legs or mammals are bipedal)",False
+Some birds are bipedal and birds can fly,"exists(birds, are bipedal and birds can fly)",True
+Some vehicles have wheels and vehicles can fly,"exists(vehicles, have wheels and vehicles can fly)",False
+No vehicles are bipedal and vehicles can fly,"not(vehicles, are bipedal and vehicles can fly)",False
+No mammals have fur and mammals are bipedal,"not(mammals, have fur and mammals are bipedal)",True
+If birds are mortal,birds are mortal :- birds are mortal,True
+Some birds are mortal or birds can fly,"exists(birds, are mortal or birds can fly)",True
+Some mammals have wheels and mammals can fly,"exists(mammals, have wheels and mammals can fly)",True
+If insects have fur,insects have fur :- insects have fur,True
+All insects are mortal or insects are bipedal,"forall(insects, are mortal or insects are bipedal)",False
+All vehicles have wheels and vehicles can fly,"forall(vehicles, have wheels and vehicles can fly)",False
+Some vehicles are bipedal and vehicles have wheels,"exists(vehicles, are bipedal and vehicles have wheels)",True
+No insects have wheels or insects are bipedal,"not(insects, have wheels or insects are bipedal)",False
+All mammals are bipedal or mammals have six legs,"forall(mammals, are bipedal or mammals have six legs)",False
+No students have fur and students are mortal,"not(students, have fur and students are mortal)",False
+No vehicles have wheels and vehicles have fur,"not(vehicles, have wheels and vehicles have fur)",True
+No vehicles can fly and vehicles are mortal,"not(vehicles, can fly and vehicles are mortal)",False
+Some birds have fur or birds have wheels,"exists(birds, have fur or birds have wheels)",False
+No birds can fly and birds have wheels,"not(birds, can fly and birds have wheels)",True
+Some mammals have six legs or mammals are bipedal,"exists(mammals, have six legs or mammals are bipedal)",True
+All birds have wheels and birds have six legs,"forall(birds, have wheels and birds have six legs)",True
+If men have wheels,men have wheels :- men have wheels,True
+Some birds have wheels and birds are mortal,"exists(birds, have wheels and birds are mortal)",False
+Some men have six legs or men are bipedal,"exists(men, have six legs or men are bipedal)",False
+No vehicles are bipedal and vehicles have fur,"not(vehicles, are bipedal and vehicles have fur)",False
+No insects have fur or insects can fly,"not(insects, have fur or insects can fly)",True
+If mammals have wheels,mammals have wheels :- mammals have wheels,True
+Some men are bipedal and men have wheels,"exists(men, are bipedal and men have wheels)",True
+If students have wheels,students have wheels :- students have wheels,True
+No students have fur or students have wheels,"not(students, have fur or students have wheels)",False
+If birds are mortal,birds are mortal :- birds are mortal,True
+No students have wheels and students have fur,"not(students, have wheels and students have fur)",True
+Some men have fur or men have wheels,"exists(men, have fur or men have wheels)",False
+Some birds have wheels or birds have fur,"exists(birds, have wheels or birds have fur)",True
+All mammals have wheels or mammals are bipedal,"forall(mammals, have wheels or mammals are bipedal)",False
+If mammals have six legs,mammals have six legs :- mammals have six legs,True
+All vehicles have six legs or vehicles are bipedal,"forall(vehicles, have six legs or vehicles are bipedal)",False
+If mammals have six legs,mammals have six legs :- mammals have six legs,True
+If birds are bipedal,birds are bipedal :- birds are bipedal,True
+All insects are mortal or insects have six legs,"forall(insects, are mortal or insects have six legs)",False
+If vehicles have wheels,vehicles have wheels :- vehicles have wheels,True
+No mammals are bipedal and mammals have wheels,"not(mammals, are bipedal and mammals have wheels)",True
+Some students are bipedal or students are mortal,"exists(students, are bipedal or students are mortal)",True
+No men have fur or men have six legs,"not(men, have fur or men have six legs)",True
+If insects have six legs,insects have six legs :- insects have six legs,True
+No students can fly and students have six legs,"not(students, can fly and students have six legs)",False
+Some insects can fly or insects have six legs,"exists(insects, can fly or insects have six legs)",False
+All mammals can fly and mammals are bipedal,"forall(mammals, can fly and mammals are bipedal)",False
+If men are bipedal,men are bipedal :- men are bipedal,True
+No mammals have fur and mammals are mortal,"not(mammals, have fur and mammals are mortal)",False
+Some birds have six legs and birds have wheels,"exists(birds, have six legs and birds have wheels)",False
+If men can fly,men can fly :- men can fly,True
+If vehicles have fur,vehicles have fur :- vehicles have fur,True
+All insects have fur and insects are mortal,"forall(insects, have fur and insects are mortal)",False
+All students can fly and students are mortal,"forall(students, can fly and students are mortal)",False
+Some men have fur or men have six legs,"exists(men, have fur or men have six legs)",True
+If birds can fly,birds can fly :- birds can fly,True
+If students are mortal,students are mortal :- students are mortal,True
+If men are mortal,men are mortal :- men are mortal,True
+Some men are mortal or men have wheels,"exists(men, are mortal or men have wheels)",False
+Some mammals have six legs and mammals can fly,"exists(mammals, have six legs and mammals can fly)",False
+If insects can fly,insects can fly :- insects can fly,True
+If men have wheels,men have wheels :- men have wheels,True
+No men are bipedal or men can fly,"not(men, are bipedal or men can fly)",False
+If birds are mortal,birds are mortal :- birds are mortal,True
+All mammals are bipedal or mammals can fly,"forall(mammals, are bipedal or mammals can fly)",False
+No birds are bipedal and birds have fur,"not(birds, are bipedal and birds have fur)",False
+If insects have fur,insects have fur :- insects have fur,True
+If vehicles have six legs,vehicles have six legs :- vehicles have six legs,True
+Some students have fur and students have six legs,"exists(students, have fur and students have six legs)",True
+If men are bipedal,men are bipedal :- men are bipedal,True
+Some insects are bipedal and insects have fur,"exists(insects, are bipedal and insects have fur)",True
+Some vehicles can fly or vehicles are bipedal,"exists(vehicles, can fly or vehicles are bipedal)",False
+Some men are mortal and men have six legs,"exists(men, are mortal and men have six legs)",False
+All mammals can fly or mammals are mortal,"forall(mammals, can fly or mammals are mortal)",False
+Some students are bipedal and students are mortal,"exists(students, are bipedal and students are mortal)",False
+No birds are mortal and birds are bipedal,"not(birds, are mortal and birds are bipedal)",False
+If men have fur,men have fur :- men have fur,True
+All birds have wheels and birds are mortal,"forall(birds, have wheels and birds are mortal)",True
+If birds have wheels,birds have wheels :- birds have wheels,True
+If students have fur,students have fur :- students have fur,True
+If insects are mortal,insects are mortal :- insects are mortal,True
+No mammals have six legs or mammals are mortal,"not(mammals, have six legs or mammals are mortal)",True
+No insects can fly and insects have fur,"not(insects, can fly and insects have fur)",False
+No men can fly or men have wheels,"not(men, can fly or men have wheels)",False
+All men are bipedal or men have six legs,"forall(men, are bipedal or men have six legs)",True
+If birds can fly,birds can fly :- birds can fly,True
+If mammals have six legs,mammals have six legs :- mammals have six legs,True
+All mammals have six legs or mammals have wheels,"forall(mammals, have six legs or mammals have wheels)",True
+Some birds can fly and birds are mortal,"exists(birds, can fly and birds are mortal)",True
+All insects are mortal and insects are bipedal,"forall(insects, are mortal and insects are bipedal)",True
+All vehicles have fur and vehicles can fly,"forall(vehicles, have fur and vehicles can fly)",False
+If insects can fly,insects can fly :- insects can fly,True
+If men can fly,men can fly :- men can fly,True
+Some students are bipedal or students are mortal,"exists(students, are bipedal or students are mortal)",True
+No students have wheels and students have fur,"not(students, have wheels and students have fur)",True
+All insects have six legs and insects are mortal,"forall(insects, have six legs and insects are mortal)",False
+If students have six legs,students have six legs :- students have six legs,True
+If students have fur,students have fur :- students have fur,True
+If insects have fur,insects have fur :- insects have fur,True
+No insects can fly and insects have six legs,"not(insects, can fly and insects have six legs)",False
+No birds can fly or birds have wheels,"not(birds, can fly or birds have wheels)",False
+All men are mortal or men can fly,"forall(men, are mortal or men can fly)",True
+No insects have fur and insects are bipedal,"not(insects, have fur and insects are bipedal)",False
+All mammals have six legs or mammals are bipedal,"forall(mammals, have six legs or mammals are bipedal)",True
+If vehicles are mortal,vehicles are mortal :- vehicles are mortal,True
+Some birds are bipedal and birds have wheels,"exists(birds, are bipedal and birds have wheels)",False
+Some insects have fur or insects have six legs,"exists(insects, have fur or insects have six legs)",True
+No vehicles have fur or vehicles are mortal,"not(vehicles, have fur or vehicles are mortal)",True
+No birds are bipedal and birds are mortal,"not(birds, are bipedal and birds are mortal)",False
+Some insects can fly or insects have fur,"exists(insects, can fly or insects have fur)",True
+If insects have six legs,insects have six legs :- insects have six legs,True
+If insects are bipedal,insects are bipedal :- insects are bipedal,True
+If birds have wheels,birds have wheels :- birds have wheels,True
+All mammals are mortal or mammals have six legs,"forall(mammals, are mortal or mammals have six legs)",True
+Some insects are mortal and insects have fur,"exists(insects, are mortal and insects have fur)",False
+No students can fly and students are mortal,"not(students, can fly and students are mortal)",False
+If mammals are mortal,mammals are mortal :- mammals are mortal,True
+All vehicles have six legs or vehicles can fly,"forall(vehicles, have six legs or vehicles can fly)",False
+Some men can fly or men are mortal,"exists(men, can fly or men are mortal)",True
+All students can fly and students have fur,"forall(students, can fly and students have fur)",True
+If vehicles are mortal,vehicles are mortal :- vehicles are mortal,True
+If students have fur,students have fur :- students have fur,True
+If insects have six legs,insects have six legs :- insects have six legs,True
+Some birds can fly or birds have wheels,"exists(birds, can fly or birds have wheels)",False
+Some men are mortal and men have fur,"exists(men, are mortal and men have fur)",False
+If students are bipedal,students are bipedal :- students are bipedal,True
+All vehicles are bipedal or vehicles are mortal,"forall(vehicles, are bipedal or vehicles are mortal)",False
+All vehicles have fur or vehicles can fly,"forall(vehicles, have fur or vehicles can fly)",False
+If mammals are mortal,mammals are mortal :- mammals are mortal,True
+All mammals have fur and mammals have wheels,"forall(mammals, have fur and mammals have wheels)",False
+If men have six legs,men have six legs :- men have six legs,True
+If birds have fur,birds have fur :- birds have fur,True
+Some vehicles have wheels and vehicles are bipedal,"exists(vehicles, have wheels and vehicles are bipedal)",False
+All students can fly and students are bipedal,"forall(students, can fly and students are bipedal)",False
+No mammals have wheels and mammals are bipedal,"not(mammals, have wheels and mammals are bipedal)",True
+Some men are bipedal and men are mortal,"exists(men, are bipedal and men are mortal)",True
+No men have fur and men have six legs,"not(men, have fur and men have six legs)",False
+If vehicles have fur,vehicles have fur :- vehicles have fur,True
+If students can fly,students can fly :- students can fly,True
+If mammals have fur,mammals have fur :- mammals have fur,True
+Some vehicles are bipedal or vehicles have fur,"exists(vehicles, are bipedal or vehicles have fur)",True
+If students are bipedal,students are bipedal :- students are bipedal,True
+Some students are mortal and students have six legs,"exists(students, are mortal and students have six legs)",False
+No mammals have six legs or mammals are mortal,"not(mammals, have six legs or mammals are mortal)",True
+All men have wheels and men have fur,"forall(men, have wheels and men have fur)",False
+If birds can fly,birds can fly :- birds can fly,True
+Some mammals are bipedal or mammals have six legs,"exists(mammals, are bipedal or mammals have six legs)",True
+No students can fly and students have six legs,"not(students, can fly and students have six legs)",False
+If insects can fly,insects can fly :- insects can fly,True
+No insects can fly and insects have fur,"not(insects, can fly and insects have fur)",False
+All men have wheels or men are bipedal,"forall(men, have wheels or men are bipedal)",True
+No men have six legs and men are mortal,"not(men, have six legs and men are mortal)",False
+No men have fur or men have wheels,"not(men, have fur or men have wheels)",False
+All birds are mortal and birds can fly,"forall(birds, are mortal and birds can fly)",True
+Some mammals are bipedal and mammals have wheels,"exists(mammals, are bipedal and mammals have wheels)",False
+Some birds can fly and birds have six legs,"exists(birds, can fly and birds have six legs)",True
+No insects have wheels and insects have six legs,"not(insects, have wheels and insects have six legs)",True
+If mammals have wheels,mammals have wheels :- mammals have wheels,True
+No men have fur or men have wheels,"not(men, have fur or men have wheels)",False
+Some insects have fur and insects are mortal,"exists(insects, have fur and insects are mortal)",False
+If mammals have fur,mammals have fur :- mammals have fur,True
+Some students are mortal and students have six legs,"exists(students, are mortal and students have six legs)",False
+No mammals have fur or mammals have six legs,"not(mammals, have fur or mammals have six legs)",False
+No birds are mortal and birds can fly,"not(birds, are mortal and birds can fly)",False
+If men have six legs,men have six legs :- men have six legs,True
+All men have wheels or men are mortal,"forall(men, have wheels or men are mortal)",False
+Some mammals have six legs or mammals have fur,"exists(mammals, have six legs or mammals have fur)",True
+If students have fur,students have fur :- students have fur,True
+Some mammals have fur or mammals have six legs,"exists(mammals, have fur or mammals have six legs)",True
+Some students have wheels and students have six legs,"exists(students, have wheels and students have six legs)",True
+If men are mortal,men are mortal :- men are mortal,True
+No students have six legs and students are bipedal,"not(students, have six legs and students are bipedal)",False
+If insects have wheels,insects have wheels :- insects have wheels,True
+If students have six legs,students have six legs :- students have six legs,True
+If birds have six legs,birds have six legs :- birds have six legs,True
+If vehicles have six legs,vehicles have six legs :- vehicles have six legs,True
+No students are mortal and students have wheels,"not(students, are mortal and students have wheels)",False
+Some students are bipedal or students have fur,"exists(students, are bipedal or students have fur)",False
+If birds are mortal,birds are mortal :- birds are mortal,True
+All men have six legs or men are mortal,"forall(men, have six legs or men are mortal)",True
+No men can fly and men have fur,"not(men, can fly and men have fur)",False
+All students have six legs or students can fly,"forall(students, have six legs or students can fly)",True
+Some vehicles have fur or vehicles are mortal,"exists(vehicles, have fur or vehicles are mortal)",True
+If insects have wheels,insects have wheels :- insects have wheels,True
+All men have six legs and men have fur,"forall(men, have six legs and men have fur)",True
+If students can fly,students can fly :- students can fly,True
+If mammals are mortal,mammals are mortal :- mammals are mortal,True
+If men are bipedal,men are bipedal :- men are bipedal,True
+No vehicles are bipedal or vehicles are mortal,"not(vehicles, are bipedal or vehicles are mortal)",True
+All students are mortal or students have six legs,"forall(students, are mortal or students have six legs)",False
+Some mammals have wheels and mammals are mortal,"exists(mammals, have wheels and mammals are mortal)",False
+Some insects have six legs or insects are mortal,"exists(insects, have six legs or insects are mortal)",False
+Some birds have fur or birds are mortal,"exists(birds, have fur or birds are mortal)",False
+If students are mortal,students are mortal :- students are mortal,True
+If vehicles can fly,vehicles can fly :- vehicles can fly,True
+Some vehicles are bipedal and vehicles have fur,"exists(vehicles, are bipedal and vehicles have fur)",False
+If vehicles have wheels,vehicles have wheels :- vehicles have wheels,True
+If men have fur,men have fur :- men have fur,True
+All mammals can fly and mammals have wheels,"forall(mammals, can fly and mammals have wheels)",True
+All mammals are mortal or mammals have six legs,"forall(mammals, are mortal or mammals have six legs)",False
+All men have fur or men have wheels,"forall(men, have fur or men have wheels)",True
+Some mammals have six legs or mammals are mortal,"exists(mammals, have six legs or mammals are mortal)",False
+If mammals have wheels,mammals have wheels :- mammals have wheels,True
+All vehicles are mortal and vehicles have fur,"forall(vehicles, are mortal and vehicles have fur)",True
+No men can fly or men are bipedal,"not(men, can fly or men are bipedal)",False
+No students are bipedal or students have six legs,"not(students, are bipedal or students have six legs)",True
+Some vehicles can fly or vehicles have fur,"exists(vehicles, can fly or vehicles have fur)",True
+All birds are bipedal or birds can fly,"forall(birds, are bipedal or birds can fly)",True
+No men can fly or men are bipedal,"not(men, can fly or men are bipedal)",False
+All men can fly and men have six legs,"forall(men, can fly and men have six legs)",False
+No men are bipedal and men are mortal,"not(men, are bipedal and men are mortal)",False
+Some men have wheels and men have fur,"exists(men, have wheels and men have fur)",False
+All birds have fur or birds are mortal,"forall(birds, have fur or birds are mortal)",False
+All birds have wheels and birds are bipedal,"forall(birds, have wheels and birds are bipedal)",False
+If mammals have six legs,mammals have six legs :- mammals have six legs,True
+All students can fly or students are mortal,"forall(students, can fly or students are mortal)",False
+If insects are bipedal,insects are bipedal :- insects are bipedal,True
+No vehicles have six legs or vehicles are bipedal,"not(vehicles, have six legs or vehicles are bipedal)",False
+If vehicles have wheels,vehicles have wheels :- vehicles have wheels,True
+If students are mortal,students are mortal :- students are mortal,True
+No mammals are bipedal or mammals are mortal,"not(mammals, are bipedal or mammals are mortal)",False
+All mammals have fur and mammals can fly,"forall(mammals, have fur and mammals can fly)",True
+All men are mortal or men have fur,"forall(men, are mortal or men have fur)",True
+No birds have wheels and birds can fly,"not(birds, have wheels and birds can fly)",False
+No vehicles have fur and vehicles can fly,"not(vehicles, have fur and vehicles can fly)",False
+If men can fly,men can fly :- men can fly,True
+No insects have fur and insects can fly,"not(insects, have fur and insects can fly)",True
+If insects are bipedal,insects are bipedal :- insects are bipedal,True
+Some vehicles are mortal or vehicles are bipedal,"exists(vehicles, are mortal or vehicles are bipedal)",True
+If mammals are bipedal,mammals are bipedal :- mammals are bipedal,True
+If students can fly,students can fly :- students can fly,True
+Some birds have fur or birds are mortal,"exists(birds, have fur or birds are mortal)",False
+If birds are mortal,birds are mortal :- birds are mortal,True
+No mammals have wheels or mammals are bipedal,"not(mammals, have wheels or mammals are bipedal)",False
+No men can fly and men have fur,"not(men, can fly and men have fur)",True
+If men are bipedal,men are bipedal :- men are bipedal,True
+All men are bipedal or men have fur,"forall(men, are bipedal or men have fur)",True
+If birds are mortal,birds are mortal :- birds are mortal,True
+If mammals can fly,mammals can fly :- mammals can fly,True
+All birds have six legs or birds are bipedal,"forall(birds, have six legs or birds are bipedal)",True
+All vehicles can fly and vehicles have fur,"forall(vehicles, can fly and vehicles have fur)",False
+All men can fly and men are bipedal,"forall(men, can fly and men are bipedal)",False
+If men have fur,men have fur :- men have fur,True
+All students have wheels or students can fly,"forall(students, have wheels or students can fly)",True
+All mammals have six legs and mammals can fly,"forall(mammals, have six legs and mammals can fly)",False
+If birds are bipedal,birds are bipedal :- birds are bipedal,True
+If men are mortal,men are mortal :- men are mortal,True
+Some students have wheels and students have six legs,"exists(students, have wheels and students have six legs)",False
+If vehicles are mortal,vehicles are mortal :- vehicles are mortal,True
+All men can fly or men have six legs,"forall(men, can fly or men have six legs)",False
+No students are bipedal and students can fly,"not(students, are bipedal and students can fly)",True
+All mammals have six legs or mammals have wheels,"forall(mammals, have six legs or mammals have wheels)",True
+If men are bipedal,men are bipedal :- men are bipedal,True
+If birds have fur,birds have fur :- birds have fur,True
+All insects can fly or insects are bipedal,"forall(insects, can fly or insects are bipedal)",False
+Some mammals have six legs or mammals have fur,"exists(mammals, have six legs or mammals have fur)",False
+No students have fur and students are mortal,"not(students, have fur and students are mortal)",True
+Some vehicles can fly and vehicles have six legs,"exists(vehicles, can fly and vehicles have six legs)",False
+All men can fly or men have wheels,"forall(men, can fly or men have wheels)",True
+Some insects can fly and insects have wheels,"exists(insects, can fly and insects have wheels)",True
+All insects have fur or insects are mortal,"forall(insects, have fur or insects are mortal)",False
+All insects can fly or insects are bipedal,"forall(insects, can fly or insects are bipedal)",False
+If students have wheels,students have wheels :- students have wheels,True
+If men have fur,men have fur :- men have fur,True
+If vehicles have wheels,vehicles have wheels :- vehicles have wheels,True
+No insects are mortal and insects have wheels,"not(insects, are mortal and insects have wheels)",True
+All insects have wheels or insects have six legs,"forall(insects, have wheels or insects have six legs)",False
+If mammals have fur,mammals have fur :- mammals have fur,True
+All vehicles have six legs or vehicles have fur,"forall(vehicles, have six legs or vehicles have fur)",False
+If vehicles have wheels,vehicles have wheels :- vehicles have wheels,True
+Some students have wheels or students are mortal,"exists(students, have wheels or students are mortal)",True
+All students have wheels and students are bipedal,"forall(students, have wheels and students are bipedal)",True
+If vehicles have six legs,vehicles have six legs :- vehicles have six legs,True
+No vehicles have fur and vehicles are bipedal,"not(vehicles, have fur and vehicles are bipedal)",True
+If birds have wheels,birds have wheels :- birds have wheels,True
+If men have six legs,men have six legs :- men have six legs,True
+All birds have wheels and birds are mortal,"forall(birds, have wheels and birds are mortal)",False
+All students are bipedal and students have wheels,"forall(students, are bipedal and students have wheels)",True
+If insects have fur,insects have fur :- insects have fur,True
+If insects have wheels,insects have wheels :- insects have wheels,True
+If mammals have fur,mammals have fur :- mammals have fur,True
+If vehicles can fly,vehicles can fly :- vehicles can fly,True
+All insects are bipedal and insects can fly,"forall(insects, are bipedal and insects can fly)",True
+If men have wheels,men have wheels :- men have wheels,True
+Some students are mortal or students have six legs,"exists(students, are mortal or students have six legs)",False
+If mammals have wheels,mammals have wheels :- mammals have wheels,True
+If mammals are mortal,mammals are mortal :- mammals are mortal,True
+No students can fly or students have wheels,"not(students, can fly or students have wheels)",False
+All insects can fly or insects are mortal,"forall(insects, can fly or insects are mortal)",False
+Some mammals have wheels or mammals can fly,"exists(mammals, have wheels or mammals can fly)",False
+If mammals can fly,mammals can fly :- mammals can fly,True
+No vehicles have six legs and vehicles have fur,"not(vehicles, have six legs and vehicles have fur)",True
+If students are mortal,students are mortal :- students are mortal,True
+All vehicles can fly and vehicles have wheels,"forall(vehicles, can fly and vehicles have wheels)",True
+No vehicles have fur or vehicles have six legs,"not(vehicles, have fur or vehicles have six legs)",False
+All insects have six legs or insects are bipedal,"forall(insects, have six legs or insects are bipedal)",False
+Some insects have six legs or insects are bipedal,"exists(insects, have six legs or insects are bipedal)",False
+All insects are mortal or insects have wheels,"forall(insects, are mortal or insects have wheels)",True
+If vehicles are bipedal,vehicles are bipedal :- vehicles are bipedal,True
+All vehicles are bipedal and vehicles can fly,"forall(vehicles, are bipedal and vehicles can fly)",True
+All vehicles are bipedal and vehicles are mortal,"forall(vehicles, are bipedal and vehicles are mortal)",True
+All insects have wheels or insects have six legs,"forall(insects, have wheels or insects have six legs)",True
+If men can fly,men can fly :- men can fly,True
+If mammals have fur,mammals have fur :- mammals have fur,True
+No insects are mortal or insects have fur,"not(insects, are mortal or insects have fur)",False
+If men can fly,men can fly :- men can fly,True
+If men have wheels,men have wheels :- men have wheels,True
+Some insects are mortal and insects are bipedal,"exists(insects, are mortal and insects are bipedal)",True
+If students are mortal,students are mortal :- students are mortal,True
+If students are mortal,students are mortal :- students are mortal,True
+All students are bipedal or students can fly,"forall(students, are bipedal or students can fly)",False
+All men have wheels or men are bipedal,"forall(men, have wheels or men are bipedal)",True
+Some vehicles have wheels or vehicles have six legs,"exists(vehicles, have wheels or vehicles have six legs)",False
+All men are bipedal and men have fur,"forall(men, are bipedal and men have fur)",True
+If men have wheels,men have wheels :- men have wheels,True
+No men can fly or men have six legs,"not(men, can fly or men have six legs)",False
+All birds can fly and birds have wheels,"forall(birds, can fly and birds have wheels)",True
+If insects are mortal,insects are mortal :- insects are mortal,True
+All mammals have six legs and mammals are bipedal,"forall(mammals, have six legs and mammals are bipedal)",True
+If vehicles have six legs,vehicles have six legs :- vehicles have six legs,True
+No mammals are mortal or mammals have wheels,"not(mammals, are mortal or mammals have wheels)",False
+If insects are bipedal,insects are bipedal :- insects are bipedal,True
+If mammals have six legs,mammals have six legs :- mammals have six legs,True
+No mammals are bipedal and mammals can fly,"not(mammals, are bipedal and mammals can fly)",True
+Some birds have wheels and birds are bipedal,"exists(birds, have wheels and birds are bipedal)",False
+No birds are mortal and birds are bipedal,"not(birds, are mortal and birds are bipedal)",True
+If insects have wheels,insects have wheels :- insects have wheels,True
+Some mammals are mortal and mammals have fur,"exists(mammals, are mortal and mammals have fur)",True
+If mammals are bipedal,mammals are bipedal :- mammals are bipedal,True
+If men are bipedal,men are bipedal :- men are bipedal,True
+Some mammals have fur or mammals have wheels,"exists(mammals, have fur or mammals have wheels)",True
+Some insects have six legs and insects can fly,"exists(insects, have six legs and insects can fly)",True
+No birds have fur or birds are mortal,"not(birds, have fur or birds are mortal)",True
+No vehicles are bipedal and vehicles are mortal,"not(vehicles, are bipedal and vehicles are mortal)",False
+If students are bipedal,students are bipedal :- students are bipedal,True
+Some students have wheels or students can fly,"exists(students, have wheels or students can fly)",True
+If vehicles are mortal,vehicles are mortal :- vehicles are mortal,True
+All vehicles are mortal and vehicles have fur,"forall(vehicles, are mortal and vehicles have fur)",True
+If vehicles can fly,vehicles can fly :- vehicles can fly,True
+Some students have wheels and students are bipedal,"exists(students, have wheels and students are bipedal)",False
+All men have six legs and men are bipedal,"forall(men, have six legs and men are bipedal)",False
+If insects have wheels,insects have wheels :- insects have wheels,True
+If men have six legs,men have six legs :- men have six legs,True
+If vehicles have fur,vehicles have fur :- vehicles have fur,True
+If students have wheels,students have wheels :- students have wheels,True
+Some students have wheels and students have fur,"exists(students, have wheels and students have fur)",True
+No men have wheels and men are bipedal,"not(men, have wheels and men are bipedal)",True
+No mammals are bipedal or mammals have fur,"not(mammals, are bipedal or mammals have fur)",False
+All birds can fly or birds are bipedal,"forall(birds, can fly or birds are bipedal)",False
+Some birds have six legs or birds have fur,"exists(birds, have six legs or birds have fur)",False
+If vehicles have fur,vehicles have fur :- vehicles have fur,True
+All men can fly and men are bipedal,"forall(men, can fly and men are bipedal)",False
+All students can fly and students are mortal,"forall(students, can fly and students are mortal)",False
+No birds have wheels or birds can fly,"not(birds, have wheels or birds can fly)",True
+All insects have six legs and insects have wheels,"forall(insects, have six legs and insects have wheels)",True
+No birds have six legs and birds can fly,"not(birds, have six legs and birds can fly)",False
+If birds have six legs,birds have six legs :- birds have six legs,True
+Some birds have fur or birds are bipedal,"exists(birds, have fur or birds are bipedal)",True
+If men have wheels,men have wheels :- men have wheels,True
+If students have wheels,students have wheels :- students have wheels,True
+No vehicles can fly and vehicles have six legs,"not(vehicles, can fly and vehicles have six legs)",True
+Some men are bipedal and men have wheels,"exists(men, are bipedal and men have wheels)",False
+No birds have fur or birds can fly,"not(birds, have fur or birds can fly)",True
+All mammals have wheels and mammals are mortal,"forall(mammals, have wheels and mammals are mortal)",False
+No mammals are mortal or mammals can fly,"not(mammals, are mortal or mammals can fly)",True
+If men have fur,men have fur :- men have fur,True
+No birds are mortal or birds are bipedal,"not(birds, are mortal or birds are bipedal)",False
+No mammals have six legs and mammals can fly,"not(mammals, have six legs and mammals can fly)",False
+Some students are mortal and students can fly,"exists(students, are mortal and students can fly)",False
+Some students have six legs or students have wheels,"exists(students, have six legs or students have wheels)",True
+If men are mortal,men are mortal :- men are mortal,True
+All birds have six legs and birds can fly,"forall(birds, have six legs and birds can fly)",True
+If birds have six legs,birds have six legs :- birds have six legs,True
+Some students are mortal and students can fly,"exists(students, are mortal and students can fly)",False
+Some insects have wheels and insects have fur,"exists(insects, have wheels and insects have fur)",False
+If students are mortal,students are mortal :- students are mortal,True
+Some vehicles can fly or vehicles have wheels,"exists(vehicles, can fly or vehicles have wheels)",False
+All insects have wheels or insects are bipedal,"forall(insects, have wheels or insects are bipedal)",False
+Some men have fur or men can fly,"exists(men, have fur or men can fly)",True
+All students are mortal or students have six legs,"forall(students, are mortal or students have six legs)",True
+No vehicles can fly or vehicles have fur,"not(vehicles, can fly or vehicles have fur)",True
+Some mammals have fur or mammals can fly,"exists(mammals, have fur or mammals can fly)",False
+Some insects have wheels or insects can fly,"exists(insects, have wheels or insects can fly)",True
+If mammals have wheels,mammals have wheels :- mammals have wheels,True
+Some men are bipedal and men can fly,"exists(men, are bipedal and men can fly)",False
+All men are mortal and men have wheels,"forall(men, are mortal and men have wheels)",True
+Some vehicles can fly or vehicles have six legs,"exists(vehicles, can fly or vehicles have six legs)",False
+No mammals are bipedal or mammals have wheels,"not(mammals, are bipedal or mammals have wheels)",True
+No mammals have fur and mammals are mortal,"not(mammals, have fur and mammals are mortal)",True
+All birds have six legs or birds have wheels,"forall(birds, have six legs or birds have wheels)",True
+Some insects can fly and insects are bipedal,"exists(insects, can fly and insects are bipedal)",True
+If insects have fur,insects have fur :- insects have fur,True
+If vehicles are mortal,vehicles are mortal :- vehicles are mortal,True
+If students can fly,students can fly :- students can fly,True
+All mammals have wheels or mammals have fur,"forall(mammals, have wheels or mammals have fur)",False
+If insects have six legs,insects have six legs :- insects have six legs,True
+Some mammals are mortal and mammals have wheels,"exists(mammals, are mortal and mammals have wheels)",False
+All mammals have fur or mammals can fly,"forall(mammals, have fur or mammals can fly)",False
+If insects are mortal,insects are mortal :- insects are mortal,True
+Some students have wheels or students have six legs,"exists(students, have wheels or students have six legs)",True
+All mammals can fly or mammals have fur,"forall(mammals, can fly or mammals have fur)",True
+If mammals are bipedal,mammals are bipedal :- mammals are bipedal,True
+All birds can fly or birds are mortal,"forall(birds, can fly or birds are mortal)",True
+If birds have fur,birds have fur :- birds have fur,True
+No mammals have fur or mammals are mortal,"not(mammals, have fur or mammals are mortal)",True
+No students have wheels and students have six legs,"not(students, have wheels and students have six legs)",True
+No birds are mortal and birds have fur,"not(birds, are mortal and birds have fur)",True
+Some birds are mortal or birds have fur,"exists(birds, are mortal or birds have fur)",False
+Some students are bipedal and students have fur,"exists(students, are bipedal and students have fur)",True
+No students are bipedal and students have six legs,"not(students, are bipedal and students have six legs)",False
+Some men have wheels and men are mortal,"exists(men, have wheels and men are mortal)",False
+No men have fur and men have six legs,"not(men, have fur and men have six legs)",False
+All insects are bipedal or insects can fly,"forall(insects, are bipedal or insects can fly)",True
+All students can fly or students have six legs,"forall(students, can fly or students have six legs)",True
+All birds have six legs and birds can fly,"forall(birds, have six legs and birds can fly)",True
+All students are bipedal or students have fur,"forall(students, are bipedal or students have fur)",True
+If vehicles are mortal,vehicles are mortal :- vehicles are mortal,True
+If students are bipedal,students are bipedal :- students are bipedal,True
+If birds have six legs,birds have six legs :- birds have six legs,True
+All vehicles have wheels or vehicles have six legs,"forall(vehicles, have wheels or vehicles have six legs)",True
+No vehicles are mortal or vehicles have wheels,"not(vehicles, are mortal or vehicles have wheels)",True
+Some mammals can fly or mammals have wheels,"exists(mammals, can fly or mammals have wheels)",False
+All insects have six legs and insects have wheels,"forall(insects, have six legs and insects have wheels)",True
+All birds can fly or birds are bipedal,"forall(birds, can fly or birds are bipedal)",True
+If men have wheels,men have wheels :- men have wheels,True
+All insects are bipedal or insects have six legs,"forall(insects, are bipedal or insects have six legs)",True
+If mammals can fly,mammals can fly :- mammals can fly,True
+Some mammals are mortal and mammals have six legs,"exists(mammals, are mortal and mammals have six legs)",False
+All insects have six legs and insects have fur,"forall(insects, have six legs and insects have fur)",False
+All students have wheels and students have fur,"forall(students, have wheels and students have fur)",False
+Some vehicles have six legs and vehicles have fur,"exists(vehicles, have six legs and vehicles have fur)",True
+If men have six legs,men have six legs :- men have six legs,True
+If birds are bipedal,birds are bipedal :- birds are bipedal,True
+All men have six legs and men can fly,"forall(men, have six legs and men can fly)",False
+All insects can fly and insects have fur,"forall(insects, can fly and insects have fur)",False
+If students have fur,students have fur :- students have fur,True
+Some students are mortal and students have fur,"exists(students, are mortal and students have fur)",True
+Some vehicles have wheels and vehicles have six legs,"exists(vehicles, have wheels and vehicles have six legs)",True
+All vehicles have six legs and vehicles have fur,"forall(vehicles, have six legs and vehicles have fur)",True
+Some students have wheels and students have fur,"exists(students, have wheels and students have fur)",True
+If birds have wheels,birds have wheels :- birds have wheels,True
+If insects have wheels,insects have wheels :- insects have wheels,True
+No mammals are mortal or mammals are bipedal,"not(mammals, are mortal or mammals are bipedal)",False
+If insects are mortal,insects are mortal :- insects are mortal,True
+All vehicles have fur or vehicles are mortal,"forall(vehicles, have fur or vehicles are mortal)",False
+No students have wheels and students are bipedal,"not(students, have wheels and students are bipedal)",True
+No vehicles can fly and vehicles are mortal,"not(vehicles, can fly and vehicles are mortal)",False
+No insects have six legs or insects can fly,"not(insects, have six legs or insects can fly)",True
+No men are mortal and men have six legs,"not(men, are mortal and men have six legs)",True
+All students are bipedal or students have wheels,"forall(students, are bipedal or students have wheels)",True
+If insects are bipedal,insects are bipedal :- insects are bipedal,True
+Some students have six legs or students have fur,"exists(students, have six legs or students have fur)",False
+If vehicles have wheels,vehicles have wheels :- vehicles have wheels,True
+All birds can fly or birds have wheels,"forall(birds, can fly or birds have wheels)",True
+If insects can fly,insects can fly :- insects can fly,True
+Some students are mortal and students can fly,"exists(students, are mortal and students can fly)",False
+No insects can fly or insects have six legs,"not(insects, can fly or insects have six legs)",True
+All mammals are bipedal and mammals have wheels,"forall(mammals, are bipedal and mammals have wheels)",True
+No mammals are bipedal or mammals have six legs,"not(mammals, are bipedal or mammals have six legs)",True
+All insects are mortal or insects are bipedal,"forall(insects, are mortal or insects are bipedal)",False
+Some mammals are mortal and mammals have six legs,"exists(mammals, are mortal and mammals have six legs)",False
+No students have fur or students have wheels,"not(students, have fur or students have wheels)",True
+If birds are bipedal,birds are bipedal :- birds are bipedal,True
+No students can fly and students have six legs,"not(students, can fly and students have six legs)",True
+If men have six legs,men have six legs :- men have six legs,True
+No students have wheels and students have fur,"not(students, have wheels and students have fur)",True
+If vehicles have six legs,vehicles have six legs :- vehicles have six legs,True
+All insects have fur or insects can fly,"forall(insects, have fur or insects can fly)",False
+All men have six legs and men are mortal,"forall(men, have six legs and men are mortal)",True
+Some birds have fur or birds are bipedal,"exists(birds, have fur or birds are bipedal)",True
+No men have wheels or men are mortal,"not(men, have wheels or men are mortal)",False
+If men can fly,men can fly :- men can fly,True
+All vehicles have six legs or vehicles are mortal,"forall(vehicles, have six legs or vehicles are mortal)",True
+If insects can fly,insects can fly :- insects can fly,True
+No vehicles can fly and vehicles have fur,"not(vehicles, can fly and vehicles have fur)",False
+If birds are bipedal,birds are bipedal :- birds are bipedal,True
+All vehicles have wheels or vehicles are bipedal,"forall(vehicles, have wheels or vehicles are bipedal)",True
+No men have six legs and men are bipedal,"not(men, have six legs and men are bipedal)",True
+No insects are mortal and insects have wheels,"not(insects, are mortal and insects have wheels)",False
+Some birds are bipedal or birds are mortal,"exists(birds, are bipedal or birds are mortal)",False
+If insects have fur,insects have fur :- insects have fur,True
+If students have fur,students have fur :- students have fur,True
+If vehicles are bipedal,vehicles are bipedal :- vehicles are bipedal,True
+If mammals have fur,mammals have fur :- mammals have fur,True
+All vehicles are mortal or vehicles can fly,"forall(vehicles, are mortal or vehicles can fly)",True
+If students have six legs,students have six legs :- students have six legs,True
+No men can fly and men are bipedal,"not(men, can fly and men are bipedal)",True
+If mammals have wheels,mammals have wheels :- mammals have wheels,True
+If mammals are bipedal,mammals are bipedal :- mammals are bipedal,True
+Some students have fur or students are mortal,"exists(students, have fur or students are mortal)",False
+If mammals are mortal,mammals are mortal :- mammals are mortal,True
+If vehicles have six legs,vehicles have six legs :- vehicles have six legs,True
+No vehicles are mortal or vehicles are bipedal,"not(vehicles, are mortal or vehicles are bipedal)",False
+If students can fly,students can fly :- students can fly,True
+If students have wheels,students have wheels :- students have wheels,True
+If men have wheels,men have wheels :- men have wheels,True
+If men can fly,men can fly :- men can fly,True
+If insects have wheels,insects have wheels :- insects have wheels,True
+No mammals are mortal and mammals can fly,"not(mammals, are mortal and mammals can fly)",False
+If students can fly,students can fly :- students can fly,True
+Some insects have six legs and insects have wheels,"exists(insects, have six legs and insects have wheels)",False
+If students have fur,students have fur :- students have fur,True
+No insects have wheels and insects are mortal,"not(insects, have wheels and insects are mortal)",True
+If mammals have fur,mammals have fur :- mammals have fur,True
+If vehicles can fly,vehicles can fly :- vehicles can fly,True
+No vehicles have fur or vehicles are mortal,"not(vehicles, have fur or vehicles are mortal)",True
+If students can fly,students can fly :- students can fly,True
+If birds have six legs,birds have six legs :- birds have six legs,True
+Some birds are bipedal and birds have six legs,"exists(birds, are bipedal and birds have six legs)",True
+No men have six legs or men are bipedal,"not(men, have six legs or men are bipedal)",True
+If birds are mortal,birds are mortal :- birds are mortal,True
+If vehicles are bipedal,vehicles are bipedal :- vehicles are bipedal,True
+Some students can fly and students have fur,"exists(students, can fly and students have fur)",False
+If insects have six legs,insects have six legs :- insects have six legs,True
+If birds are mortal,birds are mortal :- birds are mortal,True
+If mammals can fly,mammals can fly :- mammals can fly,True
+If vehicles are mortal,vehicles are mortal :- vehicles are mortal,True
+All mammals have fur or mammals have wheels,"forall(mammals, have fur or mammals have wheels)",False
+If insects can fly,insects can fly :- insects can fly,True
+If men have fur,men have fur :- men have fur,True
+No birds have fur and birds can fly,"not(birds, have fur and birds can fly)",False
+Some birds are bipedal or birds are mortal,"exists(birds, are bipedal or birds are mortal)",True
+If insects have fur,insects have fur :- insects have fur,True
+No insects have wheels and insects have six legs,"not(insects, have wheels and insects have six legs)",False
+No vehicles have six legs or vehicles have fur,"not(vehicles, have six legs or vehicles have fur)",False
+No vehicles are mortal and vehicles are bipedal,"not(vehicles, are mortal and vehicles are bipedal)",True
+No mammals have six legs and mammals have fur,"not(mammals, have six legs and mammals have fur)",False
+All mammals are bipedal or mammals can fly,"forall(mammals, are bipedal or mammals can fly)",True
+If insects are bipedal,insects are bipedal :- insects are bipedal,True
+No insects are bipedal or insects have six legs,"not(insects, are bipedal or insects have six legs)",False
+All students can fly or students have wheels,"forall(students, can fly or students have wheels)",True
+If insects have fur,insects have fur :- insects have fur,True
+If men are mortal,men are mortal :- men are mortal,True
+If insects are bipedal,insects are bipedal :- insects are bipedal,True
+If vehicles can fly,vehicles can fly :- vehicles can fly,True
+No insects can fly and insects have wheels,"not(insects, can fly and insects have wheels)",False
+No mammals have six legs or mammals can fly,"not(mammals, have six legs or mammals can fly)",True
+If mammals have six legs,mammals have six legs :- mammals have six legs,True
+Some birds are bipedal or birds have fur,"exists(birds, are bipedal or birds have fur)",True
+If insects are mortal,insects are mortal :- insects are mortal,True
+No students can fly or students are mortal,"not(students, can fly or students are mortal)",False
+If birds are mortal,birds are mortal :- birds are mortal,True
+If insects are bipedal,insects are bipedal :- insects are bipedal,True
+Some birds have fur and birds are bipedal,"exists(birds, have fur and birds are bipedal)",True
+No men are mortal and men can fly,"not(men, are mortal and men can fly)",False
+All birds are bipedal and birds have six legs,"forall(birds, are bipedal and birds have six legs)",False
+All birds have wheels or birds have fur,"forall(birds, have wheels or birds have fur)",True
+All birds can fly or birds have six legs,"forall(birds, can fly or birds have six legs)",True
+Some students have fur or students are mortal,"exists(students, have fur or students are mortal)",False
+Some students are bipedal or students have fur,"exists(students, are bipedal or students have fur)",True
+If students are mortal,students are mortal :- students are mortal,True
+If students are mortal,students are mortal :- students are mortal,True
+No mammals have six legs and mammals are mortal,"not(mammals, have six legs and mammals are mortal)",True
+If mammals have wheels,mammals have wheels :- mammals have wheels,True
+All insects are bipedal and insects can fly,"forall(insects, are bipedal and insects can fly)",True
+All men can fly or men are bipedal,"forall(men, can fly or men are bipedal)",False
+If students have six legs,students have six legs :- students have six legs,True
+No students can fly and students have wheels,"not(students, can fly and students have wheels)",True
+Some men are bipedal and men have fur,"exists(men, are bipedal and men have fur)",False
+No men are bipedal or men can fly,"not(men, are bipedal or men can fly)",False
+All students have fur and students can fly,"forall(students, have fur and students can fly)",True
+No students have six legs or students have fur,"not(students, have six legs or students have fur)",False
+If students have fur,students have fur :- students have fur,True
+If vehicles have wheels,vehicles have wheels :- vehicles have wheels,True
+Some birds can fly or birds have six legs,"exists(birds, can fly or birds have six legs)",True
+If men have wheels,men have wheels :- men have wheels,True
+Some mammals can fly and mammals are mortal,"exists(mammals, can fly and mammals are mortal)",True
+If vehicles are mortal,vehicles are mortal :- vehicles are mortal,True
+All students can fly or students have fur,"forall(students, can fly or students have fur)",True
+If vehicles are bipedal,vehicles are bipedal :- vehicles are bipedal,True
+If students can fly,students can fly :- students can fly,True
+No vehicles have six legs or vehicles are mortal,"not(vehicles, have six legs or vehicles are mortal)",False
+Some vehicles have wheels and vehicles have fur,"exists(vehicles, have wheels and vehicles have fur)",False
+If mammals are bipedal,mammals are bipedal :- mammals are bipedal,True
+If students can fly,students can fly :- students can fly,True
+All vehicles have wheels or vehicles can fly,"forall(vehicles, have wheels or vehicles can fly)",False
+If insects have wheels,insects have wheels :- insects have wheels,True
+Some birds have fur or birds have six legs,"exists(birds, have fur or birds have six legs)",True
+All mammals are bipedal and mammals are mortal,"forall(mammals, are bipedal and mammals are mortal)",True

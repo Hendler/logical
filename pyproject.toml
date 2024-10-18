@@ -1,25 +1,52 @@
-[tool.black]
-line-length = 88
-target-version = ['py39']
-include = '\.pyi?$'
-
-exclude = '''
-/(
-    \.git
-  | \.mypy_cache
-  | \.tox
-)/
-| docker
-'''
-
-
-[tool.pytest.ini_options]
-pythonpath = [
-  ".", "tasks"
+[tool.poetry]
+name = "logical"
+version = "0.1.1-beta"
+description = "A logic engine that processes English logical statements into Prolog."
+authors = ["Jonathan Hendler <jonathan.hendler@example.com>"]
+license = "MIT"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Interpreters"
 ]
 
-# extend-exclude = '''
-# # A regex preceded with ^/ will apply only to files and directories
-# # in the root of the project.
-# ^/foo.py  # exclude a file named foo.py in the root of the project (in addition to the defaults)
-# '''
+[tool.poetry.dependencies]
+python = "^3.9"
+openai = "1.30.1"
+pyswip = {git = "https://github.com/yuce/pyswip.git", rev = "master"}
+pendulum = "2.1.2"
+folpy = "0.1.0"
+
+[tool.poetry.dev-dependencies]
+black = "*"
+ipython = "*"
+python-dotenv = "*"
+invoke = "*"
+
+[[tool.poetry.packages]]
+from = "logical"
+include = "*.py"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+    "logical/tasks"
+]
+addopts = "-ra --junitxml=test_results.xml -vv"
+log_cli = true
+log_cli_level = "DEBUG"
+
+[tool.poetry.scripts]
+logical = "logical.__main__:main"
