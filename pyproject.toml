@@ -1,25 +1,28 @@
-[tool.black]
-line-length = 88
-target-version = ['py39']
-include = '\.pyi?$'
-
-exclude = '''
-/(
-    \.git
-  | \.mypy_cache
-  | \.tox
-)/
-| docker
-'''
-
-
-[tool.pytest.ini_options]
-pythonpath = [
-  ".", "tasks"
+[project]
+name = "logical"
+version = "0.2.0"
+description = "A triple-backed logic engine that projects natural-language knowledge into Prolog."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Jonathan Hendler" }]
+dependencies = [
+    "openai>=1.93.0",
+    "python-dotenv>=1.0.1",
 ]
 
-# extend-exclude = '''
-# # A regex preceded with ^/ will apply only to files and directories
-# # in the root of the project.
-# ^/foo.py  # exclude a file named foo.py in the root of the project (in addition to the defaults)
-# '''
+[project.scripts]
+logical = "logical.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.2.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
