@@ -2,7 +2,14 @@ from pathlib import Path
 
 from logical.conflicts import find_conflicts
 from logical.prolog import project_world
-from logical.schema import ClaimRecord, ConstraintRecord, KnowledgeStatus, RecordType
+from logical.schema import (
+    ClaimRecord,
+    ConstraintRecord,
+    ExtractionResult,
+    KnowledgeStatus,
+    RecordType,
+)
+from logical.service import add_extraction
 from logical.store import KnowledgeStore
 
 
@@ -120,3 +127,52 @@ def test_record_type_is_persisted_for_future_migrations(tmp_path):
 
     raw = Path(tmp_path, "knowledge.jsonl").read_text()
     assert f'"type": "{RecordType.CLAIM.value}"' in raw
+
+
+def test_invalid_claim_is_quarantined_and_not_projected(tmp_path):
+    store = KnowledgeStore(tmp_path)
+    invalid = ClaimRecord(
+        id="invalid-claim",
+        s="",
+        p="color",
+        o="red",
+        source_text="",
+        confidence=1.4,
+    )
+
+    result = add_extraction(ExtractionResult(claims=[invalid]), store)
+
+    assert not result.accepted
+    assert result.quarantined == [invalid]
+    assert {issue.kind for issue in result.invalid} == {
+        "invalid_confidence",
+        "missing_source",
+        "missing_term",
+    }
+    assert "invalid_claim" not in project_world(store.load_claims(), [])
+
+
+def test_unsupported_constraint_is_rejected_without_blocking_valid_claim(tmp_path):
+    store = KnowledgeStore(tmp_path)
+    claim = ClaimRecord(
+        id="claim-valid",
+        s="door",
+        p="state",
+        o="open",
+        source_text="the door is open",
+    )
+    constraint = ConstraintRecord(
+        kind="mutually exclusive",
+        s="door",
+        p="state",
+        source_claim_id="constraint-invalid",
+    )
+
+    result = add_extraction(
+        ExtractionResult(claims=[claim], constraints=[constraint]),
+        store,
+    )
+
+    assert result.accepted == [claim]
+    assert {issue.kind for issue in result.invalid} == {"unsupported_constraint"}
+    assert store.load_constraints() == []

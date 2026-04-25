@@ -48,7 +48,9 @@ def main(
             print(f"quarantined: {claim.s} {claim.p} {claim.o}")
         for conflict in result.conflicts:
             print(f"conflict: {conflict.message}")
-        return 2 if result.quarantined else 0
+        for issue in result.invalid:
+            print(f"invalid: {issue.message}")
+        return 2 if result.quarantined or result.invalid else 0
 
     if args.command == "ask":
         extractor = extractor or OpenAIExtractor()

@@ -13,6 +13,7 @@ from logical.prolog import (
 )
 from logical.schema import ClaimRecord, ExtractionResult, KnowledgeStatus, QueryIntent
 from logical.store import KnowledgeStore
+from logical.validation import ValidationIssue, validate_claim, validate_constraint
 
 
 @dataclass
@@ -20,6 +21,7 @@ class AddResult:
     accepted: list[ClaimRecord]
     quarantined: list[ClaimRecord]
     conflicts: list[Conflict]
+    invalid: list[ValidationIssue]
 
 
 @dataclass
@@ -59,10 +61,24 @@ def add_extraction(
     accepted: list[ClaimRecord] = []
     quarantined: list[ClaimRecord] = []
     conflicts: list[Conflict] = []
+    invalid: list[ValidationIssue] = []
     existing_claims = store.load_claims(status=KnowledgeStatus.ACCEPTED)
-    constraints = store.load_constraints() + extraction.constraints
+    valid_constraints = []
+    for constraint in extraction.constraints:
+        issues = validate_constraint(constraint)
+        if issues:
+            invalid.extend(issues)
+        else:
+            valid_constraints.append(constraint)
+    constraints = store.load_constraints() + valid_constraints
 
     for claim in extraction.claims:
+        validation_issues = validate_claim(claim)
+        if validation_issues:
+            claim.status = KnowledgeStatus.QUARANTINED
+            quarantined.append(claim)
+            invalid.extend(validation_issues)
+            continue
         claim_conflicts = find_conflicts(claim, existing_claims + accepted, constraints)
         if claim_conflicts:
             decision = _conflict_decision(claim, claim_conflicts, interactive)
@@ -88,9 +104,14 @@ def add_extraction(
             accepted.append(claim)
 
     store.append_records(
-        [*extraction.aliases, *extraction.constraints, *accepted, *quarantined]
+        [*extraction.aliases, *valid_constraints, *accepted, *quarantined]
     )
-    return AddResult(accepted=accepted, quarantined=quarantined, conflicts=conflicts)
+    return AddResult(
+        accepted=accepted,
+        quarantined=quarantined,
+        conflicts=conflicts,
+        invalid=invalid,
+    )
 
 
 def ask_knowledge(

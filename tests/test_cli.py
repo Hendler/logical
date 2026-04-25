@@ -37,6 +37,18 @@ class FakeExtractor:
                     )
                 ]
             ),
+            "broken logic": ExtractionResult(
+                claims=[
+                    ClaimRecord(
+                        id="broken",
+                        s="",
+                        p="color",
+                        o="red",
+                        source_text="",
+                        confidence=2,
+                    )
+                ]
+            ),
         }
 
     def extract_knowledge(self, text):
@@ -113,3 +125,14 @@ def test_cli_interactive_conflict_can_replace_existing_claim(
     output = capsys.readouterr().out
     assert "triple(sky,color,blue)." in output
     assert "triple(sky,color,red)." not in output
+
+
+def test_cli_add_invalid_logic_reports_validation_issue(tmp_path, capsys):
+    extractor = FakeExtractor()
+
+    exit_code = cli.main(["--store-dir", str(tmp_path), "add", "broken logic"], extractor)
+
+    assert exit_code == 2
+    output = capsys.readouterr().out
+    assert "quarantined: unknown color red" in output
+    assert "invalid:" in output
