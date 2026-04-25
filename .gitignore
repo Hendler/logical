@@ -1,5 +1,9 @@
+.logical/
 myprolog.csv
 myprolog.pl
+openai_requests.log
+logical/openai_requests.log
+logical/logical.log
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
