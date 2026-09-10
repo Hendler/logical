@@ -5,7 +5,9 @@ questions with checkable proofs and citations. GPT-6 Astra translates the text;
 a finite logic engine and SWI-Prolog check its logical consequences. Sources,
 ambiguous references, conflicting claims, and old versions remain inspectable.
 
-![Source documents become typed, quoted premises through Astra, then a compact logical basis and an answer with supporting evidence.](docs/illustrations/knowledge-flow.svg)
+<img alt="Illustration of Bertrand Russell giving a Vulcan salute in a book-lined study." src="./russell.png" width="420" />
+
+*With a nod to Bertrand Russell and the tradition of formal logic.*
 
 ## Install
 
@@ -39,6 +41,8 @@ hatchling 1.32.0. Use `uv lock --upgrade` followed by `uv sync --locked --dev` t
 refresh later, and rerun the tests before adopting the new lockfile.
 
 ## A complete journey
+
+![Source documents become typed, quoted premises through Astra, then a compact logical basis and an answer with supporting evidence.](docs/illustrations/knowledge-flow.svg)
 
 These are **synthetic premises**, not biographical assertions:
 
@@ -291,7 +295,7 @@ your configured API key:
 LOGICAL_LIVE_TESTS=1 uv run --locked pytest tests/test_live_astra.py -v
 ```
 
-The README illustrations are editable SVGs in [docs/illustrations](docs/illustrations).
+The technical diagrams are editable SVGs in [docs/illustrations](docs/illustrations).
 They use synthetic premises and contain no external fonts or image dependencies.
 
 First developed at the [OpenAI emergency hackathon on March 5, 2023](https://twitter.com/nonmayorpete/status/1632456433102098434).
