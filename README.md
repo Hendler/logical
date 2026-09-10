@@ -5,14 +5,20 @@ questions with checkable proofs and citations. GPT-6 Astra translates the text;
 a finite logic engine and SWI-Prolog check its logical consequences. Sources,
 ambiguous references, conflicting claims, and old versions remain inspectable.
 
-First developed at the [OpenAI emergency hackathon on 3/5/2023](https://twitter.com/nonmayorpete/status/1632456433102098434).
+![Source documents become typed, quoted premises through Astra, then a compact logical basis and an answer with supporting evidence.](docs/illustrations/knowledge-flow.svg)
 
 ## Install
 
-Python 3.11+ on macOS or Linux:
+Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/getting-started/installation/)
+on macOS or Linux. Install SWI-Prolog for independent syntax and consistency
+checks: `brew install swi-prolog` on macOS, or `sudo apt install swi-prolog-nox`
+on Debian/Ubuntu. Python inference remains available without it.
+
+Clone the repository and run these commands from its root:
 
 ```bash
-brew install swi-prolog                 # Debian/Ubuntu: apt install swi-prolog-nox
+git clone https://github.com/Hendler/logical.git
+cd logical
 uv sync --locked --dev
 cp .env-example .env
 ```
@@ -22,7 +28,9 @@ Set `OPENAI_API_KEY` in `.env`. The default translation and query model is
 the Responses API with strict structured outputs and high reasoning effort.
 Model precedence: `--model`, `LOGICAL_MODEL`, legacy `OPEN_AI_MODEL_TYPE`, then
 Astra. For an existing installation, set `LOGICAL_MODEL=gpt-6-astra` to override
-an old `.env` model selection. `LOGICAL_REASONING_EFFORT` is configurable.
+an old `.env` model selection. `LOGICAL_REASONING_EFFORT` accepts `low`, `medium`,
+`high` (default), `xhigh`, or `max`; the selected model must support that effort,
+the Responses API, and strict structured outputs.
 Model access errors fail visibly; there is no silent model fallback.
 
 The dependency bounds and `uv.lock` were refreshed against stable PyPI releases
@@ -86,6 +94,8 @@ policies still govern processing. There is no automatic URL fetching. A
 
 ## What the logic means
 
+![Ada is an object in the person category; person is a subclass of mammal. Together with the explicit rule that all mammals breathe, these premises entail that Ada breathes.](docs/illustrations/typed-proof.svg)
+
 | Representation | Meaning |
 | --- | --- |
 | `ada instance_of person` | Ada is a particular member of the person category. |
@@ -116,14 +126,22 @@ collective properties to individuals, takes a converse or contrapositive, or
 uses missing evidence as negation. There are no arbitrary executable rules.
 The engine limits closure to 50,000 facts and fails if that limit is exceeded.
 
-Answers are `true`, `false`, `unknown`, or `both` (a contradiction in an externally
-modified store). Every positive or negative answer includes its supporting
-premise IDs, source quotes, and freshness. Unknown means no current proof in
-either direction. Unsupported questions return unknown with a reason. Direct
-queries also return unknown for inconsistent type/constraint snapshots; natural
-language translation refuses an invalid context. Translation and evaluation use one captured
-snapshot, identified by `evaluated_at`; later source or file changes apply to the
-next query. Answers cite the identity evidence used by their premises and query.
+Answers describe the evaluated snapshot:
+
+| Answer | Meaning |
+| --- | --- |
+| `true` | A proof supports the requested proposition. |
+| `false` | A proof supports its negation. |
+| `unknown` | No eligible proof, an unresolved question, or an integrity problem prevents an answer. Read `reason` for the distinction. |
+| `both` | Supporting and opposing proofs exist. This can occur when future evidence activates, or after external edits. |
+
+Every positive or negative answer includes its supporting premise IDs, source
+quotes, and freshness. Direct queries return `unknown` for inconsistent type or
+constraint snapshots; natural language translation refuses an invalid context.
+Translation and evaluation use one captured snapshot, identified by
+`evaluated_at`; later source or file changes apply to the next query. Answers
+cite the identity evidence used by their premises and query, and any constraints
+responsible for a reported functional conflict.
 `check` validates provenance and logical consistency, then independently checks
 the generated Prolog. It reports explicitly when SWI-Prolog is unavailable.
 
@@ -135,11 +153,15 @@ expressions are retained as unresolved instead of being turned into facts.
 
 ## Freshness and compression
 
+![Robert equals Bob is due for review September 15. The source saying Bob won the prize remains current until September 30, but the conclusion about Robert becomes unknown when its identity premise expires.](docs/illustrations/evidence-lifecycle.svg)
+
 Freshness is separate from acceptance. Each source records its content hash,
 observation time, review deadline, translator model, and replacement history.
 The default review interval is 30 days from observation; use `--observed-at`
 (a timezone-aware ISO timestamp) and `--ttl-days` for your source policy.
 “Fresh” means within that policy, not independently fact-checked or fetched.
+Observation times cannot be in the future. `--ttl-days 0` expires a source
+immediately. `stale` lists `stale`, `future`, and `unknown` freshness states.
 
 Explicit claim validity intervals are also enforced (`valid_until` is exclusive).
 Expired, superseded, changed-file, or missing-source evidence cannot support
@@ -155,6 +177,20 @@ These explicit as-of reads use recorded source versions and validity intervals.
 They do not compare historical evidence with today's filesystem. Current reads
 without `at` check files once when capturing the snapshot. Time-activated type
 conflicts fail integrity checks and cannot be exported as verified knowledge.
+There is no CLI `--at` option; use the Python API for historical evaluation:
+
+```python
+from logical.schema import QueryIntent
+from logical.service import ask_query
+from logical.store import KnowledgeStore
+
+result = ask_query(
+    QueryIntent("ada", "breathes", "true"),
+    KnowledgeStore(".logical"),
+    at="2026-09-10T12:00:00Z",
+)
+print(result.answer, result.evaluated_at)
+```
 
 Identical canonical claims are stored once with multiple evidence entries.
 `compress` exports a deterministic, irredundant basis: it removes a ground claim
@@ -164,6 +200,48 @@ basis size, and derived fact counts. The canonical store is untouched. This is a
 snapshot of current knowledge; regenerate it after updates or expiry. It is not
 a guarantee of a globally shortest encoding, a token compression ratio, or a
 license to generalize away exceptions.
+
+For example, three premises—Ada is a person, every person is a mammal, and all
+mammals breathe—already entail that Ada breathes. If a source also states that
+conclusion explicitly, `compress` can export the **four claims as a three-premise
+basis**, retaining the omitted claim's proof and evidence. The quickstart above
+has four independent premises (including a home city), so its basis may already
+be irredundant. Compression does not promise a reduction for every input.
+
+## Command reference
+
+Run commands from the repository with `uv run logical`. Global options go
+**before** the command, for example:
+
+```bash
+uv run logical --store-dir ./demo-kb --model gpt-6-astra add "Ada is a person."
+uv run logical --store-dir ./demo-kb query ada instance_of person --negative --json
+uv run logical --store-dir ./demo-kb export-prolog > world.pl
+```
+
+`--negative` asks whether the negative proposition is supported; it does not
+turn a missing positive fact into a negative one.
+
+| Command | Purpose | JSON output |
+| --- | --- | --- |
+| `add TEXT` / `add --file PATH` | Translate and ingest a source. | `--json` |
+| `update SOURCE_ID TEXT` / `update SOURCE_ID --file PATH` | Validate a complete replacement and preserve source history. | `--json` |
+| `ask QUESTION` | Translate a natural-language question and evaluate its proof. | `--json` |
+| `query SUBJECT PREDICATE OBJECT` | Evaluate a triple offline; accepts `--negative`. | `--json` |
+| `check` | Validate integrity and rebuild the Prolog projection. | Text |
+| `export-prolog` | Write a consistent active snapshot to standard output. | Prolog |
+| `stale` | List sources and claims needing review, including future evidence. | `--json` |
+| `inspect` | Show records, source history, resolutions, and quarantine reasons. | Always |
+| `compress` | Export a compact basis, proofs, provenance, and statistics. | Always |
+
+For ingestion, exit **0** means success, **2** means some assertions were
+quarantined, invalid, or unresolved, and **1** means an operational or validation
+error prevented normal completion. `add` can retain supported claims while
+returning 2; inspect its result. A rejected `update` preserves the previous
+source. A successful update that retires an older invalid constraint returns 0
+with a warning. So does a successful canonical commit whose Prolog projection
+could not be rebuilt. `check` returns 1 when verification fails. An `unknown`
+query answer is a valid result and returns 0.
 
 ## Storage and compatibility
 
@@ -212,3 +290,8 @@ your configured API key:
 ```bash
 LOGICAL_LIVE_TESTS=1 uv run --locked pytest tests/test_live_astra.py -v
 ```
+
+The README illustrations are editable SVGs in [docs/illustrations](docs/illustrations).
+They use synthetic premises and contain no external fonts or image dependencies.
+
+First developed at the [OpenAI emergency hackathon on March 5, 2023](https://twitter.com/nonmayorpete/status/1632456433102098434).

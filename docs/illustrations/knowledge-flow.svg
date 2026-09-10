@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="560" viewBox="0 0 1120 560" role="img" aria-labelledby="title desc">
+  <title id="title">Compact knowledge. Traceable answers.</title>
+  <desc id="desc">Source text passes through GPT-6 Astra into typed, quoted premises. The logic engine derives an answer and exports a compact basis with its provenance. Ambiguous and conflicting assertions go to review.</desc>
+  <defs>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#d6dbd3"/></pattern>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#53746b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+  <rect width="1120" height="560" rx="24" fill="#f5f3eb"/>
+  <rect x="756" y="26" width="330" height="150" fill="url(#grid)"/>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#193b35">
+    <text x="48" y="49" font-size="13" font-weight="700" letter-spacing="2.5">LOGICAL / FROM TEXT TO PROOF</text>
+    <text x="48" y="106" font-size="44" font-weight="700" letter-spacing="-1.6">Compact knowledge.</text>
+    <text x="48" y="153" font-size="44" font-weight="700" letter-spacing="-1.6">Traceable answers.</text>
+    <path d="M842 90L895 55L956 99L1028 57M842 90L911 138L956 99" fill="none" stroke="#c5d4c7" stroke-width="2"/>
+    <circle cx="842" cy="90" r="13" fill="#187b65"/>
+    <rect x="883" y="43" width="24" height="24" rx="6" fill="#dde6d9" stroke="#638672"/>
+    <rect x="941" y="84" width="30" height="30" rx="7" fill="#e6ad67"/>
+    <circle cx="911" cy="138" r="9" fill="#98b7a3"/>
+    <circle cx="1028" cy="57" r="8" fill="#98b7a3"/>
+
+    <rect x="48" y="200" width="302" height="250" rx="17" fill="#fffefa" stroke="#d5dcd0"/>
+    <text x="72" y="234" font-size="13" font-weight="700" letter-spacing="1.8" fill="#577268">01 / SOURCE</text>
+    <path d="M315 222V241H296V215H308Z M307 215V223H315" fill="none" stroke="#789083" stroke-width="1.5"/>
+    <text x="72" y="278" font-size="21" font-weight="700">Start with what was said.</text>
+    <g font-size="19" fill="#4b6259">
+      <text x="72" y="319">“Ada is a person.</text>
+      <text x="72" y="349">Every person is a mammal.</text>
+      <text x="72" y="379">All mammals breathe.”</text>
+    </g>
+    <path d="M72 405H326" stroke="#e1e4dc"/>
+    <text x="72" y="430" font-size="14" fill="#697c70">Keep the document and its history.</text>
+
+    <path d="M359 321H399" stroke="#53746b" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+    <rect x="409" y="200" width="302" height="250" rx="17" fill="#e9efe3" stroke="#cad9c4"/>
+    <text x="433" y="234" font-size="13" font-weight="700" letter-spacing="1.8" fill="#577268">02 / TRANSLATE</text>
+    <text x="433" y="278" font-size="23" font-weight="700">GPT-6 Astra</text>
+    <g fill="#187b65"><circle cx="441" cy="314" r="5"/><rect x="436" y="343" width="10" height="10" rx="2"/><path d="M441 376L447 382L441 388L435 382Z"/></g>
+    <g font-size="19" fill="#365c4b">
+      <text x="460" y="321">Typed premises</text>
+      <text x="460" y="355">Bound references</text>
+      <text x="460" y="389">Exact source quotes</text>
+    </g>
+    <path d="M433 405H687" stroke="#cad9c4"/>
+    <text x="433" y="430" font-size="14" fill="#526f5b">Keep ambiguity and conflicts for review.</text>
+
+    <path d="M721 321H761" stroke="#53746b" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+    <rect x="770" y="200" width="302" height="250" rx="17" fill="#193b35"/>
+    <text x="794" y="234" font-size="13" font-weight="700" letter-spacing="1.8" fill="#b9d2bd">03 / VERIFY + COMPRESS</text>
+    <text x="794" y="278" font-size="23" font-weight="700" fill="#f7f5ed">Derive what follows.</text>
+    <rect x="794" y="299" width="254" height="65" rx="10" fill="#234b40"/>
+    <text x="809" y="325" font-family="Menlo, Consolas, monospace" font-size="16" fill="#d3e5cc">ada breathes true</text>
+    <circle cx="818" cy="348" r="5" fill="#c9e29a"/>
+    <text x="833" y="353" font-size="14" fill="#d3e5cc">Supported by 3 premises</text>
+    <text x="794" y="390" font-size="18" fill="#f7f5ed">Compact basis + provenance</text>
+    <path d="M794 405H1048" stroke="#3b5e50"/>
+    <text x="794" y="430" font-size="14" fill="#b9d2bd">Keep the basis and its evidence.</text>
+
+    <path d="M48 487H1072" stroke="#d8dfd2"/>
+    <g font-size="15" fill="#516e60">
+      <circle cx="55" cy="520" r="4" fill="#187b65"/>
+      <text x="70" y="525">Preserve identity</text>
+      <circle cx="390" cy="520" r="4" fill="#c38747"/>
+      <text x="405" y="525">Track what goes stale</text>
+      <circle cx="787" cy="520" r="4" fill="#187b65"/>
+      <text x="802" y="525">Keep the evidence</text>
+    </g>
+  </g>
+</svg>
