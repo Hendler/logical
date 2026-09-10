@@ -1,14 +1,21 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
+import fcntl
+import hashlib
 import json
+import os
 from pathlib import Path
-from typing import Iterable
+import tempfile
+from typing import Iterable, Iterator
 
 from logical.schema import (
     AliasRecord,
     ClaimRecord,
     ConstraintRecord,
     KnowledgeStatus,
+    Record,
+    SourceRecord,
     record_from_dict,
     record_to_dict,
 )
@@ -23,56 +30,86 @@ class KnowledgeStore:
     def ensure_root(self) -> None:
         self.root.mkdir(parents=True, exist_ok=True)
 
-    def append_records(
-        self, records: Iterable[ClaimRecord | AliasRecord | ConstraintRecord]
-    ) -> None:
-        records = list(records)
-        if not records:
-            return
+    @contextmanager
+    def transaction(self) -> Iterator[list[Record]]:
+        """Serialize read/modify/write, committing once or leaving the old file intact."""
         self.ensure_root()
-        with self.knowledge_path.open("a", encoding="utf-8") as handle:
-            for record in records:
-                handle.write(json.dumps(record_to_dict(record), sort_keys=True))
-                handle.write("\n")
+        with (self.root / ".lock").open("a") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            try:
+                records = self.load_records()
+                yield records
+                self._atomic_write(self.knowledge_path, self._serialize(records))
+            finally:
+                fcntl.flock(lock, fcntl.LOCK_UN)
 
-    def load_records(self) -> list[ClaimRecord | AliasRecord | ConstraintRecord]:
+    def revision(self) -> str:
+        data = self.knowledge_path.read_bytes() if self.knowledge_path.exists() else b""
+        return hashlib.sha256(data).hexdigest()
+
+    def append_records(self, records: Iterable[Record]) -> None:
+        additions = list(records)
+        if additions:
+            with self.transaction() as current:
+                current.extend(additions)
+
+    def load_records(self) -> list[Record]:
         if not self.knowledge_path.exists():
             return []
-        records: list[ClaimRecord | AliasRecord | ConstraintRecord] = []
+        records: list[Record] = []
         with self.knowledge_path.open("r", encoding="utf-8") as handle:
-            for line in handle:
+            for line_number, line in enumerate(handle, 1):
                 if line.strip():
-                    records.append(record_from_dict(json.loads(line)))
+                    try:
+                        records.append(record_from_dict(json.loads(line)))
+                    except (ValueError, TypeError, KeyError) as exc:
+                        raise ValueError(
+                            f"Invalid knowledge record on line {line_number}: {exc}"
+                        ) from exc
         return records
 
     def load_claims(self, status: KnowledgeStatus | None = None) -> list[ClaimRecord]:
-        claims = [
-            record for record in self.load_records() if isinstance(record, ClaimRecord)
-        ]
-        if status is None:
-            return claims
-        return [claim for claim in claims if claim.status is status]
+        claims = [r for r in self.load_records() if isinstance(r, ClaimRecord)]
+        return claims if status is None else [c for c in claims if c.status is status]
 
     def load_aliases(self) -> list[AliasRecord]:
-        return [
-            record for record in self.load_records() if isinstance(record, AliasRecord)
-        ]
+        return [r for r in self.load_records() if isinstance(r, AliasRecord)]
 
     def load_constraints(self) -> list[ConstraintRecord]:
-        return [
-            record for record in self.load_records() if isinstance(record, ConstraintRecord)
-        ]
+        return [r for r in self.load_records() if isinstance(r, ConstraintRecord)]
+
+    def load_sources(self) -> list[SourceRecord]:
+        return [r for r in self.load_records() if isinstance(r, SourceRecord)]
 
     def write_world(self, prolog_text: str) -> Path:
         self.ensure_root()
-        self.world_path.write_text(prolog_text, encoding="utf-8")
+        self._atomic_write(self.world_path, prolog_text)
         return self.world_path
 
-    def rewrite_records(
-        self, records: Iterable[ClaimRecord | AliasRecord | ConstraintRecord]
-    ) -> None:
-        self.ensure_root()
-        with self.knowledge_path.open("w", encoding="utf-8") as handle:
-            for record in records:
-                handle.write(json.dumps(record_to_dict(record), sort_keys=True))
-                handle.write("\n")
+    def rewrite_records(self, records: Iterable[Record]) -> None:
+        replacement = list(records)
+        with self.transaction() as current:
+            current[:] = replacement
+
+    @staticmethod
+    def _serialize(records: Iterable[Record]) -> str:
+        return "".join(
+            json.dumps(
+                record_to_dict(r), sort_keys=True, ensure_ascii=False, allow_nan=False
+            )
+            + "\n"
+            for r in records
+        )
+
+    @staticmethod
+    def _atomic_write(path: Path, text: str) -> None:
+        fd, temporary = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.")
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                handle.write(text)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(temporary, path)
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
