@@ -75,8 +75,15 @@ class KnowledgeStore:
     def load_aliases(self) -> list[AliasRecord]:
         return [r for r in self.load_records() if isinstance(r, AliasRecord)]
 
-    def load_constraints(self) -> list[ConstraintRecord]:
-        return [r for r in self.load_records() if isinstance(r, ConstraintRecord)]
+    def load_constraints(
+        self, status: KnowledgeStatus | None = KnowledgeStatus.ACCEPTED
+    ) -> list[ConstraintRecord]:
+        return [
+            r
+            for r in self.load_records()
+            if isinstance(r, ConstraintRecord)
+            and (status is None or r.status is status)
+        ]
 
     def load_sources(self) -> list[SourceRecord]:
         return [r for r in self.load_records() if isinstance(r, SourceRecord)]

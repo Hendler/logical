@@ -38,6 +38,10 @@ def array_schema(properties: dict[str, Any]) -> dict[str, Any]:
 STRING = {"type": "string"}
 NULLABLE_STRING = {"type": ["string", "null"]}
 TERM_KIND = {"type": "string", "enum": ["object", "category", "value"]}
+REFERENCE = object_schema(
+    {"mention": STRING, "resolution": {"type": ["integer", "null"], "minimum": 0}}
+)
+REFERENCE["type"] = ["object", "null"]
 EXTRACTION_SCHEMA = object_schema(
     {
         "claims": array_schema(
@@ -53,6 +57,8 @@ EXTRACTION_SCHEMA = object_schema(
                 "evidence": STRING,
                 "valid_from": NULLABLE_STRING,
                 "valid_until": NULLABLE_STRING,
+                "s_ref": REFERENCE,
+                "o_ref": REFERENCE,
             }
         ),
         "aliases": array_schema(
@@ -64,10 +70,16 @@ EXTRACTION_SCHEMA = object_schema(
                 "s": STRING,
                 "p": STRING,
                 "evidence": STRING,
+                "s_ref": REFERENCE,
             }
         ),
         "resolutions": array_schema(
-            {"mention": STRING, "canonical": STRING, "evidence": STRING}
+            {
+                "mention": STRING,
+                "canonical": STRING,
+                "antecedent": STRING,
+                "evidence": STRING,
+            }
         ),
         "unresolved": array_schema({"text": STRING, "reason": STRING}),
     }
@@ -79,6 +91,8 @@ QUERY_SCHEMA = object_schema(
         "o": STRING,
         "polarity": {"type": "boolean"},
         "unresolved": STRING,
+        "s_ref": REFERENCE,
+        "o_ref": REFERENCE,
     }
 )
 
@@ -105,7 +119,17 @@ Generic, usually, most, sometimes and existential statements are not universal r
 Do not invent universals by generalizing examples. Store compact explicit premises, not inferred closure.
 
 Resolve pronouns and descriptions only when the source has a unique supported referent. Include each
-resolution with mention, canonical and a quote containing the mention and its antecedent where possible.
+resolution with mention, canonical, the exact antecedent surface name, and a quote containing both.
+The antecedent must explicitly name the canonical referent or an established alias for it. If it is
+another pronoun, resolve back to the explicit name. Never discard an alias dependency in an antecedent.
+For every object term provide s_ref/o_ref: the exact surface mention in that claim's evidence and a
+zero-based resolution index for a pronoun or description, or null resolution for an explicit name.
+For category/value terms the reference may be null. Keep canonical s/o unchanged: a source-local
+resolution confirms only its bound mention, never all occurrences of a normalized word in the source.
+The resolution passage must uniquely locate the occurrence and contain the entire claim quote.
+When a context alias maps Bob to Robert, output canonical robert AND reference mention Bob, so the
+application can preserve the identity premise. Do not hide an identity dependency by omitting its mention.
+Constraint subjects also require s_ref with the same rules.
 If ambiguous, report the affected assertion as unresolved; never guess. Context is a registry, not a
 conversation establishing antecedents for a new source. Never put pronouns or temporary descriptions in
 aliases. Aliases are explicit stable alternative names for the same entity (e.g. a declared abbreviation).
@@ -158,6 +182,16 @@ class OpenAIExtractor:
         )
         payload = _loads_json(response)
         _validate_shape(payload, EXTRACTION_SCHEMA)
+        for item in payload["claims"]:
+            for side in ("s", "o"):
+                if item[side + "_kind"] == "object" and item[side + "_ref"] is None:
+                    raise ValueError(
+                        "object terms require an explicit source reference binding"
+                    )
+        if any(item["s_ref"] is None for item in payload["constraints"]):
+            raise ValueError(
+                "constraint subjects require an explicit source reference binding"
+            )
         return parse_extraction_response(payload, text)
 
     def extract_query(self, text: str) -> QueryIntent:
@@ -173,6 +207,9 @@ class OpenAIExtractor:
             "Do not confuse a category with an object or guess ambiguous identity, pronouns or quantifiers. "
             "For ambiguous, universal, temporal or unsupported questions set unresolved to the reason. "
             "For a supported ground question set unresolved to the empty string. Do not answer the question."
+            " Include s_ref/o_ref for explicit entity mentions: their exact question text and resolution=null. "
+            "Use null for implicit true values or categories. Preserve alias surface names in references even "
+            "when s/o reuse a canonical ID. Queries cannot resolve source-local pronouns."
         )
         response = self._responses_json(
             system,
@@ -231,6 +268,8 @@ def parse_extraction_response(
                     item["evidence"],
                     item.get("valid_from"),
                     item.get("valid_until"),
+                    s_ref=item.get("s_ref"),
+                    o_ref=item.get("o_ref"),
                 )
             ]
         claims.append(
@@ -269,6 +308,7 @@ def parse_extraction_response(
                 item["p"],
                 "",
                 evidence=item.get("evidence", ""),
+                s_ref=item.get("s_ref"),
             )
         )
     resolutions = _items(payload, "resolutions")
@@ -291,6 +331,8 @@ def parse_query_response(raw: str | dict[str, Any]) -> QueryIntent:
         payload["o"],
         _polarity(payload),
         payload.get("unresolved", ""),
+        s_ref=payload.get("s_ref"),
+        o_ref=payload.get("o_ref"),
     )
 
 
@@ -325,6 +367,8 @@ def _validate_shape(value: Any, schema: dict[str, Any]) -> None:
         float: "number",
         type(None): "null",
     }.get(type(value))
+    if type(value) is int and "integer" in types:
+        actual = "integer"
     if actual not in types:
         raise ValueError(f"model output expected {types}, received {actual}")
     if "enum" in schema and value not in schema["enum"]:
@@ -339,7 +383,7 @@ def _validate_shape(value: Any, schema: dict[str, Any]) -> None:
     elif actual == "array":
         for child in value:
             _validate_shape(child, schema["items"])
-    elif actual == "number":
+    elif actual in {"number", "integer"}:
         if not math.isfinite(value) or not schema.get(
             "minimum", -math.inf
         ) <= value <= schema.get("maximum", math.inf):

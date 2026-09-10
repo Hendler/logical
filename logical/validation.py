@@ -79,8 +79,18 @@ def validate_claim(claim: ClaimRecord) -> list[ValidationIssue]:
     return issues
 
 
-def validate_constraint(constraint: ConstraintRecord) -> list[ValidationIssue]:
+def validate_constraint(
+    constraint: ConstraintRecord, kinds: dict[str, TermKind] | None = None
+) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
+    if kinds and kinds.get(constraint.s) in {TermKind.CATEGORY, TermKind.VALUE}:
+        issues.append(
+            ValidationIssue(
+                "category_error",
+                constraint.source_id or constraint.source_claim_id,
+                "functional_for_subject needs an object, not a category or value",
+            )
+        )
     if constraint.kind not in SUPPORTED_CONSTRAINTS:
         issues.append(
             ValidationIssue(

@@ -61,6 +61,8 @@ def structured_payload():
                 "evidence": "Ada is a person.",
                 "valid_from": None,
                 "valid_until": None,
+                "s_ref": {"mention": "Ada", "resolution": None},
+                "o_ref": None,
             }
         ],
         "aliases": [],
@@ -120,6 +122,9 @@ def test_model_override_precedence_preserves_explicit_choice(monkeypatch):
         lambda p: p["claims"][0].pop("evidence"),
         lambda p: p.pop("unresolved"),
         lambda p: p.update(unexpected="overwrite the world"),
+        lambda p: p["claims"][0].update(s_ref=None),
+        lambda p: p["claims"][0].update(s_ref={"mention": "Ada", "resolution": True}),
+        lambda p: p["claims"][0].update(s_ref={"mention": "Ada", "resolution": -1}),
     ],
 )
 def test_malformed_structured_output_is_rejected_before_ingestion(mutate):

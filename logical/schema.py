@@ -58,11 +58,58 @@ def normalize_term(value: Any) -> str:
 
 
 @dataclass
+class ReferenceBinding:
+    mention: str
+    resolution: int | None = None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.mention, str) or not self.mention.strip():
+            raise ValueError("reference mention must be a nonempty string")
+        if self.resolution is not None and (
+            type(self.resolution) is not int or self.resolution < 0
+        ):
+            raise ValueError("resolution must be a nonnegative integer or null")
+
+
+@dataclass
+class AliasDependency:
+    alias: str
+    canonical: str
+    source_ids: list[str] = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        if (
+            not isinstance(self.alias, str)
+            or not self.alias.strip()
+            or not isinstance(self.canonical, str)
+            or not self.canonical.strip()
+            or not isinstance(self.source_ids, list)
+            or any(not isinstance(sid, str) or not sid for sid in self.source_ids)
+        ):
+            raise ValueError(
+                "identity dependency requires terms and a list of source IDs"
+            )
+
+
+@dataclass
 class Evidence:
     source_id: str
     quote: str
     valid_from: str | None = None
     valid_until: str | None = None
+    s_ref: ReferenceBinding | None = None
+    o_ref: ReferenceBinding | None = None
+    identity_dependencies: list[AliasDependency] = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        for name in ("s_ref", "o_ref"):
+            value = getattr(self, name)
+            if isinstance(value, dict):
+                setattr(self, name, ReferenceBinding(**value))
+        self.identity_dependencies = [
+            AliasDependency(**d) if isinstance(d, dict) else d
+            for d in self.identity_dependencies
+        ]
 
 
 @dataclass
@@ -75,17 +122,23 @@ class SourceRecord:
     review_after: str | None = None
     created_at: str = field(default_factory=utc_now)
     model: str = ""
+    translation_version: int = 2
     supersedes: str = ""
     superseded_by: str = ""
     superseded_at: str | None = None
     resolutions: list[dict[str, str]] = field(default_factory=list)
     unresolved: list[dict[str, str]] = field(default_factory=list)
+    validation_issues: list[dict[str, str]] = field(default_factory=list)
     content_hash: str = ""
     type: RecordType = field(default=RecordType.SOURCE, init=False)
 
     def __post_init__(self) -> None:
         if not isinstance(self.text, str) or not self.text.strip():
             raise ValueError("source text must be a nonempty string")
+        if type(
+            self.translation_version
+        ) is not int or self.translation_version not in {1, 2}:
+            raise ValueError("unsupported source translation version")
         digest = hashlib.sha256(self.text.encode("utf-8")).hexdigest()
         if self.content_hash and self.content_hash != digest:
             raise ValueError(f"source {self.id} content hash does not match its text")
@@ -155,9 +208,22 @@ class ConstraintRecord:
     o: str = ""
     source_id: str = ""
     evidence: str = ""
+    status: KnowledgeStatus = KnowledgeStatus.ACCEPTED
+    issues: list[str] = field(default_factory=list)
+    s_ref: ReferenceBinding | None = None
+    identity_dependencies: list[AliasDependency] = field(default_factory=list)
     type: RecordType = field(default=RecordType.CONSTRAINT, init=False)
 
     def __post_init__(self) -> None:
+        self.status = KnowledgeStatus(self.status)
+        evidence = Evidence(
+            self.source_id,
+            self.evidence,
+            s_ref=self.s_ref,
+            identity_dependencies=self.identity_dependencies,
+        )
+        self.s_ref = evidence.s_ref
+        self.identity_dependencies = evidence.identity_dependencies
         self.kind = normalize_term(self.kind)
         self.s = normalize_term(self.s)
         self.p = normalize_term(self.p)
@@ -180,11 +246,17 @@ class QueryIntent:
     o: str
     polarity: bool = True
     unresolved: str = ""
+    s_ref: ReferenceBinding | None = None
+    o_ref: ReferenceBinding | None = None
 
     def __post_init__(self) -> None:
         self.s = normalize_term(self.s)
         self.p = normalize_term(self.p)
         self.o = normalize_term(self.o)
+        for name in ("s_ref", "o_ref"):
+            value = getattr(self, name)
+            if isinstance(value, dict):
+                setattr(self, name, ReferenceBinding(**value))
 
 
 Record = ClaimRecord | AliasRecord | ConstraintRecord | SourceRecord
@@ -204,6 +276,8 @@ def record_from_dict(data: dict[str, Any]) -> Record:
             + hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest(),
         )
         payload.setdefault("created_at", "1970-01-01T00:00:00+00:00")
+    if record_type is RecordType.SOURCE:
+        payload.setdefault("translation_version", 1)
     constructors = {
         RecordType.CLAIM: ClaimRecord,
         RecordType.ALIAS: AliasRecord,

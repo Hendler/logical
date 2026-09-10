@@ -99,8 +99,16 @@ be an object and a category in active knowledge. New model output must declare
 these types. Reusing a familiar name alone is insufficient evidence of identity.
 Stable, explicit aliases are applied during ingestion and querying; collisions,
 cycles, and pronoun aliases are rejected. Source-local coreference resolutions
-and unresolved passages are retained in source records. Ambiguous assertions
-must be reviewed rather than guessed.
+bind specific quoted mentions to canonical IDs and retain their antecedents.
+Resolving “the apple” to a particular fruit cannot rewrite an independent mention
+of Apple the company. Repeated pronouns have separate bindings. Unresolved
+passages remain in source records for review.
+
+Identity is part of the proof: an assertion about Bob translated to Robert retains
+the evidence for Bob = Robert, including alias chains and pronoun antecedents.
+This applies to category aliases and constraint subjects too. Expiry or correction
+of that identity evidence stops the dependent assertion from supporting current
+answers; independent evidence for the same identity can keep it current.
 
 Inference supports subclass transitivity, inherited membership, and explicit
 universal properties. It never invents a universal rule from examples, applies
@@ -111,7 +119,11 @@ The engine limits closure to 50,000 facts and fails if that limit is exceeded.
 Answers are `true`, `false`, `unknown`, or `both` (a contradiction in an externally
 modified store). Every positive or negative answer includes its supporting
 premise IDs, source quotes, and freshness. Unknown means no current proof in
-either direction. Unsupported questions also return unknown with a reason.
+either direction. Unsupported questions return unknown with a reason. Direct
+queries also return unknown for inconsistent type/constraint snapshots; natural
+language translation refuses an invalid context. Translation and evaluation use one captured
+snapshot, identified by `evaluated_at`; later source or file changes apply to the
+next query. Answers cite the identity evidence used by their premises and query.
 `check` validates provenance and logical consistency, then independently checks
 the generated Prolog. It reports explicitly when SWI-Prolog is unavailable.
 
@@ -137,6 +149,13 @@ invalidate their conclusions. `stale` reports claims and sources, including
 constraint-only sources. Repeating identical ingestion does not reset deadlines
 or call the model; an explicit `update` can record a new observation.
 
+Python callers can pass a timezone-aware `at=` timestamp to `ask_query`,
+`check_knowledge`, `export_prolog`, `compress_knowledge`, and `freshness_report`.
+These explicit as-of reads use recorded source versions and validity intervals.
+They do not compare historical evidence with today's filesystem. Current reads
+without `at` check files once when capturing the snapshot. Time-activated type
+conflicts fail integrity checks and cannot be exported as verified knowledge.
+
 Identical canonical claims are stored once with multiple evidence entries.
 `compress` exports a deterministic, irredundant basis: it removes a ground claim
 only when the remaining premises entail it, and includes a proof using the final
@@ -152,13 +171,27 @@ license to generalize away exceptions.
 Writes use a process lock, an fsynced temporary file, and atomic replacement.
 Translation runs outside the lock; changed knowledge or context prevents a stale
 translation from committing. A failed update cannot leave a partial replacement.
+If the canonical transaction succeeds but rebuilding `world.pl` fails, ingestion
+returns the committed source ID and a projection warning. Repair the reported
+projection problem and run `logical check` to rebuild; do not replay the update.
 
 Existing JSONL claim and constraint records remain readable. Legacy claims retain
 unknown types and **unknown freshness** and remain queryable for compatibility;
 `stale` flags them for re-ingestion with provenance and a review policy. Legacy
 aliases had no effect in the old engine and remain inactive until re-ingested.
-Quarantined claims and their reasons are visible through `inspect`. Conflicts
-are quarantined by default; `add --interactive` can replace the explicitly listed
+Source records from the earlier version of this branch lack complete identity
+provenance. They remain inspectable, but are marked stale until explicitly
+retranslated with `update`; identity dependencies cannot safely be reconstructed
+from their canonical triples alone. New source records use `translation_version=2`.
+
+Quarantined claims, constraints, and their reasons are visible through `inspect`.
+Source validation failures are retained, so retrying a rejected source reports
+the same failure without another model call. If accepted facts establish that a
+constraint's subject is a category, the invalid object-only constraint is
+quarantined and its originating source audit is updated. Rejected claims cannot
+disable a valid constraint. A valid source update that retires an older invalid
+constraint succeeds with a warning. Conflicts are quarantined by default;
+`add --interactive` can replace the explicitly listed
 conflicting premises. These changes remain in the audit history.
 
 ## Development and verification

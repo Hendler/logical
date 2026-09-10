@@ -642,12 +642,25 @@ def test_fresh_proof_is_preferred_to_unknown_legacy_assertion(tmp_path):
 
 
 def test_grounded_coreference_is_applied_locally_without_retyping_categories(tmp_path):
+    from logical.schema import ReferenceBinding
+
     store = KnowledgeStore(tmp_path)
     text = "Ada is a mathematician. The mathematician breathes."
     extraction = ExtractionResult(
         claims=[
             claim("ada", "instance_of", "mathematician", o_kind="category"),
-            claim("mathematician", "breathes", "true"),
+            claim(
+                "ada",
+                "breathes",
+                "true",
+                evidence=[
+                    Evidence(
+                        "",
+                        "The mathematician breathes.",
+                        s_ref=ReferenceBinding("The mathematician", 0),
+                    )
+                ],
+            ),
         ],
         resolutions=[
             {"mention": "The mathematician", "canonical": "ada", "evidence": text}

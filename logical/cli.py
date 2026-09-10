@@ -140,6 +140,8 @@ def main(
                     print(f"invalid: {issue.message}")
                 for unresolved in result.unresolved:
                     print(f"unresolved: {unresolved['text']} — {unresolved['reason']}")
+                for warning in result.warnings:
+                    print(f"warning: {warning}", file=sys.stderr)
             return 2 if result.quarantined or result.invalid or result.unresolved else 0
         if args.command in {"ask", "query"}:
             if args.command == "ask":
@@ -154,6 +156,7 @@ def main(
                 _json(asdict(result))
             else:
                 print(result.answer)
+                print(f"evaluated at: {result.evaluated_at}")
                 if result.reason:
                     print(result.reason)
                 sources = {s.id: s for s in result.sources}
@@ -166,6 +169,14 @@ def main(
                         print(
                             f"  {source.reference or source.id if source else evidence.source_id}: {evidence.quote}"
                         )
+                for alias in result.identity_evidence:
+                    print(
+                        f"identity: {alias.alias} = {alias.canonical} ({alias.source_id}): {alias.evidence}"
+                    )
+                for constraint in result.constraint_evidence:
+                    print(
+                        f"constraint: {constraint.kind} {constraint.s} {constraint.p} ({constraint.source_id}): {constraint.evidence}"
+                    )
             return 0
         if args.command == "check":
             result = check_knowledge(store)

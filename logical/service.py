@@ -1,17 +1,31 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
+from copy import deepcopy
 from datetime import timedelta
 import math
 import sys
 from typing import Any
 
 from logical.conflicts import Conflict, find_conflicts
-from logical.freshness import claim_state, evaluation_time, source_index, source_state
+from logical.freshness import (
+    claim_state,
+    evidence_state,
+    evaluation_time,
+    source_index,
+    source_state,
+)
 from logical.openai_client import OpenAIExtractor
 from logical.prolog import project_world, validate_with_swipl
 from logical.reasoning import compact_basis, infer, inconsistencies
-from logical.resolution import PRONOUNS, alias_index, canonical, term_kinds
+from logical.resolution import (
+    PRONOUNS,
+    alias_index,
+    bind_identity,
+    canonical,
+    identity_path,
+    term_kinds,
+)
 from logical.schema import (
     AliasRecord,
     ClaimRecord,
@@ -22,7 +36,6 @@ from logical.schema import (
     QueryIntent,
     Record,
     SourceRecord,
-    TermKind,
     normalize_term,
     parse_time,
     record_to_dict,
@@ -41,6 +54,7 @@ class AddResult:
     duplicates: list[str] = field(default_factory=list)
     source_id: str = ""
     unresolved: list[dict[str, str]] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -51,6 +65,9 @@ class AskResult:
     freshness: dict[str, str] = field(default_factory=dict)
     sources: list[SourceRecord] = field(default_factory=list)
     reason: str = ""
+    identity_evidence: list[AliasRecord] = field(default_factory=list)
+    constraint_evidence: list[ConstraintRecord] = field(default_factory=list)
+    evaluated_at: str = ""
 
 
 @dataclass
@@ -63,12 +80,26 @@ class KnowledgeView:
     def __init__(self, records: list[Record], at: str | None = None) -> None:
         self.at = evaluation_time(at)
         self.sources = source_index(records)
+        # Cache the observed filesystem state once. As-of reads use recorded
+        # source history, never today's file contents to rewrite a past answer.
+        self.source_states = {
+            sid: source_state(s, self.at, inspect_file=at is None)
+            for sid, s in self.sources.items()
+        }
+        self.identity_sources: dict[tuple[str, str], set[str]] = {}
+        for record in records:
+            if isinstance(record, AliasRecord):
+                source = self.sources.get(record.source_id)
+                if source and record.evidence and record.evidence in source.text:
+                    self.identity_sources.setdefault(
+                        (record.alias, record.canonical), set()
+                    ).add(source.id)
         self.claims = [r for r in records if isinstance(r, ClaimRecord)]
         self.active = [
             c
             for c in self.claims
             if c.status is KnowledgeStatus.ACCEPTED
-            and claim_state(c, self.sources, self.at)[0] in {"fresh", "unknown"}
+            and self.claim_state(c)[0] in {"fresh", "unknown"}
         ]
         self.aliases = [
             r for r in records if isinstance(r, AliasRecord) and self.metadata_active(r)
@@ -80,16 +111,86 @@ class KnowledgeView:
         ]
 
     def metadata_active(self, record: AliasRecord | ConstraintRecord) -> bool:
+        if (
+            isinstance(record, ConstraintRecord)
+            and record.status is not KnowledgeStatus.ACCEPTED
+        ):
+            return False
         if not record.source_id:
             # Old constraints already affected reasoning; old aliases never did.
             return isinstance(record, ConstraintRecord)
         source = self.sources.get(record.source_id)
-        return source is not None and source_state(source, self.at)[0] in {
+        if isinstance(record, ConstraintRecord) and source:
+            return self.evidence_state(
+                Evidence(
+                    record.source_id,
+                    record.evidence,
+                    identity_dependencies=record.identity_dependencies,
+                )
+            )[0] in {"fresh", "unknown"}
+        return source is not None and self.source_states[source.id][0] in {
             "fresh",
             "unknown",
         }
 
+    def evidence_state(self, evidence: Evidence) -> tuple[str, str]:
+        return evidence_state(
+            evidence,
+            self.sources,
+            self.at,
+            source_states=self.source_states,
+            identity_sources=self.identity_sources,
+        )
+
+    def claim_state(self, claim: ClaimRecord) -> tuple[str, list[str]]:
+        return claim_state(
+            claim,
+            self.sources,
+            self.at,
+            source_states=self.source_states,
+            identity_sources=self.identity_sources,
+        )
+
+    def integrity_problems(self) -> list[str]:
+        problems = [i.message for c in self.active for i in validate_claim(c)]
+        for claim in self.active:
+            for evidence in claim.evidence:
+                if self.evidence_state(evidence)[0] in {"fresh", "unknown"}:
+                    source = self.sources.get(evidence.source_id)
+                    if (
+                        not source
+                        or not evidence.quote
+                        or evidence.quote not in source.text
+                    ):
+                        problems.append(f"unsupported provenance for {claim.id}")
+        for record in self.aliases + self.constraints:
+            if record.source_id:
+                source = self.sources.get(record.source_id)
+                if (
+                    not source
+                    or not record.evidence
+                    or record.evidence not in source.text
+                ):
+                    problems.append(f"unsupported provenance for {record.type.value}")
+        try:
+            kinds = term_kinds(self.active)
+            alias_index(self.aliases)
+            problems.extend(
+                i.message
+                for c in self.constraints
+                for i in validate_constraint(c, kinds)
+            )
+        except ValueError as exc:
+            problems.append(str(exc))
+        return problems
+
+    def require_integrity(self) -> None:
+        problems = self.integrity_problems()
+        if problems:
+            raise ValueError("active knowledge is inconsistent: " + "; ".join(problems))
+
     def context(self) -> dict[str, Any]:
+        self.require_integrity()
         aliases = alias_index(self.aliases)
         return {
             "terms": {
@@ -166,6 +267,9 @@ def add_knowledge(
                         c for c in claims if c.status is KnowledgeStatus.QUARANTINED
                     ],
                     unresolved=existing.unresolved,
+                    invalid=[
+                        ValidationIssue(**issue) for issue in existing.validation_issues
+                    ],
                 )
             if not existing.superseded_by and (
                 (source.reference and existing.reference == source.reference)
@@ -203,7 +307,13 @@ def add_knowledge(
         expected_revision=revision,
         expected_context=context,
     )
-    rebuild_world(store)
+    try:
+        rebuild_world(store)
+    except (OSError, ValueError) as exc:
+        result.warnings.append(
+            f"Source {result.source_id} was committed, but world.pl could not be rebuilt: {exc}. "
+            "Fix the projection problem and run logical check; do not repeat the source update."
+        )
     return result
 
 
@@ -242,6 +352,7 @@ def add_extraction(
         ):
             raise ValueError("duplicate record IDs; no changes committed")
         if source:
+            source.resolutions = deepcopy(extraction.resolutions)
             if source.supersedes:
                 previous = source_index(records).get(source.supersedes)
                 if previous is None or previous.superseded_by:
@@ -252,6 +363,7 @@ def add_extraction(
                 previous.superseded_at = source.observed_at
             records.append(source)
         view = KnowledgeView(records)
+        view.require_integrity()
         existing = list(view.active)
         constraints = list(view.constraints)
         if inconsistencies(infer(existing), constraints):
@@ -287,11 +399,26 @@ def add_extraction(
             pending_aliases.append(alias)
         try:
             proposed_aliases = alias_index(view.aliases + pending_aliases)
+            proposed_view = KnowledgeView(records + pending_aliases)
+            problems = proposed_view.integrity_problems() + [
+                message
+                for message, _ in inconsistencies(
+                    infer(proposed_view.active), proposed_view.constraints
+                )
+            ]
+            if problems:
+                raise ValueError(
+                    "alias support would activate inconsistent knowledge: "
+                    + "; ".join(problems)
+                )
         except ValueError as exc:
             metadata_issues.append(ValidationIssue("ambiguous_alias", "", str(exc)))
             proposed_aliases = aliases
-        targets = occupied | {t for c in extraction.claims for t in (c.s, c.o)}
-        local_targets: dict[str, set[str]] = {}
+        targets = (
+            occupied
+            | {t for c in extraction.claims for t in (c.s, c.o)}
+            | {c.s for c in extraction.constraints}
+        )
         for resolution in extraction.resolutions:
             mention = resolution["mention"]
             quote = resolution["evidence"]
@@ -312,36 +439,21 @@ def add_extraction(
                         f"cannot ground resolution of {mention}",
                     )
                 )
-            else:
-                local_targets.setdefault(normalize_term(mention), set()).add(
-                    canonical(target, proposed_aliases)
-                )
         result.invalid.extend(metadata_issues)
         if not metadata_issues:
             aliases = proposed_aliases
             records.extend(a for a in pending_aliases if a.alias != a.canonical)
+            # New alias supports must be available to candidate freshness below.
+            view = KnowledgeView(records)
+            existing = list(view.active)
+            constraints = list(view.constraints)
         else:
             result.unresolved.extend(
                 {"text": source.text if source else "", "reason": issue.message}
                 for issue in metadata_issues
             )
-        # Repeated pronouns can denote different objects in different sentences.
-        # Only a unique mapping can repair an unresolved term; otherwise the model
-        # must already have supplied canonical terms for each individual claim.
-        local_names = (
-            {
-                mention: next(iter(values))
-                for mention, values in local_targets.items()
-                if len(values) == 1
-            }
-            if not metadata_issues
-            else {}
-        )
         for constraint in extraction.constraints:
-            constraint.s = canonical(
-                local_names.get(constraint.s, constraint.s), aliases
-            )
-            issues = validate_constraint(constraint)
+            issues = []
             if source:
                 constraint.source_id = source.id
                 constraint.evidence = constraint.evidence or source.text
@@ -353,14 +465,27 @@ def add_extraction(
                             "constraint evidence is not in the source",
                         )
                     )
-            if term_kinds(existing).get(constraint.s) is TermKind.CATEGORY:
+            identity = Evidence(
+                constraint.source_id, constraint.evidence, s_ref=constraint.s_ref
+            )
+            try:
+                bind_identity(
+                    ClaimRecord(
+                        constraint.s, constraint.p, "true", constraint.evidence
+                    ),
+                    identity,
+                    source,
+                    view.aliases,
+                )
+                constraint.identity_dependencies = identity.identity_dependencies
+            except ValueError as exc:
                 issues.append(
                     ValidationIssue(
-                        "category_error",
-                        "",
-                        "functional_for_subject needs an object, not a category",
+                        "unsupported_reference", constraint.source_id, str(exc)
                     )
                 )
+            constraint.s = canonical(constraint.s, aliases)
+            issues.extend(validate_constraint(constraint, term_kinds(existing)))
             if (
                 not issues
                 and view.metadata_active(constraint)
@@ -375,17 +500,14 @@ def add_extraction(
                 )
             if issues:
                 result.invalid.extend(issues)
+                constraint.status = KnowledgeStatus.QUARANTINED
+                constraint.issues.extend(i.message for i in issues)
+                records.append(constraint)
             elif not metadata_issues:
                 records.append(constraint)
                 if view.metadata_active(constraint):
                     constraints.append(constraint)
         for claim in extraction.claims:
-            if claim.s_kind is TermKind.OBJECT:
-                claim.s = local_names.get(claim.s, claim.s)
-            if claim.o_kind is TermKind.OBJECT:
-                claim.o = local_names.get(claim.o, claim.o)
-            claim.s = canonical(claim.s, aliases)
-            claim.o = canonical(claim.o, aliases)
             if source:
                 if not claim.evidence:
                     claim.evidence = [
@@ -393,7 +515,17 @@ def add_extraction(
                     ]
                 for evidence in claim.evidence:
                     evidence.source_id = source.id
-            issues = validate_claim(claim) + metadata_issues
+            reference_issues = []
+            for evidence in claim.evidence:
+                try:
+                    bind_identity(claim, evidence, source, view.aliases)
+                except ValueError as exc:
+                    reference_issues.append(
+                        ValidationIssue("unsupported_reference", claim.id, str(exc))
+                    )
+            claim.s = canonical(claim.s, aliases)
+            claim.o = canonical(claim.o, aliases)
+            issues = validate_claim(claim) + metadata_issues + reference_issues
             if source:
                 if any(
                     not e.quote.strip() or e.quote not in source.text
@@ -418,17 +550,6 @@ def add_extraction(
                 term_kinds(existing + [claim])
             except ValueError as exc:
                 issues.append(ValidationIssue("category_error", claim.id, str(exc)))
-            if any(
-                c.s == claim.s and claim.s_kind is TermKind.CATEGORY
-                for c in constraints
-            ):
-                issues.append(
-                    ValidationIssue(
-                        "category_error",
-                        claim.id,
-                        "a category cannot be the subject of a functional_for_subject constraint",
-                    )
-                )
             if issues:
                 _quarantine(claim, [i.message for i in issues], result)
                 result.invalid.extend(i for i in issues if i not in result.invalid)
@@ -440,15 +561,23 @@ def add_extraction(
                 _quarantine(claim, ["provided as quarantined"], result)
             candidate_is_active = (
                 claim.status is KnowledgeStatus.ACCEPTED
-                and claim_state(claim, view.sources, view.at)[0] in {"fresh", "unknown"}
+                and view.claim_state(claim)[0] in {"fresh", "unknown"}
             )
+            # Consider a category fact without invalid object-only constraints,
+            # but deactivate those constraints only if the fact is accepted.
+            candidate_kinds = term_kinds(existing + [claim])
+            candidate_constraints = [
+                c
+                for c in constraints
+                if not (candidate_is_active and validate_constraint(c, candidate_kinds))
+            ]
             claim_conflicts = (
-                find_conflicts(claim, existing, constraints)
+                find_conflicts(claim, existing, candidate_constraints)
                 if candidate_is_active
                 else []
             )
             logical_issues = (
-                inconsistencies(infer(existing + [claim]), constraints)
+                inconsistencies(infer(existing + [claim]), candidate_constraints)
                 if candidate_is_active
                 else []
             )
@@ -480,13 +609,39 @@ def add_extraction(
                     result.accepted = [
                         c for c in result.accepted if c.id not in replaced_ids
                     ]
-                    if inconsistencies(infer(existing + [claim]), constraints):
+                    if inconsistencies(
+                        infer(existing + [claim]), candidate_constraints
+                    ):
                         raise ValueError(
                             "Replacement would leave inconsistent knowledge; no changes committed"
                         )
                 else:
                     _quarantine(claim, [c.message for c in claim_conflicts], result)
             if claim.status is KnowledgeStatus.ACCEPTED:
+                for constraint in list(constraints):
+                    if constraint not in candidate_constraints:
+                        issues = validate_constraint(constraint, candidate_kinds)
+                        constraint.status = KnowledgeStatus.QUARANTINED
+                        constraint.issues.extend(i.message for i in issues)
+                        if (
+                            source
+                            and source.supersedes
+                            and constraint not in extraction.constraints
+                        ):
+                            result.warnings.append(
+                                f"Retired an older invalid constraint for {constraint.s} {constraint.p}: "
+                                + "; ".join(i.message for i in issues)
+                            )
+                        else:
+                            result.invalid.extend(issues)
+                        owner = view.sources.get(constraint.source_id)
+                        if owner:
+                            owner.validation_issues.extend(
+                                asdict(i)
+                                for i in issues
+                                if asdict(i) not in owner.validation_issues
+                            )
+                        constraints.remove(constraint)
                 duplicate = next(
                     (
                         c
@@ -513,10 +668,15 @@ def add_extraction(
                 claim.source_text = ""
         if source:
             source.unresolved = result.unresolved
+            source.validation_issues = [asdict(issue) for issue in result.invalid]
             if source.supersedes and (
-                result.invalid
+                metadata_issues
                 or result.quarantined
                 or result.unresolved
+                or any(
+                    c.status is KnowledgeStatus.QUARANTINED
+                    for c in extraction.constraints
+                )
                 or not (
                     extraction.claims or extraction.constraints or extraction.aliases
                 )
@@ -567,14 +727,47 @@ def ask_knowledge(
         if context_method
         else extractor.extract_query(text)
     )
-    return ask_query(query, store)
+    return _ask_view(query, view, question=text)
 
 
 def ask_query(
     query: QueryIntent, store: KnowledgeStore, *, at: str | None = None
 ) -> AskResult:
     view = KnowledgeView(store.load_records(), at)
+    return _ask_view(query, view)
+
+
+def _ask_view(
+    query: QueryIntent, view: KnowledgeView, *, question: str = ""
+) -> AskResult:
+    evaluated_at = view.at.isoformat()
+    problems = view.integrity_problems()
+    if problems:
+        return AskResult(
+            "unknown",
+            [],
+            query,
+            evaluated_at=evaluated_at,
+            reason="active knowledge is inconsistent: " + "; ".join(problems),
+        )
     aliases = alias_index(view.aliases)
+    query_identity = identity_path(query.s, view.aliases) + identity_path(
+        query.o, view.aliases
+    )
+    if question:
+        binding = Evidence("", question, s_ref=query.s_ref, o_ref=query.o_ref)
+        try:
+            bind_identity(
+                ClaimRecord(query.s, query.p, query.o, question),
+                binding,
+                None,
+                view.aliases,
+            )
+        except ValueError as exc:
+            return AskResult(
+                "unknown", [], query, evaluated_at=evaluated_at, reason=str(exc)
+            )
+        query_identity += binding.identity_dependencies
     query = QueryIntent(
         canonical(query.s, aliases),
         query.p,
@@ -593,6 +786,7 @@ def ask_query(
             [],
             query,
             reason=query.unresolved or "unresolved query reference",
+            evaluated_at=evaluated_at,
         )
     world = infer(view.active)
     answer, ids = world.answer(query)
@@ -607,36 +801,71 @@ def ask_query(
             message for message, _ in problems
         )
     if answer in {"true", "false"}:
-        fresh = [
-            c
-            for c in view.active
-            if claim_state(c, view.sources, view.at)[0] == "fresh"
-        ]
+        fresh = [c for c in view.active if view.claim_state(c)[0] == "fresh"]
         fresh_answer, fresh_ids = infer(fresh).answer(query)
         if fresh_answer == answer:
             ids = fresh_ids
-    evidence = [c for c in view.active if c.id in ids]
+    evidence = deepcopy([c for c in view.active if c.id in ids])
+    for claim in evidence:
+        best_state = view.claim_state(claim)[0]
+        claim.evidence = [
+            e for e in claim.evidence if view.evidence_state(e)[0] == best_state
+        ]
     evidence_sources = {e.source_id for c in evidence for e in c.evidence}
+    constraint_evidence = [
+        c
+        for c in view.constraints
+        if problems
+        and sum(fact[:2] == (c.s, c.p) and fact[3] for fact in world.proofs) > 1
+    ]
+    evidence_sources.update(c.source_id for c in constraint_evidence if c.source_id)
+    dependencies = (
+        query_identity
+        + [d for c in evidence for e in c.evidence for d in e.identity_dependencies]
+        + [d for c in constraint_evidence for d in c.identity_dependencies]
+    )
+    identity_evidence = []
+    for dependency in dependencies:
+        alternatives = [
+            a
+            for a in view.aliases
+            if (a.alias, a.canonical) == (dependency.alias, dependency.canonical)
+        ]
+        best_state = (
+            "fresh"
+            if any(view.source_states[a.source_id][0] == "fresh" for a in alternatives)
+            else "unknown"
+        )
+        for alias in alternatives:
+            if (
+                view.source_states[alias.source_id][0] == best_state
+                and alias not in identity_evidence
+            ):
+                identity_evidence.append(alias)
+                evidence_sources.add(alias.source_id)
     return AskResult(
         answer,
         evidence,
         query,
-        freshness={c.id: claim_state(c, view.sources, view.at)[0] for c in evidence},
+        freshness={c.id: view.claim_state(c)[0] for c in evidence},
         sources=[s for s in view.sources.values() if s.id in evidence_sources],
         reason=consistency_reason or "no current supporting or opposing proof"
         if answer == "unknown"
         else "entailed from accepted evidence; source accuracy is not independently verified",
+        identity_evidence=identity_evidence,
+        constraint_evidence=constraint_evidence,
+        evaluated_at=evaluated_at,
     )
 
 
-def check_knowledge(store: KnowledgeStore | None = None) -> CheckResult:
+def check_knowledge(
+    store: KnowledgeStore | None = None, *, at: str | None = None
+) -> CheckResult:
     store = store or KnowledgeStore()
     try:
         records = store.load_records()
-        view = KnowledgeView(records)
-        problems = [i.message for c in view.active for i in validate_claim(c)]
-        term_kinds(view.active)
-        alias_index(view.aliases)
+        view = KnowledgeView(records, at)
+        problems = view.integrity_problems()
         ids = [r.id for r in records if isinstance(r, (ClaimRecord, SourceRecord))]
         if len(ids) != len(set(ids)):
             problems.append("duplicate record IDs")
@@ -650,10 +879,13 @@ def check_knowledge(store: KnowledgeStore | None = None) -> CheckResult:
                         or evidence.quote not in source.text
                     ):
                         problems.append(f"unsupported provenance for {claim.id}")
-        for constraint in view.constraints:
-            problems.extend(i.message for i in validate_constraint(constraint))
         for record in records:
             if isinstance(record, (AliasRecord, ConstraintRecord)) and record.source_id:
+                if (
+                    isinstance(record, ConstraintRecord)
+                    and record.status is KnowledgeStatus.QUARANTINED
+                ):
+                    continue
                 source = view.sources.get(record.source_id)
                 if (
                     not source
@@ -683,12 +915,18 @@ def check_knowledge(store: KnowledgeStore | None = None) -> CheckResult:
         world_path = store.write_world(project_world(view.active, view.constraints))
         result = validate_with_swipl(world_path)
         return CheckResult(result.ok, result.message)
-    except (ValueError, TypeError, KeyError) as exc:
+    except (ValueError, TypeError, KeyError, OSError) as exc:
         return CheckResult(False, str(exc))
 
 
-def export_prolog(store: KnowledgeStore | None = None) -> str:
-    view = KnowledgeView((store or KnowledgeStore()).load_records())
+def export_prolog(store: KnowledgeStore | None = None, *, at: str | None = None) -> str:
+    view = KnowledgeView((store or KnowledgeStore()).load_records(), at)
+    view.require_integrity()
+    problems = inconsistencies(infer(view.active), view.constraints)
+    if problems:
+        raise ValueError(
+            "Cannot export inconsistent knowledge: " + "; ".join(m for m, _ in problems)
+        )
     return project_world(view.active, view.constraints)
 
 
@@ -703,7 +941,7 @@ def freshness_report(
     result = []
     for claim in view.claims:
         if claim.status is KnowledgeStatus.ACCEPTED:
-            state, reasons = claim_state(claim, view.sources, view.at)
+            state, reasons = view.claim_state(claim)
             result.append(
                 {
                     "id": claim.id,
@@ -716,7 +954,7 @@ def freshness_report(
                 }
             )
     for source in view.sources.values():
-        state, reason = source_state(source, view.at)
+        state, reason = view.source_states[source.id]
         result.append(
             {
                 "id": source.id,
@@ -731,9 +969,12 @@ def freshness_report(
     return result
 
 
-def compress_knowledge(store: KnowledgeStore) -> dict[str, Any]:
+def compress_knowledge(
+    store: KnowledgeStore, *, at: str | None = None
+) -> dict[str, Any]:
     records = store.load_records()
-    view = KnowledgeView(records)
+    view = KnowledgeView(records, at)
+    view.require_integrity()
     problems = inconsistencies(infer(view.active), view.constraints)
     if problems:
         raise ValueError(
@@ -743,7 +984,8 @@ def compress_knowledge(store: KnowledgeStore) -> dict[str, Any]:
     basis, entailed = compact_basis(view.active)
     supports = sum(max(1, len(c.evidence)) for c in view.active)
     return {
-        "schema_version": 1,
+        "schema_version": 2,
+        "evaluated_at": view.at.isoformat(),
         "basis": [
             {
                 "id": c.id,
