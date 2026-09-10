@@ -54,6 +54,8 @@ def _is_direct_contradiction(candidate: ClaimRecord, existing: ClaimRecord) -> b
         candidate.s == existing.s
         and candidate.p == existing.p
         and candidate.o == existing.o
+        and candidate.scope == existing.scope
+        and candidate.scope == "fact"
         and candidate.polarity != existing.polarity
     )
 
@@ -65,7 +67,13 @@ def _violates_functional_constraint(
 ) -> bool:
     if not candidate.polarity or not existing.polarity:
         return False
-    if candidate.s != existing.s or candidate.p != existing.p or candidate.o == existing.o:
+    if candidate.scope != "fact" or existing.scope != "fact":
+        return False
+    if (
+        candidate.s != existing.s
+        or candidate.p != existing.p
+        or candidate.o == existing.o
+    ):
         return False
     return any(
         constraint.kind == "functional_for_subject"

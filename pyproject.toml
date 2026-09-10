@@ -1,14 +1,14 @@
 [project]
 name = "logical"
-version = "0.2.0"
-description = "A triple-backed logic engine that projects natural-language knowledge into Prolog."
+version = "0.3.0"
+description = "Source-backed knowledge compression with typed logic, proofs, and freshness."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Jonathan Hendler" }]
 dependencies = [
-    "openai>=1.93.0",
-    "python-dotenv>=1.0.1",
+    "openai>=3.13.0",
+    "python-dotenv>=1.2.3",
 ]
 
 [project.scripts]
@@ -16,11 +16,11 @@ logical = "logical.cli:main"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.2.0",
+    "pytest>=9.1.1",
 ]
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.32.0"]
 build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
